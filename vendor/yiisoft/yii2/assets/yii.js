@@ -44,6 +44,8 @@
 window.yii = (function ($) {
     var pub = {
         /**
+         * 可以通过AJAX请求多次加载的JS或CSS url列表。
+         * 每个脚本都可以表示为一个绝对URL或一个相对的URL。
          * List of JS or CSS URLs that can be loaded multiple times via AJAX requests.
          * Each item may be represented as either an absolute URL or a relative one.
          * Each item may contain a wildcard matching character `*`, that means one or more
@@ -54,26 +56,32 @@ window.yii = (function ($) {
          */
         reloadableScripts: [],
         /**
+         * 可点击元素的选择器，它需要支持确认和表单提交。
          * The selector for clickable elements that need to support confirmation and form submission.
          */
         clickableSelector: 'a, button, input[type="submit"], input[type="button"], input[type="reset"], ' +
         'input[type="image"]',
         /**
+         * 可改变元素的选择器，它需要支持确认和表单提交。
          * The selector for changeable elements that need to support confirmation and form submission.
          */
         changeableSelector: 'select, input, textarea',
 
         /**
+         * CSRF参数名称。如果不启用CSRF验证，则返回Undefined
          * @return string|undefined the CSRF parameter name. Undefined is returned if CSRF validation is not enabled.
          */
         getCsrfParam: function () {
+            // 从meta标签中获取 CSRF 参数名
             return $('meta[name=csrf-param]').attr('content');
         },
 
         /**
+         * CSRF token。如果不启用CSRF验证，则返回Undefined
          * @return string|undefined the CSRF token. Undefined is returned if CSRF validation is not enabled.
          */
         getCsrfToken: function () {
+            // 从meta标签中获取 CSRF Token
             return $('meta[name=csrf-token]').attr('content');
         },
 
@@ -89,48 +97,66 @@ window.yii = (function ($) {
         },
 
         /**
+         * 将所有表单的 CSRF 输入字段 填充最新的令牌。
+         * 此方法提供了避免缓存表单包含过时的CSRF令牌。
          * Updates all form CSRF input fields with the latest CSRF token.
          * This method is provided to avoid cached forms containing outdated CSRF tokens.
          */
         refreshCsrfToken: function () {
+            // 获取csrf Token
             var token = pub.getCsrfToken();
+            // 若token存在，则在表单中填充 csrf Token
             if (token) {
                 $('form input[name="' + pub.getCsrfParam() + '"]').val(token);
             }
         },
 
         /**
+         * 显示一个确认对话框
          * Displays a confirmation dialog.
+         * 默认的实现只是显示一个js确认对话框。
          * The default implementation simply displays a js confirmation dialog.
+         * 您可以通过设置`yii.confirm`来覆盖此方法。
          * You may override this by setting `yii.confirm`.
          * @param message the confirmation message.
+         * 当用户确认消息时，将调用一个回调
          * @param ok a callback to be called when the user confirms the message
+         * 当用户取消确认时，将调用一个回调
          * @param cancel a callback to be called when the user cancels the confirmation
          */
         confirm: function (message, ok, cancel) {
             if (window.confirm(message)) {
+                // 若ok存在，则调用ok
                 !ok || ok();
             } else {
+                // 若cancel存在，则调用cancel
                 !cancel || cancel();
             }
         },
 
         /**
+         * 处理由用户触发的操作。
+         * 该方法识别元素的`data-method`属性。
+         * 如果该属性存在，则该方法将提交包含该元素的表单。
+         * 如果没有包含表单，则将使用该属性值所提供的方法创建并提交表单(例如: "post", "put")。
+         * 对于超链接，表单操作将获取链接的“href”属性的值。
+         * 对于其他元素，包含表单操作或当前页面URL将用作表单动作URL。
          * Handles the action triggered by user.
-         * This method recognizes the `data-method` attribute of the element. If the attribute exists,
-         * the method will submit the form containing this element. If there is no containing form, a form
-         * will be created and submitted using the method given by this attribute value (e.g. "post", "put").
+         * This method recognizes the `data-method` attribute of the element.
+         * If the attribute exists, the method will submit the form containing this element.
+         * If there is no containing form, a form will be created and submitted using the method given by this attribute value (e.g. "post", "put").
          * For hyperlinks, the form action will take the value of the "href" attribute of the link.
-         * For other elements, either the containing form action or the current page URL will be used
-         * as the form action URL.
+         * For other elements, either the containing form action or the current page URL will be used as the form action URL.
          *
-         * If the `data-method` attribute is not defined, the `href` attribute (if any) of the element
-         * will be assigned to `window.location`.
+         * 如果没有定义`data-method`属性，那么元素的href属性(如果有的话)将被分配给window.location。
+         * If the `data-method` attribute is not defined, the `href` attribute (if any) of the element will be assigned to `window.location`.
          *
-         * Starting from version 2.0.3, the `data-params` attribute is also recognized when you specify
-         * `data-method`. The value of `data-params` should be a JSON representation of the data (name-value pairs)
-         * that should be submitted as hidden inputs. For example, you may use the following code to generate
-         * such a link:
+         * 从2.0.3开始，当您指定数据方法时，数据params属性也会被识别。
+         * `data-params`的值应该是由JSON表示的数据(键值对)，并作为隐藏输入提交。
+         * 例如，您可以使用以下代码生成这样的链接:
+         * Starting from version 2.0.3, the `data-params` attribute is also recognized when you specify `data-method`.
+         * The value of `data-params` should be a JSON representation of the data (name-value pairs) that should be submitted as hidden inputs.
+         * For example, you may use the following code to generate such a link:
          *
          * ```php
          * use yii\helpers\Html;
@@ -151,27 +177,38 @@ window.yii = (function ($) {
          * @param event Related event
          */
         handleAction: function ($e, event) {
+            // 若当前元素存在 data-form 属性，则将该属性作为ID查找表单。否则获取祖先元素中的第一个 form
             var $form = $e.attr('data-form') ? $('#' + $e.attr('data-form')) : $e.closest('form'),
+                // 若 当前元素不存在 data-method 属性，且 表单存在，则使用表单的 data-method 属性，否则使用 当前元素的 data-method 属性
                 method = !$e.data('method') && $form ? $form.attr('method') : $e.data('method'),
+                // 获取当前元素的 href 属性
                 action = $e.attr('href'),
+                // 判断action 是否可用，由于 action = $e.attr('href')。即判断点击a 标签跳转
                 isValidAction = action && action !== '#',
+                // 获取当前元素的 data-params 属性
                 params = $e.data('params'),
                 areValidParams = params && $.isPlainObject(params),
+                // 获取当前元素的 data-pjax 属性
                 pjax = $e.data('pjax'),
+                // 设置了pjax，并且浏览器支持pjax
                 usePjax = pjax !== undefined && pjax !== 0 && $.support.pjax,
                 pjaxContainer,
                 pjaxOptions = {};
 
             if (usePjax) {
+                // 若当前元素有 data-pjax-container 属性，则直接使用该属性，否则获取祖先元素中的第一个 data-pjax-container
                 pjaxContainer = $e.data('pjax-container');
                 if (pjaxContainer === undefined || !pjaxContainer.length) {
                     pjaxContainer = $e.closest('[data-pjax-container]').attr('id')
                         ? ('#' + $e.closest('[data-pjax-container]').attr('id'))
                         : '';
                 }
+                // default to body if pjax container not found
+                // 如果没有找到pjax容器，那么默认为body
                 if (!pjaxContainer.length) {
                     pjaxContainer = 'body';
                 }
+                // pjax 配置属性
                 pjaxOptions = {
                     container: pjaxContainer,
                     push: !!$e.data('pjax-push-state'),
@@ -186,6 +223,7 @@ window.yii = (function ($) {
                 };
             }
 
+            // 若没有定义提交方法
             if (method === undefined) {
                 if (isValidAction) {
                     usePjax ? $.pjax.click(event, pjaxOptions) : window.location.assign(action);
@@ -272,41 +310,54 @@ window.yii = (function ($) {
             });
         },
 
+        // 获取查询参数
         getQueryParams: function (url) {
+            // 在url中查找 ?,若没有，则没有参数。
             var pos = url.indexOf('?');
             if (pos < 0) {
                 return {};
             }
 
+            // 截取 ? 之后到第一个 # 之前的部分，再将该部分以 '&' 为分隔符，切分成数组。
             var pairs = $.grep(url.substring(pos + 1).split('#')[0].split('&'), function (value) {
                 return value !== '';
             });
             var params = {};
 
+            // 遍历 pairs
             for (var i = 0, len = pairs.length; i < len; i++) {
+                // 将参数 a=1 的key 和 val 分开
                 var pair = pairs[i].split('=');
+                // decodeURIComponent() 函数可对 encodeURIComponent() 函数编码的 URI 进行解码。
                 var name = decodeURIComponent(pair[0].replace(/\+/g, '%20'));
                 var value = decodeURIComponent(pair[1].replace(/\+/g, '%20'));
+                // 若 name 为 空
                 if (!name.length) {
                     continue;
                 }
+                // 若 params[name] 已经存在
                 if (params[name] === undefined) {
+                    // 若 params[name] 不存在，则直接赋值
                     params[name] = value || '';
                 } else {
+                    // params[name] 不是数组，则将其转换成一个数组
                     if (!$.isArray(params[name])) {
                         params[name] = [params[name]];
                     }
+                    // 将新值添加到数组后。
                     params[name].push(value || '');
                 }
             }
-
+            // 返回 kv数组
             return params;
         },
 
+        // 初始化模块
         initModule: function (module) {
             if (module.isActive !== undefined && !module.isActive) {
                 return;
             }
+            // 判断 module 是否存在 init 函数
             if ($.isFunction(module.init)) {
                 module.init();
             }
@@ -318,13 +369,17 @@ window.yii = (function ($) {
         },
 
         init: function () {
+            // 初始化 Csrf 令牌
             initCsrfHandler();
+            // 重定向处理器
             initRedirectHandler();
+            // 资源文件过滤器
             initAssetFilters();
             initDataMethods();
         },
 
         /**
+         * 获取当前域名
          * Returns the URL of the current page without params and trailing slash. Separated and made public for testing.
          * @returns {string}
          */
@@ -342,6 +397,9 @@ window.yii = (function ($) {
         }
     };
 
+    /**
+     * Csrf 处理器
+     */
     function initCsrfHandler() {
         // automatically send CSRF token for all AJAX requests
         $.ajaxPrefilter(function (options, originalOptions, xhr) {
@@ -351,7 +409,10 @@ window.yii = (function ($) {
         });
         pub.refreshCsrfToken();
     }
-
+    
+    /**
+     * 重定向处理器
+     */
     function initRedirectHandler() {
         // handle AJAX redirection
         $(document).ajaxComplete(function (event, xhr) {
@@ -362,6 +423,9 @@ window.yii = (function ($) {
         });
     }
 
+    /**
+     * 资源文件过滤器
+     */
     function initAssetFilters() {
         /**
          * Used for storing loaded scripts and information about loading each script if it's in the process of loading.
@@ -381,21 +445,27 @@ window.yii = (function ($) {
          */
         var loadedScripts = {};
 
+        // 选中所有包含src属性的script标签，遍历，
+        // 将资源的相对路径转换为绝对路径
         $('script[src]').each(function () {
             var url = getAbsoluteUrl(this.src);
             loadedScripts[url] = true;
         });
-
+        // jQuery.ajaxPrefilter()函数用于指定预先处理Ajax参数选项的回调函数。
+        // 过滤 通过ajax 请求脚本
         $.ajaxPrefilter('script', function (options, originalOptions, xhr) {
+            // 如果是 jsonp，则跳过
             if (options.dataType == 'jsonp') {
                 return;
             }
-
+            // 获取Url绝对路径
             var url = getAbsoluteUrl(options.url),
+                // 若url已经加载，并且不可以多次加载
                 forbiddenRepeatedLoad = loadedScripts[url] === true && !isReloadableAsset(url),
                 cleanupRunning = loadedScripts[url] !== undefined && loadedScripts[url]['xhrDone'] === true;
 
             if (forbiddenRepeatedLoad || cleanupRunning) {
+                // 如果不能多次加载，则终止请求
                 xhr.abort();
                 return;
             }
@@ -448,10 +518,13 @@ window.yii = (function ($) {
             loadedScripts[url]['xhrList'][xhr.yiiIndex] = xhr;
         });
 
+        // ajax 请求完成之后执行
         $(document).ajaxComplete(function () {
             var styleSheets = [];
+            // 遍历所有外部CSS链接标签
             $('link[rel=stylesheet]').each(function () {
                 var url = getAbsoluteUrl(this.href);
+                // 判断 href 是否可以多次加载
                 if (isReloadableAsset(url)) {
                     return;
                 }
@@ -488,6 +561,7 @@ window.yii = (function ($) {
             .on('change.yii', pub.changeableSelector, handler);
     }
 
+    // 判断资源是否可以多次加载
     function isReloadableAsset(url) {
         for (var i = 0; i < pub.reloadableScripts.length; i++) {
             var rule = getAbsoluteUrl(pub.reloadableScripts[i]);
@@ -506,11 +580,16 @@ window.yii = (function ($) {
     }
 
     /**
+     * 获取资源文件的绝对路径
+     * 将  ["/assets/345a7110/jquery.js", "/assets/10cc81ed/yii.js", "/assets/a08dd668/js/bootstrap.js"]
+     * 转换为  ["http://tran/assets/345a7110/jquery.js", "http://tran/assets/10cc81ed/yii.js", "http://tran/assets/a08dd668/js/bootstrap.js"]
+     var loadedScripts = $('script[src]').map(function () {
      * Returns absolute URL based on the given URL
      * @param {string} url Initial URL
      * @returns {string}
      */
     function getAbsoluteUrl(url) {
+        // 若src是以'/'开头，则在前面加上域名
         return url.charAt(0) === '/' ? pub.getBaseCurrentUrl() + url : url;
     }
 
