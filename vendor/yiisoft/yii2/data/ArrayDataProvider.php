@@ -45,6 +45,8 @@ use yii\helpers\ArrayHelper;
  * Note: if you want to use the sorting feature, you must configure the [[sort]] property
  * so that the provider knows which columns can be sorted.
  *
+ * For more details and usage information on ArrayDataProvider, see the [guide article on data providers](guide:output-data-providers).
+ *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
@@ -72,7 +74,7 @@ class ArrayDataProvider extends BaseDataProvider
 
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function prepareModels()
     {
@@ -96,7 +98,7 @@ class ArrayDataProvider extends BaseDataProvider
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function prepareKeys($models)
     {
@@ -111,13 +113,13 @@ class ArrayDataProvider extends BaseDataProvider
             }
 
             return $keys;
-        } else {
-            return array_keys($models);
         }
+
+        return array_keys($models);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function prepareTotalCount()
     {
@@ -125,7 +127,7 @@ class ArrayDataProvider extends BaseDataProvider
     }
 
     /**
-     * Sorts the data models according to the given sort definition
+     * Sorts the data models according to the given sort definition.
      * @param array $models the models to be sorted
      * @param Sort $sort the sort definition
      * @return array the sorted data models
