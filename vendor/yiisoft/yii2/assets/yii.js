@@ -142,21 +142,24 @@ window.yii = (function ($) {
          * 对于超链接，表单操作将获取链接的“href”属性的值。
          * 对于其他元素，包含表单操作或当前页面URL将用作表单动作URL。
          * Handles the action triggered by user.
-         * This method recognizes the `data-method` attribute of the element.
-         * If the attribute exists, the method will submit the form containing this element.
-         * If there is no containing form, a form will be created and submitted using the method given by this attribute value (e.g. "post", "put").
+         * This method recognizes the `data-method` attribute of the element. If the attribute exists,
+         * the method will submit the form containing this element. If there is no containing form, a form
+         * will be created and submitted using the method given by this attribute value (e.g. "post", "put").
          * For hyperlinks, the form action will take the value of the "href" attribute of the link.
-         * For other elements, either the containing form action or the current page URL will be used as the form action URL.
+         * For other elements, either the containing form action or the current page URL will be used
+         * as the form action URL.
          *
          * 如果没有定义`data-method`属性，那么元素的href属性(如果有的话)将被分配给window.location。
-         * If the `data-method` attribute is not defined, the `href` attribute (if any) of the element will be assigned to `window.location`.
+         * If the `data-method` attribute is not defined, the `href` attribute (if any) of the element
+         * will be assigned to `window.location`.
          *
          * 从2.0.3开始，当您指定数据方法时，数据params属性也会被识别。
          * `data-params`的值应该是由JSON表示的数据(键值对)，并作为隐藏输入提交。
          * 例如，您可以使用以下代码生成这样的链接:
-         * Starting from version 2.0.3, the `data-params` attribute is also recognized when you specify `data-method`.
-         * The value of `data-params` should be a JSON representation of the data (name-value pairs) that should be submitted as hidden inputs.
-         * For example, you may use the following code to generate such a link:
+         * Starting from version 2.0.3, the `data-params` attribute is also recognized when you specify
+         * `data-method`. The value of `data-params` should be a JSON representation of the data (name-value pairs)
+         * that should be submitted as hidden inputs. For example, you may use the following code to generate
+         * such a link:
          *
          * ```php
          * use yii\helpers\Html;
@@ -317,6 +320,7 @@ window.yii = (function ($) {
             if (pos < 0) {
                 return {};
             }
+
             // 截取 ? 之后到第一个 # 之前的部分，再将该部分以 '&' 为分隔符，切分成数组。
             var pairs = $.grep(url.substring(pos + 1).split('#')[0].split('&'), function (value) {
                 return value !== '';
@@ -347,6 +351,7 @@ window.yii = (function ($) {
                     params[name].push(value || '');
                 }
             }
+
             // 返回 kv数组
             return params;
         },
@@ -408,7 +413,7 @@ window.yii = (function ($) {
         });
         pub.refreshCsrfToken();
     }
-    
+
     /**
      * 重定向处理器
      */
@@ -450,6 +455,7 @@ window.yii = (function ($) {
             var url = getAbsoluteUrl(this.src);
             loadedScripts[url] = true;
         });
+
         // jQuery.ajaxPrefilter()函数用于指定预先处理Ajax参数选项的回调函数。
         // 过滤 通过ajax 请求脚本
         $.ajaxPrefilter('script', function (options, originalOptions, xhr) {
@@ -457,6 +463,7 @@ window.yii = (function ($) {
             if (options.dataType == 'jsonp') {
                 return;
             }
+
             // 获取Url绝对路径
             var url = getAbsoluteUrl(options.url),
                 // 若url已经加载，并且不可以多次加载

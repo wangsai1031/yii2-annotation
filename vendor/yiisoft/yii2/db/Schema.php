@@ -623,6 +623,7 @@ abstract class Schema extends BaseObject
         if (strpos($name, '{{') !== false) {
             // {{%table_name}} 匹配出 %table_name
             $name = preg_replace('/\\{\\{(.*?)\\}\\}/', '\1', $name);
+
             // 将 % 替换为 表前缀
             return str_replace('%', $this->db->tablePrefix, $name);
         }

@@ -234,7 +234,7 @@ class Controller extends \yii\base\Controller
      * Any relative URL that starts with a single forward slash "/" will be converted
      * into an absolute one by prepending it with the host info of the current request.
      * 通过添加当前请求的主机信息，会吧相对url转化成绝对url
-     * 
+     *
      * @param int $statusCode the HTTP status code. Defaults to 302.
      * 参数 整型 http响应状态码，默认是302
      * See <https://tools.ietf.org/html/rfc2616#section-10>

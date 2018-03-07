@@ -107,6 +107,7 @@ class Widget extends Component implements ViewContextInterface
          * @link http://php.net/manual/zh/function.get-called-class.php
          */
         $config['class'] = get_called_class();
+        /* @var $widget Widget */
         /**
          * @var $widget Widget
          *

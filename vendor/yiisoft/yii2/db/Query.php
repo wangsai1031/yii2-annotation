@@ -30,11 +30,13 @@ use yii\base\InvalidConfigException;
  *
  * ```php
  * $query = new Query;
- * // compose the query  //组织查询
+ * // compose the query
+ * //组织查询
  * $query->select('id, name')
  *     ->from('user')
  *     ->limit(10);
- * // build and execute the query  // 生成并执行查询
+ * // build and execute the query
+ * // 生成并执行查询
  * $rows = $query->all();
  * // alternatively, you can create DB command and execute it
  * // 或者，你可以创建一个DB command 并执行它。
@@ -49,7 +51,7 @@ use yii\base\InvalidConfigException;
  *
  * A more detailed usage guide on how to work with Query can be found in the [guide article on Query Builder](guide:db-query-builder).
  * 想要更多关于使用Query类的详情，请参考[查询构造器指南]
- * 
+ *
  * @property string[] $tablesUsedInFrom Table names indexed by aliases. This property is read-only.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
@@ -749,7 +751,7 @@ PATTERN;
      * (which means the column contains a DB expression). A DB expression may also be passed in form of
      * an [[ExpressionInterface]] object.
      * 该方法会自动引用列名，除非某一个包含插入成分（就是说列包含db表达式）。一个db表达式可以通过[[Expression]]对象传递。
-     * 
+     *
      * Note that if you are selecting an expression like `CONCAT(first_name, ' ', last_name)`, you should
      * use an array to specify the columns. Otherwise, the expression may be incorrectly split into several parts.
      * 请注意，如果你使用的表达式类似于`CONCAT(first_name, ' ', last_name)`，你应该使用数组去指定列名。否则，该表达式会被错误的分割成几个部分。
@@ -921,7 +923,7 @@ PATTERN;
      * Use a Query object to represent a sub-query. In this case, the corresponding array key will be used
      * as the alias for the sub-query.
      * 使用查询对象代表一个子查询。在这种情况下，相应的数组键将会用来做子查询的别名。
-     * 
+     *
      * To specify the `FROM` part in plain SQL, you may pass an instance of [[ExpressionInterface]].
      *
      * Here are some examples:

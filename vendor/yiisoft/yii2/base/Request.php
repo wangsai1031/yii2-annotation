@@ -14,7 +14,7 @@ use Yii;
  * Request代表了被[[Application]]处理的请求。
  *
  * For more details and usage information on Request, see the [guide article on requests](guide:runtime-requests).
- * 
+ *
  * @property bool $isConsoleRequest The value indicating whether the current request is made via console.
  * 属性 boolean 代表当前请求是否来自控制台的一个值。
  * @property string $scriptFile Entry script file path (processed w/ realpath()).
@@ -44,13 +44,13 @@ abstract class Request extends Component
     abstract public function resolve();
 
     /**
-     * // isConsoleRequest属性的getter函数
-    // 使用 PHP_SAPI 常量判断当前应用是否是命令行应用
+     * isConsoleRequest属性的getter函数
+     * 使用 PHP_SAPI 常量判断当前应用是否是命令行应用
      *
-     * Returns a value indicating whether the current request is made via command line
+     * Returns a value indicating whether the current request is made via command line.
      * 返回一个值表示当前的请求是不是通过命令行发出的。
      *
-     * @return boolean the value indicating whether the current request is made via console
+     * @return bool the value indicating whether the current request is made via console
      * 返回值 boolean 表示当前请求是否来自控制台的值。
      */
     public function getIsConsoleRequest()
@@ -60,12 +60,12 @@ abstract class Request extends Component
     }
 
     /**
-     * // isConsoleRequest属性的setter函数
+     * isConsoleRequest属性的setter函数
      *
-     * Sets the value indicating whether the current request is made via command line
+     * Sets the value indicating whether the current request is made via command line.
      * 设置一个值来表示当前的请示是否是命令行发出的。
      *
-     * @param boolean $value the value indicating whether the current request is made via command line
+     * @param bool $value the value indicating whether the current request is made via command line
      * 参数 boolean 比欧式当前请求是否通过命令行发出的。
      */
     public function setIsConsoleRequest($value)

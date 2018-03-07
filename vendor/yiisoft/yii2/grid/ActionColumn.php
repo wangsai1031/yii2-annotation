@@ -87,6 +87,7 @@ class ActionColumn extends Column
      *     // return the button HTML code
      * }
      * ```
+     *
      * 在上面的代码中，$url 是列为按钮创建的URL，$model是当前要渲染的模型对象， 并且 $key 是在数据提供者数组中模型的键。
      * where `$url` is the URL that the column creates for the button, `$model` is the model object
      * being rendered for the current row, and `$key` is the key of the model in the data provider array.
@@ -104,15 +105,14 @@ class ActionColumn extends Column
      * ```
      */
     public $buttons = [];
-    /** 
-     * 每个按钮的可见性条件。
-     * 数组键是按钮名(没有花括号)，值是布尔值true/false或匿名函数
-     * 当这个数组中没有指定按钮名称时，它将默认显示。
-     * 
-     * @var array visibility conditions for each button. The array keys are the button names (without curly brackets),
+    /** @var array visibility conditions for each button. The array keys are the button names (without curly brackets),
      * and the values are the boolean true/false or the anonymous function. When the button name is not specified in
      * this array it will be shown by default.
      * The callbacks must use the following signature:
+     *
+     * 每个按钮的可见性条件。
+     * 数组键是按钮名(没有花括号)，值是布尔值true/false或匿名函数
+     * 当这个数组中没有指定按钮名称时，它将默认显示。
      *
      * 回调必须使用以下参数：
      * ```php

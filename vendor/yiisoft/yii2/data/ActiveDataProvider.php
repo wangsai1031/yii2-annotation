@@ -22,6 +22,7 @@ use yii\di\Instance;
  *
  * The following is an example of using ActiveDataProvider to provide ActiveRecord instances:
  * 下面是一个使用ActiveDataProvider来提供ActiveRecord实例的例子
+ *
  * ```php
  * $provider = new ActiveDataProvider([
  *     'query' => Post::find(),

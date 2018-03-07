@@ -219,7 +219,7 @@ interface ActiveRecordInterface extends StaticInstanceInterface
      *
      * See the following code for usage examples:
      * 该方法会自动调用one方法并返回一个[[ActiveRecordInterface|ActiveRecord]]实例。例如，
-     * 
+     *
      * ```php
      * // find a single customer whose primary key value is 10
      * // 查找主键值是10的一个客户
@@ -279,7 +279,7 @@ interface ActiveRecordInterface extends StaticInstanceInterface
      *
      * See the following code for usage examples:
      * 该方法会自动调用all方法，并返回一个[[ActiveRecordInterface|ActiveRecord]]实例组成的数组。例如：
-     * 
+     *
      * ```php
      * // find the customers whose primary key value is 10
      * // 查找主键id为10的客户
@@ -316,6 +316,7 @@ interface ActiveRecordInterface extends StaticInstanceInterface
     /**
      * Updates records using the provided attribute values and conditions.
      * 根据给定的属性值和条件更新记录。
+     *
      * For example, to change the status to be 1 for all customers whose status is 2:
      * 例如，把所有状态为2的用户的状态改为1
      *

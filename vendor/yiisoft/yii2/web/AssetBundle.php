@@ -257,6 +257,7 @@ class AssetBundle extends BaseObject
             // 发布一个文件或一个目录，并获取该发布后资源的文件路径和Url
             list($this->basePath, $this->baseUrl) = $am->publish($this->sourcePath, $this->publishOptions);
         }
+
         // $this->basePath, $this->baseUrl 存在，则资源转换器对象不为空
         if (isset($this->basePath, $this->baseUrl) && ($converter = $am->getConverter()) !== null) {
             // 遍历 js 文件

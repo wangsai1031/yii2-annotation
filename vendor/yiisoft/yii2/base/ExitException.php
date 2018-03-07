@@ -20,7 +20,7 @@ namespace yii\base;
 class ExitException extends \Exception
 {
     /**
-     * @var integer the exit status code
+     * @var int the exit status code
      * 变量 整型 退出状态码
      */
     public $statusCode;
@@ -30,13 +30,13 @@ class ExitException extends \Exception
      * Constructor.
      * 构造函数
      *
-     * @param integer $status the exit status code
+     * @param int $status the exit status code
      * 参数 整型 退出状态吗
      *
      * @param string $message error message
      * 参数 字符串 错误信息
      *
-     * @param integer $code error code
+     * @param int $code error code
      * 参数 整型 错误代码
      *
      * @param \Exception $previous The previous exception used for the exception chaining.

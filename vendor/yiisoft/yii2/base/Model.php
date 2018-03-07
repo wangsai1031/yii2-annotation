@@ -516,7 +516,7 @@ class Model extends Component implements StaticInstanceInterface, IteratorAggreg
      * Make sure the parent implementation is invoked so that the event can be raised.
      * 确保父类的实现被调用，这样才可以触发事件。
      *
-     * @return boolean whether the validation should be executed. Defaults to true.
+     * @return bool whether the validation should be executed. Defaults to true.
      * If false is returned, the validation will stop and the model is considered invalid.
      * 返回值 boolean 是否继续执行验证。默认是true。如果返回了false,验证终止，模型会被认为不合法。
      */
@@ -575,6 +575,7 @@ class Model extends Component implements StaticInstanceInterface, IteratorAggreg
             // 基于rules方法里边指定的验证规则创建验证器对象。
             $this->_validators = $this->createValidators();
         }
+
         return $this->_validators;
     }
 
@@ -669,7 +670,7 @@ class Model extends Component implements StaticInstanceInterface, IteratorAggreg
      * @param string $attribute attribute name
      * 参数 字符串 属性名
      *
-     * @return boolean whether the attribute is required
+     * @return bool whether the attribute is required
      * 返回值 boolean 当前属性是否必需
      */
     public function isAttributeRequired($attribute)
@@ -690,7 +691,7 @@ class Model extends Component implements StaticInstanceInterface, IteratorAggreg
      * @param string $attribute attribute name
      * 参数 字符串 属性名
      *
-     * @return boolean whether the attribute is safe for massive assignments
+     * @return bool whether the attribute is safe for massive assignments
      * 返回值 boolean 该属性大量赋值是否安全。
      *
      * @see safeAttributes()
@@ -707,7 +708,7 @@ class Model extends Component implements StaticInstanceInterface, IteratorAggreg
      * @param string $attribute attribute name
      * 参数 字符串 属性名
      *
-     * @return boolean whether the attribute is active in the current scenario
+     * @return bool whether the attribute is active in the current scenario
      * 返回值 boolean 当前场景下属性是否处于活动状态。
      *
      * @see activeAttributes()
@@ -764,7 +765,7 @@ class Model extends Component implements StaticInstanceInterface, IteratorAggreg
      * @param string|null $attribute attribute name. Use null to check all attributes.
      * 参数 字符串|null 属性名，传null可以获取所有的属性
      *
-     * @return boolean whether there is any error.
+     * @return bool whether there is any error.
      * 返回值 boolean 是否有错误
      */
     public function hasErrors($attribute = null)
@@ -996,7 +997,7 @@ class Model extends Component implements StaticInstanceInterface, IteratorAggreg
      * @param array $values attribute values (name => value) to be assigned to the model.
      * 参数 数组 被分配到模型的属性值(名称 => 值)
      *
-     * @param boolean $safeOnly whether the assignments should only be done to the safe attributes.
+     * @param bool $safeOnly whether the assignments should only be done to the safe attributes.
      * A safe attribute is one that is associated with a validation rule in the current [[scenario]].
      * 参数 boolean 赋值是否只针对安全属性。安全属性是当前场景下跟验证规则相关联的属性。
      *
@@ -1170,7 +1171,7 @@ class Model extends Component implements StaticInstanceInterface, IteratorAggreg
      * If not set, [[formName()]] is used.
      * 参数 字符串 用来加载数据到模型的表单名
      *
-     * @return boolean whether `load()` found the expected form in `$data`.
+     * @return bool whether `load()` found the expected form in `$data`.
      * 返回值 boolean 是否把数据加载到指定的的表单。
      */
     public function load($data, $formName = null)
@@ -1219,7 +1220,7 @@ class Model extends Component implements StaticInstanceInterface, IteratorAggreg
      * 参数 字符串 用来载入数据到模型中用到的表单名。如果没有设置，将会使用`$models`里边的第一个model的[[formName()]]值，该参数在版本2.0.1之后
      * 可用。
      *
-     * @return boolean whether at least one of the models is successfully populated.
+     * @return bool whether at least one of the models is successfully populated.
      * 返回值 boolean 是否至少一个模型成功填充。
      */
     public static function loadMultiple($models, $data, $formName = null)
@@ -1264,7 +1265,7 @@ class Model extends Component implements StaticInstanceInterface, IteratorAggreg
      * validation rules should be validated.
      * 参数 数组 需要被验证的属性列表。如果该参数为空，意味着任何适用验证规则的属性都会被验证。
      *
-     * @return boolean whether all models are valid. False will be returned if one
+     * @return bool whether all models are valid. False will be returned if one
      * or multiple models have validation error.
      * 返回值 boolean 所有的模型验证是否都通过。如果一个或者多个模型验证不成功，将会返回false。
      */
@@ -1376,7 +1377,7 @@ class Model extends Component implements StaticInstanceInterface, IteratorAggreg
      * @param mixed $offset the offset to check on.
      * 参数 混合型 需要检测的offset
      *
-     * @return boolean whether or not an offset exists.
+     * @return bool whether or not an offset exists.
      * 返回值 boolean offset是否存在。
      */
     public function offsetExists($offset)
@@ -1415,7 +1416,7 @@ class Model extends Component implements StaticInstanceInterface, IteratorAggreg
      * It is implicitly called when you use something like `$model[$offset] = $item;`.
      * 当你使用一些类似于`$model[$offset] = $item;`的时候隐式调用。
      *
-     * @param integer $offset the offset to set element
+     * @param int $offset the offset to set element
      * 参数 整型 设置元素的offset
      *
      * @param mixed $item the element value

@@ -39,13 +39,13 @@ use Yii;
  *
  * Then the `run()` method will be invoked as `run(1)` automatically.
  * 那么run()方法会被自动当做run(1)调用
- * 
+ *
  * For more details and usage information on Action, see the [guide article on actions](guide:structure-controllers).
  *
  * @property string $uniqueId The unique ID of this action among the whole application. This property is
  * read-only.
  * 属性 字符串 动作的id在整个应用中都是唯一的，这个属性只读
- * 
+ *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
@@ -137,7 +137,7 @@ class Action extends Component
 
         return null;
     }
-    
+
     /**
      * This method is called right before `run()` is executed.
      * 此方法在执行run()方法以前调用
@@ -148,7 +148,7 @@ class Action extends Component
      * If the method returns false, it will cancel the action.
      * 如果此方法返回false，那么动作将会被取消
      *
-     * @return boolean whether to run the action.
+     * @return bool whether to run the action.
      * 返回值 boolean 是否执行此动作
      */
     protected function beforeRun()

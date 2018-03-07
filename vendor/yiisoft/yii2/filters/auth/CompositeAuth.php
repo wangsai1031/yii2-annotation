@@ -51,6 +51,7 @@ class CompositeAuth extends AuthMethod
      *
      * 如果该属性为空，则不执行身份验证
      * If this property is empty, no authentication will be performed.
+     *
      * 注意，auth方法类必须实现[[\yii\filters\auth\AuthInterface]]接口
      * Note that an auth method class must implement the [[\yii\filters\auth\AuthInterface]] interface.
      */

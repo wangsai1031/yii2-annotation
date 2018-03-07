@@ -45,6 +45,7 @@ class BaseUrl
      * // generates: /index.php?r=site/index&param1=value1&param2=value2
      * ['site/index', 'param1' => 'value1', 'param2' => 'value2']
      * ```
+     *
      * 如果您想要创建一个带有锚的URL，您可以使用带有参数 ‘#’ 的数组格式
      * If you want to create a URL with an anchor, you can use the array format with a `#` parameter.
      * For example,
@@ -80,6 +81,7 @@ class BaseUrl
      * 从2.0.2版本开始，也可以将路由指定为别名
      * Starting from version 2.0.2, a route can also be specified as an alias. In this case, the alias
      * will be converted into the actual route first before conducting the above transformation steps.
+     *
      * 下面是使用该方法的一些示例
      * Below are some examples of using this method:
      *
@@ -99,6 +101,7 @@ class BaseUrl
      * // /index.php?r=post%2Findex     assume the alias "@posts" is defined as "post/index"
      * echo Url::toRoute('@posts');
      * ```
+     *
      * 使用字符串来表示路由 或者 数组来表示一个带查询参数的路由
      * @param string|array $route use a string to represent a route (e.g. `index`, `site/index`),
      * or an array to represent a route with query parameters (e.g. `['site/index', 'param1' => 'value1']`).
@@ -177,6 +180,7 @@ class BaseUrl
          */
         if (strncmp($route, '/', 1) === 0) {
             // 绝对路径
+            // absolute route
             return ltrim($route, '/');
         }
 
@@ -231,6 +235,7 @@ class BaseUrl
      *
      * Below are some examples of using this method:
      * 下面是使用该方法的一些示例
+     *
      * ```php
      * // /index.php?r=site%2Findex
      * echo Url::to(['site/index']);
@@ -321,7 +326,7 @@ class BaseUrl
 
         // 如果url 以 // 开头e.g. //hostname/path/to/resource
         if (substr($url, 0, 2) === '//') {
-            // e.g. //hostname/path/to/resource
+            // e.g. //example.com/path/to/resource
             // 若$scheme 是 http 或 https，则拼接到 $url 前面，否则直接返回该url
             return $scheme === '' ? $url : "$scheme:$url";
         }
@@ -344,7 +349,7 @@ class BaseUrl
      * 返回当前请求的基本URL
      * Returns the base URL of the current request.
      * @param bool|string $scheme the URI scheme to use in the returned base URL:
-     * 
+     *
      * 返回基本URL，没有主机信息
      * - `false` (default): returning the base URL without host info.
      * 返回一个绝对的基本URL,其协议与 \yii\web\UrlManager::hostInfo 相同
@@ -396,6 +401,7 @@ class BaseUrl
     /**
      * 返回之前remember()记住的url
      * Returns the URL previously [[remember()|remembered]].
+     *
      * 与要记住的URL相关联的名称，这个名称将会被[[previous()]]使用，如果没有设置，他将使用[[@see \yii\web\User::returnUrlParam]]
      * @param string $name the named associated with the URL that was remembered previously.
      * If not set, [[\yii\web\User::getReturnUrl()]] will be used to obtain remembered URL.
@@ -417,6 +423,7 @@ class BaseUrl
     /**
      * 返回当前请求页面的规范URL
      * Returns the canonical URL of the currently requested page.
+     *
      * 规范化URL是构造一个使用当前控制器的[[\yii\web\Controller::route]]和[[\yii\web\Controller::actionParams]]，
      * 你可以在layout视图中使用以下代码添加一个链接标签
      * The canonical URL is constructed using the current controller's [[\yii\web\Controller::route]] and
@@ -441,7 +448,9 @@ class BaseUrl
      * 返回网站首页URL
      * Returns the home URL.
      * 用于返回的URL的URI协议
+     *
      * @param bool|string $scheme the URI scheme to use for the returned URL:
+     *
      * 如果没有传任何参数，这个方法将会生成相对 URL 。
      * 你可以传 true 来获得一个针对当前协议的绝对 URL；
      * 或者，你可以明确的指定具体的协议类型（ https , http ）。

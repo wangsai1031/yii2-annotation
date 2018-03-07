@@ -40,6 +40,21 @@ class BaseArrayHelper
      * The properties specified for each class is an array of the following format:
      *
      * ```php
+     * [
+     *     'app\models\Post' => [
+     *         'id',
+     *         'title',
+     *         // the key name in array result => property name
+     *         'createTime' => 'created_at',
+     *         // the key name in array result => anonymous function
+     *         'length' => function ($post) {
+     *             return strlen($post->content);
+     *         },
+     *     ],
+     * ]
+     * ```
+     * 
+     * ```php
         $posts = Post::find()->limit(10)->all();
         $data = ArrayHelper::toArray($posts, [
             'app\models\Post' => [
@@ -198,11 +213,16 @@ class BaseArrayHelper
      * Below are some usage examples,
      *
      * ```php
-     * // working with array 数组
+     * 数组
+     * // working with array
      * $username = \yii\helpers\ArrayHelper::getValue($_POST, 'username');
-     * // working with object 对象
+     *
+     * 对象
+     * // working with object
      * $username = \yii\helpers\ArrayHelper::getValue($user, 'username');
-     * // working with anonymous function 匿名函数
+     * 
+     * 匿名函数
+     * // working with anonymous function
      * $fullName = \yii\helpers\ArrayHelper::getValue($user, function ($user, $defaultValue) {
      *     return $user->firstName . ' ' . $user->lastName;
      * });
@@ -443,6 +463,7 @@ class BaseArrayHelper
      *     return $element['id'];
      * });
      * ```
+     *
      * 通过id作为第三个参数，将按id对数组进行分组(注意，该功能从2.0.8版本才加入，统计数据时非常有用):
      * Passing `id` as a third argument will group `$array` by `id`:
      *

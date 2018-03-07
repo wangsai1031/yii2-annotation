@@ -136,6 +136,7 @@ class UrlNormalizer extends BaseObject
         if ($this->collapseSlashes) {
             $pathInfo = $this->collapseSlashes($pathInfo);
         }
+
         // 结尾斜杠是否应该按照规则的后缀设置进行规范化
         if ($this->normalizeTrailingSlash === true) {
             // 添加或删除$pathInfo中结尾的斜杠，这取决于$suffix后缀是否有一个斜杠

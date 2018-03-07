@@ -233,7 +233,8 @@ class Validator extends Component
      * The following example will enable the validator only when the country currently selected is USA:
      * 下边示例展示了只有当被选择的国家是美国时，才会启用验证器：
      *
-     * ```javascript  //注意，这里是JavaScript代码
+     * //注意，这里是JavaScript代码
+     * ```javascript
      * function (attribute, value) {
      *     return $('#country').val() === 'USA';
      * }
@@ -280,6 +281,7 @@ class Validator extends Component
                 $params['class'] = $type;
             }
         }
+
         // 根据配置数组创建验证器对象
         return Yii::createObject($params);
     }
@@ -581,6 +583,7 @@ class Validator extends Component
         if ($this->isEmpty !== null) {
             return call_user_func($this->isEmpty, $value);
         }
+
         // 否则，null 空数组，空字符串都被视为 空
         return $value === null || $value === [] || $value === '';
     }

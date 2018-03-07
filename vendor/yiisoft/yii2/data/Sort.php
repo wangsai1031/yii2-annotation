@@ -25,6 +25,7 @@ use yii\web\Request;
  *
  * A typical usage example is as follows,
  * 典型的用法示例如下:
+ *
  * ```php
  * public function actionIndex()
  * {

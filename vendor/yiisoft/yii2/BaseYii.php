@@ -420,6 +420,7 @@ class BaseYii
     /**
      * Class autoload loader.
      * 自动加载类的方法
+     *
      * This method is invoked automatically when PHP sees an unknown class.
      * 当PHP遇到未知的类的时候，自动调用此方法
      * The method will attempt to include the class file according to the following procedure:
@@ -692,6 +693,7 @@ class BaseYii
     /**
      * Marks the beginning of a code block for profiling.
      * 标记代码块分析开始的位置。
+     *
      * This has to be matched with a call to [[endProfile]] with the same category name.
      * 必须和带有相同分类名的endProfile配对使用
      * The begin- and end- calls must also be properly nested. For example,

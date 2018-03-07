@@ -91,6 +91,7 @@ use yii\caching\CacheInterface;
  *     $transaction->rollBack();
  * }
  * ```
+ *
  * 您也可以像下面这样使用事务快捷方式。
  * You also can use shortcut for the above like the following:
  *
@@ -101,6 +102,7 @@ use yii\caching\CacheInterface;
  *     $order->addItems($items);
  * });
  * ```
+ *
  * ：如果需要，可以将事务隔离级别作为第二个参数传递
  * If needed you can pass transaction isolation level as a second parameter:
  *
@@ -882,6 +884,7 @@ class Connection extends Component
     public function beginTransaction($isolationLevel = null)
     {
         $this->open();
+
         // 尚未初始化当前连接使用的Transaction对象，则创建一个
         // 缓存的事务对象有效，则使用缓存中的事务对象
         // 否则创建一个新的事务对象

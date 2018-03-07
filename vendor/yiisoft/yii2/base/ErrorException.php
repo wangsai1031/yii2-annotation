@@ -90,7 +90,7 @@ class ErrorException extends \ErrorException
      * @param array $error error got from error_get_last()
      * 参数 数组 error_get_last()得到的错误
      *
-     * @return boolean if error is one of fatal type
+     * @return bool if error is one of fatal type
      * 返回值 boolean 错误书不是致命类型的
      */
     public static function isFatalError($error)

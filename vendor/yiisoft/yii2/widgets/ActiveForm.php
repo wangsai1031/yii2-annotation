@@ -93,6 +93,7 @@ class ActiveForm extends Widget
      * ```php
      * function ($model, $attribute)
      * ```
+     *
      * 该属性的值将被与传入[[field()]]的$options参数进行递归地合并
      * The value of this property will be merged recursively with the `$options` parameter passed to [[field()]].
      *

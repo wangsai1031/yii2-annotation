@@ -88,6 +88,7 @@ class AssetConverter extends Component implements AssetConverterInterface
                 return $result;
             }
         }
+
         // 若不需要转换，则返回源文件
         return $asset;
     }

@@ -103,6 +103,7 @@ class BaseJson
     /**
      * 将给定的值编码为一个JSON字符串的HTML转义实体，这样就可以安全地嵌入到HTML代码中了
      * Encodes the given value into a JSON string HTML-escaping entities so it is safe to be embedded in HTML code.
+     *
      * 该方法比 `json_encode()` 增加了支持 JavaScript 表达式的功能
      * The method enhances `json_encode()` by supporting JavaScript expressions.
      * 该方法不会对使用JsExpression 对象的 JavaScript表达式进行编码

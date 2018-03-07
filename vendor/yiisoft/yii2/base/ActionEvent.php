@@ -30,7 +30,7 @@ class ActionEvent extends Event
      */
     public $result;
     /**
-     * @var boolean whether to continue running the action. Event handlers of
+     * @var bool whether to continue running the action. Event handlers of
      * [[Controller::EVENT_BEFORE_ACTION]] may set this property to decide whether
      * to continue running the current action.
      * 属性 boolean 是否继续执行动作。 [[Controller::EVENT_BEFORE_ACTION]]的事件处理可以设置这个属性，然后决定是否继续执行此动作

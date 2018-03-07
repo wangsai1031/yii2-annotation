@@ -48,7 +48,7 @@ trait ArrayAccessTrait
      * This method is required by Countable interface.
      * Countable接口需要此方法
      *
-     * @return integer number of data elements.
+     * @return int number of data elements.
      * 返回值 整数 数据元素的个数
      */
     public function count()
@@ -62,7 +62,7 @@ trait ArrayAccessTrait
      *
      * @param mixed $offset the offset to check on
      * 参数 混合类型 检测的偏移量
-     * @return boolean
+     * @return bool
      */
     public function offsetExists($offset)
     {
@@ -73,7 +73,7 @@ trait ArrayAccessTrait
      * This method is required by the interface [[\ArrayAccess]].
      * [[\ArrayAccess]] 需要此方法
      *
-     * @param integer $offset the offset to retrieve element.
+     * @param int $offset the offset to retrieve element.
      * 参数 整数 到检索元素的偏移量
      *
      * @return mixed the element at the offset, null if no element is found at the offset
@@ -88,7 +88,7 @@ trait ArrayAccessTrait
      * This method is required by the interface [[\ArrayAccess]].
      * [[\ArrayAccess]]接口需要此方法
      *
-     * @param integer $offset the offset to set element
+     * @param int $offset the offset to set element
      * 参数 整型 到选定元素的偏移量
      *
      * @param mixed $item the element value

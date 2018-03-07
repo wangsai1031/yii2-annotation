@@ -246,8 +246,10 @@ class AssetManager extends Component
      *
      * If this is not set, the asset manager will use the default CRC32 and filemtime in the `hash`
      * method.
+     *
      * 如果没有设置，资产管理器将在`hash`方法中使用默认的CRC32和filemtime
      * Example of an implementation using MD4 hash:
+     *
      * 使用MD4散列的实现的例子:
      * ```php
      * function ($path) {
@@ -279,6 +281,7 @@ class AssetManager extends Component
             // 若目录不可写，则抛异常
             throw new InvalidConfigException("The directory is not writable by the Web process: {$this->basePath}");
         }
+
         // 返回规范化的绝对路径名，该函数删除所有符号连接（比如 '/./', '/../' 以及多余的 '/'），返回绝对路径名。
         $this->basePath = realpath($this->basePath);
         // 初始化基础url,去掉最右侧的 '/'
@@ -473,6 +476,7 @@ class AssetManager extends Component
             // 使用配置数组创建资源转换器对象
             $this->_converter = Yii::createObject($this->_converter);
         }
+
         // 返回资源转换器对象
         return $this->_converter;
     }
@@ -561,6 +565,7 @@ class AssetManager extends Component
     {
         // 获取要发布的资源的路径
         $path = Yii::getAlias($path);
+
         // 如果该资源已经发布，则直接返回数据
         if (isset($this->_published[$path])) {
             return $this->_published[$path];
@@ -638,6 +643,7 @@ class AssetManager extends Component
                 @chmod($dstFile, $this->fileMode);
             }
         }
+
         // 返回 被发布资产的路径和URL。
         return [$dstFile, $this->baseUrl . "/$dir/$fileName"];
     }
@@ -731,6 +737,7 @@ class AssetManager extends Component
             // 将整个目录复制为另一个目录，文件和子目录也将被复制
             FileHelper::copyDirectory($src, $dstDir, $opts);
         }
+
         // 返回 被发布资产的路径和URL。
         return [$dstDir, $this->baseUrl . '/' . $dir];
     }

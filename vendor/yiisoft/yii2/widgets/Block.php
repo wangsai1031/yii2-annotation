@@ -25,6 +25,7 @@ use yii\base\Widget;
  * Nothing.
  * <?php $this->endBlock() ?>
  * ```
+ *
  * 然后在子视图中覆盖默认值
  * And then overriding default in sub-views:
  *

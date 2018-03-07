@@ -368,6 +368,7 @@ class Request extends \yii\base\Request
         if ($result !== false) {
             list($route, $params) = $result;
             if ($this->_queryParams === null) {
+                
                 /**
                  * 数组相加与array_merge()的区别：
                  * 当键名是字符串：
@@ -379,12 +380,13 @@ class Request extends \yii\base\Request
                  *
                  * 将解析出来的参数与 $_GET 参数进行合并，并将参数复制给全局变量 $_GET
                  */
-                $_GET = $params + $_GET;
-                // preserve numeric keys 保护数字键名不被改变，键名相同时，$params 会覆盖 $_GET中的参数
+                $_GET = $params + $_GET; // preserve numeric keys
+                // 保护数字键名不被改变，键名相同时，$params 会覆盖 $_GET中的参数
             } else {
                 // $this->_queryParams不为 null,将查询参数赋值给$this->_queryParams
                 $this->_queryParams = $params + $this->_queryParams;
             }
+
             // 通过 getQueryParams() 获取参数。
             return [$route, $this->getQueryParams()];
         }
@@ -508,10 +510,12 @@ class Request extends \yii\base\Request
         if ($this->headers->has('X-Http-Method-Override')) {
             return strtoupper($this->headers->get('X-Http-Method-Override'));
         }
+
         // 或者使用 $_SERVER['REQUEST_METHOD'] 作为方法名
         if (isset($_SERVER['REQUEST_METHOD'])) {
             return strtoupper($_SERVER['REQUEST_METHOD']);
         }
+
         // 未指定时，默认为 GET 方法
         return 'GET';
     }

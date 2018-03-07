@@ -137,6 +137,7 @@ abstract class Cache extends Component implements CacheInterface
             // json 编码，在进行MD5
             $key = md5(json_encode($key));
         }
+
         // 添加前缀
         return $this->keyPrefix . $key;
     }
@@ -375,10 +376,12 @@ abstract class Cache extends Component implements CacheInterface
                 // 使用自定义的序列化函数进行序列化
                 $value = call_user_func($this->serializer[0], [$value, $dependency]);
             }
+
             // 根据给定的键构建一个规范化的高速缓存键。
             $key = $this->buildKey($key);
             $data[$key] = $value;
         }
+
         // 批量缓存，并返回缓存失败的键
         return $this->setValues($data, $duration);
     }
@@ -436,10 +439,12 @@ abstract class Cache extends Component implements CacheInterface
                 // 使用自定义的序列化函数进行序列化
                 $value = call_user_func($this->serializer[0], [$value, $dependency]);
             }
+
             // 根据给定的键构建一个规范化的高速缓存键。
             $key = $this->buildKey($key);
             $data[$key] = $value;
         }
+
         // 批量缓存，并返回缓存失败的键
         return $this->addValues($data, $duration);
     }
@@ -473,6 +478,7 @@ abstract class Cache extends Component implements CacheInterface
         }
         // 根据给定的键构建一个规范化的高速缓存键。
         $key = $this->buildKey($key);
+
         // 存储缓存数据
         return $this->addValue($key, $value, $duration);
     }
@@ -610,6 +616,7 @@ abstract class Cache extends Component implements CacheInterface
                 $failedKeys[] = $key;
             }
         }
+
         // 返回缓存失败的键
         return $failedKeys;
     }

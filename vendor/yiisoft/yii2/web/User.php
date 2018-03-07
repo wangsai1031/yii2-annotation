@@ -58,6 +58,7 @@ use yii\rbac\CheckAccessInterface;
  * 你可以参考如下的内容，通过在components应用配置中增加一个数组来改变它的配置：
  *  
  * User类必须实现IdentityInterface
+ *
  * ```php
  * 'user' => [
  *     'identityClass' => 'app\models\User', // User must implement the IdentityInterface
@@ -356,7 +357,7 @@ class User extends Component
      *
      * If [[enableSession]] is `false`:
      * - the `$duration` parameter will be ignored
-     * 
+     *
      * @param IdentityInterface $identity the user identity (which should already be authenticated)
      * @param int $duration number of seconds that the user can remain in logged-in status, defaults to `0`
      * @return bool whether the user is logged in
@@ -516,6 +517,7 @@ class User extends Component
             // 触发 afterLogout 事件
             $this->afterLogout($identity);
         }
+
         // 返回用户是否是一个游客（未登录状态）
         return $this->getIsGuest();
     }
@@ -587,6 +589,7 @@ class User extends Component
             // 如果 $url 是关联数组，则url为null
             $url = null;
         }
+
         // 若$url为空，则返回项目主页地址(一般默认是不带任何路由的域名链接)。
         return $url === null ? Yii::$app->getHomeUrl() : $url;
     }

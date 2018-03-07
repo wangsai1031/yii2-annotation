@@ -63,8 +63,10 @@ class AccessRule extends Component
      * @var array list of roles that this rule applies to (requires properly configured User component).
      * Two special roles are recognized, and they are checked via [[User::isGuest]]:
      *
-     * - `?`: matches a guest user (not authenticated yet) 匹配一个游客用户(尚未登录)
-     * - `@`: matches an authenticated user 匹配一个登录的用户
+     * 匹配一个游客用户(尚未登录)
+     * - `?`: matches a guest user (not authenticated yet)
+     * 匹配一个登录的用户
+     * - `@`: matches an authenticated user
      *
      * 如果您使用的是RBAC(基于角色的访问控制)，您也可以指定角色或权限名。
      * 在本例中，[[User::can()]]将被调用来检查访问权限。

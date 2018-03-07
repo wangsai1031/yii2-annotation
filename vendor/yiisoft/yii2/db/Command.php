@@ -577,7 +577,7 @@ class Command extends Component
      * $minAge = 30;
      * $connection->createCommand()->update('user', ['status' => 1], 'age > :minAge', [':minAge' => $minAge])->execute();
      * ```
-     * 
+     *
      * 该方法将正确编码列名和绑定要更新的值。
      * The method will properly escape the column names and bind the values to be updated.
      *

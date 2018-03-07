@@ -186,6 +186,7 @@ class ServiceLocator extends Component
         if (isset($this->_components[$id])) {
             return $this->_components[$id];
         }
+
         // 如果还没有实例化好，那么再看看是不是已经定义好
         if (isset($this->_definitions[$id])) {
             $definition = $this->_definitions[$id];
@@ -213,13 +214,16 @@ class ServiceLocator extends Component
      *
      * Registers a component definition with this locator.
      * 用这个定位器注册一个组件定义
+     *
      * For example,
      *
      * ```php
-     * // a class name 类名
+     * 类名
+     * // a class name
      * $locator->set('cache', 'yii\caching\FileCache');
      *
-     * // a configuration array 配置数组
+     * 配置数组
+     * // a configuration array
      * $locator->set('db', [
      *     'class' => 'yii\db\Connection',
      *     'dsn' => 'mysql:host=127.0.0.1;dbname=demo',
@@ -228,12 +232,14 @@ class ServiceLocator extends Component
      *     'charset' => 'utf8',
      * ]);
      *
-     * // an anonymous function 匿名函数
+     * 匿名函数
+     * // an anonymous function
      * $locator->set('cache', function ($params) {
      *     return new \yii\caching\FileCache;
      * });
      *
-     * // an instance 实例
+     * 实例
+     * // an instance
      * $locator->set('cache', new \yii\caching\FileCache);
      * ```
      *

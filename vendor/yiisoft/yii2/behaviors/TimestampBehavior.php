@@ -133,6 +133,7 @@ class TimestampBehavior extends AttributeBehavior
     /**
      * Updates a timestamp attribute to the current timestamp.
      * 将时间戳属性更新为当前时间戳
+     *
      * ```php
      * $model->touch('lastVisit');
      *

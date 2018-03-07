@@ -19,7 +19,7 @@ use yii\helpers\StringHelper;
  *
  * Check implementation of [[\yii\filters\AccessControl]], [[\yii\filters\PageCache]] and [[\yii\filters\HttpCache]] as examples on how to use it.
  * 如何使用，请参考这三个类实现的方法
- * 
+ *
  * For more details and usage information on ActionFilter, see the [guide article on filters](guide:structure-filters).
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
@@ -118,7 +118,7 @@ class ActionFilter extends Behavior
      * @param Action $action the action to be executed.
      * 参数 动作 将要执行的动作
      *
-     * @return boolean whether the action should continue to be executed.
+     * @return bool whether the action should continue to be executed.
      * 返回值 boolean 动作是否继续执行
      */
     public function beforeAction($action)
@@ -182,7 +182,7 @@ class ActionFilter extends Behavior
      * @param Action $action the action being filtered
      * 参数 动作 将被过滤的动作
      *
-     * @return boolean whether the filter is active for the given action.
+     * @return bool whether the filter is active for the given action.
      * 返回值 boolean 过滤器是否对给定的动作生效
      */
     protected function isActive($action)

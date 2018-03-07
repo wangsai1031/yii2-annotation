@@ -53,7 +53,7 @@ use Yii;
  *
  * One can call [[hasProperty()]], [[canGetProperty()]] and/or [[canSetProperty()]] to check the existence of a property.
  * 可以调用[[hasProperty()]], [[canGetProperty()]] 或 [[canSetProperty()]]等方法来检测一个属性是否存在。
- * 
+ *
  * Besides the property feature, BaseObject also introduces an important object initialization life cycle. In particular,
  * creating an new instance of BaseObject or its derived class will involve the following life cycles sequentially:
  * 除了属性特性，Object也引入了一种重要的对象初始化生命周期机制。特别地，创建一个Object或其子类的新实例时，将会循序地调用下面的生命周期：
@@ -76,7 +76,7 @@ use Yii;
  * In order to ensure the above life cycles, if a child class of BaseObject needs to override the constructor,
  * it should be done like the following:
  * 为了确保上面的生命周期，如果一个Object的子类需要重写构造函数，应该参照下面的代码：
- * 
+ *
  * ```php
  * public function __construct($param1, $param2, ..., $config = [])
  * {
@@ -88,7 +88,7 @@ use Yii;
  * That is, a `$config` parameter (defaults to `[]`) should be declared as the last parameter
  * of the constructor, and the parent implementation should be called at the end of the constructor.
  * 也就是，默认为空数组的配置参数应该在构造函数的最后一个参数位置声明，并且父类的实现应该在构造函数的结尾处调用
- * 
+ *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0.13
  */
@@ -252,7 +252,7 @@ class BaseObject implements Configurable
      * @param string $name the property name or the event name
      * 参数 字符串 属性名或者事件名
      *
-     * @return boolean whether the named property is set (not null).
+     * @return bool whether the named property is set (not null).
      * 返回值 boolean 给定的属性是否被设置（不为空）。
      *
      * @see http://php.net/manual/en/function.isset.php
@@ -352,10 +352,10 @@ class BaseObject implements Configurable
      * @param string $name the property name
      * 参数 字符串 属性名
      *
-     * @param boolean $checkVars whether to treat member variables as properties
+     * @param bool $checkVars whether to treat member variables as properties
      * 参数 boolean 是否把成员变量当属性
      *
-     * @return boolean whether the property is defined
+     * @return bool whether the property is defined
      * 返回值 boolean 属性是否被定义
      *
      * @see canGetProperty()
@@ -385,10 +385,10 @@ class BaseObject implements Configurable
      * @param string $name the property name
      * 参数 字符串 属性名
      *
-     * @param boolean $checkVars whether to treat member variables as properties
+     * @param bool $checkVars whether to treat member variables as properties
      * 参数 boolean 是否吧成员变量当做属性
      *
-     * @return boolean whether the property can be read
+     * @return bool whether the property can be read
      * 返回值 boolean 属性是否可读
      *
      * @see canSetProperty()
@@ -417,10 +417,10 @@ class BaseObject implements Configurable
      * @param string $name the property name
      * 参数 字符串 属性名
      *
-     * @param boolean $checkVars whether to treat member variables as properties
+     * @param bool $checkVars whether to treat member variables as properties
      * 参数 boolean 是否把成员变量当做属性
      *
-     * @return boolean whether the property can be written
+     * @return bool whether the property can be written
      * 返回值 boolean 该属性是否可写
      *
      * @see canGetProperty()
@@ -443,7 +443,7 @@ class BaseObject implements Configurable
      * @param string $name the method name
      * 参数 字符串 方法名
      *
-     * @return boolean whether the method is defined
+     * @return bool whether the method is defined
      * 返回值 boolean 给定方法是否定义
      */
     public function hasMethod($name)

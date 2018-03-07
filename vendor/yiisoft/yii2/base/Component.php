@@ -17,7 +17,7 @@ use yii\helpers\StringHelper;
  * Component provides the *event* and *behavior* features, in addition to the *property* feature which is implemented in
  * its parent class [[\yii\base\BaseObject|BaseObject]].
  * 除了父类[[Object]]实现的*property*属性，Component提供*event* 和 *behavior*特性。
- * 
+ *
  * Event is a way to "inject" custom code into existing code at certain places. For example, a comment object can trigger
  * an "add" event when the user adds a comment. We can write custom code and attach it to this event so that when the event
  * is triggered (i.e. comment will be added), our custom code will be executed.
@@ -122,7 +122,7 @@ use yii\helpers\StringHelper;
  *
  * @property Behavior[] $behaviors List of behaviors attached to this component. This property is read-only.
  * 属性 绑定到该组件的行为列表，该属性只读
- * 
+ *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
@@ -310,10 +310,10 @@ class Component extends BaseObject
      * @param string $name the property name or the event name
      * 参数 字符串 属性名或者事件名
      *
-     * @return boolean whether the named property is set
+     * @return bool whether the named property is set
      * 返回值 boolean 给定的属性是否被设置
      *
-     * @link http://php.net/manual/en/function.isset.php
+     * @see http://php.net/manual/en/function.isset.php
      */
     public function __isset($name)
     {
@@ -357,7 +357,7 @@ class Component extends BaseObject
      * @throws InvalidCallException if the property is read only.
      * 抛出 不可调用异常 当属性是只读的时候
      *
-     * @link http://php.net/manual/en/function.unset.php
+     * @see http://php.net/manual/en/function.unset.php
      */
     public function __unset($name)
     {
@@ -454,13 +454,13 @@ class Component extends BaseObject
      * @param string $name the property name
      * 参数 字符串 属性名
      *
-     * @param boolean $checkVars whether to treat member variables as properties
+     * @param bool $checkVars whether to treat member variables as properties
      * 参数 boolean 是否把成员变量当做属性
      *
-     * @param boolean $checkBehaviors whether to treat behaviors' properties as properties of this component
+     * @param bool $checkBehaviors whether to treat behaviors' properties as properties of this component
      * 参数 boolean 是否把行为当做该组件的属性
      *
-     * @return boolean whether the property is defined
+     * @return bool whether the property is defined
      * 返回值 boolean 给定的属性是否被定义
      *
      * @see canGetProperty()
@@ -491,13 +491,13 @@ class Component extends BaseObject
      * @param string $name the property name
      * 参数 字符串 属性名
      *
-     * @param boolean $checkVars whether to treat member variables as properties
+     * @param bool $checkVars whether to treat member variables as properties
      *  参数 boolean 是否把成员变量当做属性
      *
-     * @param boolean $checkBehaviors whether to treat behaviors' properties as properties of this component
+     * @param bool $checkBehaviors whether to treat behaviors' properties as properties of this component
      * 参数 boolean 是否把行为属性当做该组件的属性
      *
-     * @return boolean whether the property can be read
+     * @return bool whether the property can be read
      * 返回值 boolean 该属性是否可读
      *
      * @see canSetProperty()
@@ -538,13 +538,13 @@ class Component extends BaseObject
      * @param string $name the property name
      * 参数 字符串 属性名
      *
-     * @param boolean $checkVars whether to treat member variables as properties
+     * @param bool $checkVars whether to treat member variables as properties
      * 参数 boolean 是否把成员变量当做属性
      *
-     * @param boolean $checkBehaviors whether to treat behaviors' properties as properties of this component
+     * @param bool $checkBehaviors whether to treat behaviors' properties as properties of this component
      * 参数 boolean 是否把行为属性当做组件属性
      *
-     * @return boolean whether the property can be written
+     * @return bool whether the property can be written
      * 返回值 boolean 该属性是否可写
      *
      * @see canGetProperty()
@@ -581,10 +581,10 @@ class Component extends BaseObject
      * @param string $name the property name
      * 参数 字符串 属性名
      *
-     * @param boolean $checkBehaviors whether to treat behaviors' methods as methods of this component
+     * @param bool $checkBehaviors whether to treat behaviors' methods as methods of this component
      * 参数 boolean 是否把行为的方法当做该组件的方法
      *
-     * @return boolean whether the property is defined
+     * @return bool whether the method is defined
      * 返回值 boolean 该属性是否被定义
      */
     public function hasMethod($name, $checkBehaviors = true)
@@ -678,7 +678,7 @@ class Component extends BaseObject
      * @param string $name the event name
      * 参数 字符串 事件名
      *
-     * @return boolean whether there is any handler attached to the event.
+     * @return bool whether there is any handler attached to the event.
      * 返回值 boolean 该事件是否有绑定的处理程序
      */
     public function hasEventHandlers($name)
@@ -720,8 +720,7 @@ class Component extends BaseObject
      *
      * where `$event` is an [[Event]] object which includes parameters associated with the event.
      * $event是包含跟事件[[Event]]相关参数的对象
-     * 
-     * 
+     *
      * Since 2.0.14 you can specify event name as a wildcard pattern:
      *
      * ```php
@@ -740,7 +739,7 @@ class Component extends BaseObject
      * When the event handler is invoked, this data can be accessed via [[Event::data]].
      * 参数 混合型 当事件被触发时，传递给事件处理程序的参数
      *
-     * @param boolean $append whether to append new event handler to the end of the existing
+     * @param bool $append whether to append new event handler to the end of the existing
      * handler list. If false, the new handler will be inserted at the beginning of the existing
      * handler list.
      * 参数 boolean 是否添加一个新的事件处理程序到已经存在的事件处理列表的末尾。如果为false，就会把新的事件处理程序添加到程序处理的开头
@@ -827,7 +826,7 @@ class Component extends BaseObject
      * If it is null, all handlers attached to the named event will be removed.
      * 如果为null，所有绑定的事件处理程序都会被移除
      *
-     * @return boolean if a handler is found and detached
+     * @return bool if a handler is found and detached
      * 返回值 boolean 事件处理程序是否被找到并移除
      * @see on()
      *
@@ -955,6 +954,7 @@ class Component extends BaseObject
                 $event->data = $handler[1];
                 // 使用PHP的call_user_func调用handler
                 call_user_func($handler[0], $event);
+                // stop further handling if the event is handled
                 // 如果在某一handler中，将$event->handled 设为true，
                 // 就不再调用后续的handler
                 if ($event->handled) {
@@ -962,6 +962,7 @@ class Component extends BaseObject
                 }
             }
         }
+
         // invoke class-level attached handlers
         // 调用绑定过的类级别的事件处理程序
         // 触发类一级的事件
@@ -1119,7 +1120,7 @@ class Component extends BaseObject
      * Attaches a behavior to this component.
      * 把一个行为绑定到该组件
      *
-     * @param string|integer $name the name of the behavior. If this is an integer, it means the behavior
+     * @param string|int $name the name of the behavior. If this is an integer, it means the behavior
      * is an anonymous one. Otherwise, the behavior is a named one and any existing behavior with the same name
      * will be detached first.
      * 参数 字符串|整型 行为的名称。如果这个值是整型，它代表行为是匿名的。否则，行为是给定名称的，并且任何同名的行为都会先被解除。
@@ -1154,6 +1155,7 @@ class Component extends BaseObject
             $behavior->attach($this);
             $this->_behaviors[$name] = $behavior;
         }
+
         return $behavior;
     }
 }

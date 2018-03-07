@@ -12,7 +12,7 @@ use Yii;
 /**
  * Application is the base class for all application classes.
  * Application类是所有应用类的基类
- * 
+ *
  * For more details and usage information on Application, see the [guide article on applications](guide:structure-applications).
  *
  * @property \yii\web\AssetManager $assetManager The asset manager application component. This property is
@@ -177,7 +177,7 @@ abstract class Application extends Module
      */
     public $controller;
     /**
-     * @var string|boolean the layout that should be applied for views in this application. Defaults to 'main'.
+     * @var string|bool the layout that should be applied for views in this application. Defaults to 'main'.
      * If this is false, layout will be disabled.
      * 属性 字符串 或者 boolean值，指的是该应用采用的布局文件，默认是main，如果设置为false，布局将不可用
      */
@@ -207,7 +207,8 @@ abstract class Application extends Module
      * [
      *     'name' => 'extension name',
      *     'version' => 'version number',
-     *     'bootstrap' => 'BootstrapClassName',  // optional, may also be a configuration array 可选，也可以是一个配置数组
+     *      // 可选，也可以是一个配置数组
+     *     'bootstrap' => 'BootstrapClassName',  // optional, may also be a configuration array
      *     'alias' => [
      *         '@alias1' => 'to/path1',
      *         '@alias2' => 'to/path2',
@@ -263,7 +264,8 @@ abstract class Application extends Module
 
 
     /**
-     * Constructor. 构造函数
+     * Constructor.
+     * 构造函数
      * @param array $config name-value pairs that will be used to initialize the object properties.
      * Note that the configuration must contain both [[id]] and [[basePath]].
      * 参数 数组 实例化类属性时候用到的键值对。请注意配置必须包含[[id]] 和 [[basePath]]
@@ -335,6 +337,7 @@ abstract class Application extends Module
             $this->setVendorPath($config['vendorPath']);
             unset($config['vendorPath']);
         } else {
+            // set "@vendor"
             // 会调用 $this->setVendorPath()方法，设置默认的单个别名：@vendor，@bower，@npm
             $this->getVendorPath();
         }
@@ -357,7 +360,7 @@ abstract class Application extends Module
             // 若PHP配置中没有设置时区:date.timezone,则设置默认时区为UTC
             $this->setTimeZone('UTC');
         }
-        
+
         if (isset($config['container'])) {
             $this->setContainer($config['container']);
 
@@ -538,7 +541,7 @@ abstract class Application extends Module
      * This is the main entrance of an application.
      * 这个是一个应用的主要入口方法
      *
-     * @return integer the exit status (0 means normal, non-zero values mean abnormal)
+     * @return int the exit status (0 means normal, non-zero values mean abnormal)
      * 返回值 整型 退出时的状态 0表示正常，非零的数字表示不正常
      *
      */
@@ -908,7 +911,7 @@ abstract class Application extends Module
      * before terminating the application.
      * 该方法代替了exit函数，以确保终止应用之前完成应用的生命周期
      *
-     * @param integer $status the exit status (value 0 means normal exit while other values mean abnormal exit).
+     * @param int $status the exit status (value 0 means normal exit while other values mean abnormal exit).
      * 参数 整数  应用退出的状态（0表示正常，其他值表示不正常）
      *
      * @param Response $response the response to be sent. If not set, the default application [[response]] component will be used.

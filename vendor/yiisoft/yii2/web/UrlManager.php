@@ -496,6 +496,7 @@ class UrlManager extends Component
 
             return [$pathInfo, []];
         }
+
         // 没有启用 enablePrettyUrl的情况，那就更简单了，
         // 直接使用默认的解析逻辑就OK了
         Yii::debug('Pretty URL not enabled. Using default URL parsing logic.', __METHOD__);
@@ -522,6 +523,7 @@ class UrlManager extends Component
      * // generates: /index.php?r=site%2Findex&param1=value1&param2=value2
      * ['site/index', 'param1' => 'value1', 'param2' => 'value2']
      * ```
+     *
      * 如果您想要创建一个带有锚的URL，您可以使用带有参数 ‘#’ 的数组格式
      * If you want to create a URL with an anchor, you can use the array format with a `#` parameter.
      * For example,
@@ -568,6 +570,7 @@ class UrlManager extends Component
                     $cacheKey .= $key . '&';
                 }
             }
+
             // 如果存在，就从内部缓存获取URL
             $url = $this->getUrlFromCache($cacheKey, $route, $params);
 
@@ -608,6 +611,7 @@ class UrlManager extends Component
                         // 将 $baseUrl 插入到 主机地址和路由中间，将锚点信息拼接到最后
                         return substr($url, 0, $pos) . $baseUrl . substr($url, $pos) . $anchor;
                     }
+
                     // 直接将 $baseUrl 和 锚点信息拼接到 $url 后面
                     return $url . $baseUrl . $anchor;
                 } elseif (strpos($url, '//') === 0) {
@@ -690,10 +694,8 @@ class UrlManager extends Component
             // 存在该缓存且不为空,遍历该缓存的url规则
             foreach ($this->_ruleCache[$cacheKey] as $rule) {
 
-                /**
-                 * 使用$rule创建URL
-                 * @var $rule UrlRule
-                 */
+                // 使用$rule创建URL
+                /* @var $rule UrlRule */
                 if (($url = $rule->createUrl($this, $route, $params)) !== false) {
                     return $url;
                 }

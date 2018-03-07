@@ -89,6 +89,7 @@ class HttpBasicAuth extends AuthMethod
      *     ]);
      * }
      * ```
+     *
      * 如果没有设置此属性，则用户名信息将被视为访问令牌（AccessToken），而密码信息将被忽略。
      * [[\yii\web\User::loginByAccessToken()]]方法将被调用，来验证和登录用户。
      * If this property is not set, the username information will be considered as an access token

@@ -195,7 +195,7 @@ abstract class ErrorHandler extends Component
      * be used in fatal error handler
      * 该方法用作HHVM的错误处理。它会存储用于致命错误处理的异常。
      *
-     * @param integer $code the level of the error raised.
+     * @param int $code the level of the error raised.
      * 参数 整型 错误的等级
      *
      * @param string $message the error message.
@@ -204,7 +204,7 @@ abstract class ErrorHandler extends Component
      * @param string $file the filename that the error was raised in.
      * 参数 字符串 错误发生的文件名
      *
-     * @param integer $line the line number the error was raised at.
+     * @param int $line the line number the error was raised at.
      * 参数 整型 错误发生的行数
      *
      * @param mixed $context
@@ -213,7 +213,7 @@ abstract class ErrorHandler extends Component
      * @param mixed $backtrace trace of error
      * 参数 混合型 追踪错误
      *
-     * @return boolean whether the normal error handler continues.
+     * @return bool whether the normal error handler continues.
      * 返回值 boolean 正常错误处理是否继续
      *
      * @throws ErrorException
@@ -242,7 +242,7 @@ abstract class ErrorHandler extends Component
      * This method is used as a PHP error handler. It will simply raise an [[ErrorException]].
      * 该方法用作PHP的错误处理。它只是引发一个ErrorException
      *
-     * @param integer $code the level of the error raised.
+     * @param int $code the level of the error raised.
      * 参数 整型 发送错误的级别
      *
      * @param string $message the error message.
@@ -251,10 +251,10 @@ abstract class ErrorHandler extends Component
      * @param string $file the filename that the error was raised in.
      * 参数 字符串 错误发生的文件
      *
-     * @param integer $line the line number the error was raised at.
+     * @param int $line the line number the error was raised at.
      * 参数 整型 错误发生的行数
      *
-     * @return boolean whether the normal error handler continues.
+     * @return bool whether the normal error handler continues.
      * 返回值 boolean 正常错误处理是否继续
      *
      * @throws ErrorException

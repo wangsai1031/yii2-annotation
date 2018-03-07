@@ -602,6 +602,7 @@ class Container extends Component
                 }
             }
         }
+
         // 将 ReflectionClass 对象缓存起来
         $this->_reflections[$class] = $reflection;
         // 将依赖信息缓存起来
@@ -658,6 +659,7 @@ class Container extends Component
      * }
      * Yii::$container->invoke($formatString, ['string' => 'Hello World!']);
      * ```
+     *
      * 这将使用字符串`'Hello World!'`作为第一个参数，一个由DI容器创建的formatter实例作为第二个参数 传送给callable。
      * This will pass the string `'Hello World!'` as the first param, and a formatter instance created
      * by the DI container as the second param to the callable.

@@ -13,7 +13,8 @@ use Yii;
  * InlineAction represents an action that is defined as a controller method.
  * InlineAction表示一个被定义为控制器方法的动作。
  *
- * The name of the controller method is available via [[actionMethod]] which is set by the [[controller]] who creates this action.
+ * The name of the controller method is available via [[actionMethod]] which
+ * is set by the [[controller]] who creates this action.
  * 控制器方法的名称可以通过[[actionMethod]]获得，该方法由创建此操作的控制器[[controller]]设置。
  *
  * For more details and usage information on InlineAction, see the [guide article on actions](guide:structure-controllers).
@@ -71,6 +72,7 @@ class InlineAction extends Action
             // 将参数值赋给 应用实例
             Yii::$app->requestedParams = $args;
         }
+
         //用控制器类去执行action方法，并且带上参数。
         return call_user_func_array([$this->controller, $this->actionMethod], $args);
     }

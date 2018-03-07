@@ -85,7 +85,7 @@ class Event extends BaseObject
     /**
      * 是否终止事件的后续处理
      *
-     * @var boolean whether the event is handled. Defaults to `false`.
+     * @var bool whether the event is handled. Defaults to `false`.
      * 属性 boolean 事件是否被处理。默认是false
      *
      * When a handler sets this to be `true`, the event processing will stop and
@@ -161,7 +161,7 @@ class Event extends BaseObject
      * When the event handler is invoked, this data can be accessed via [[Event::data]].
      * 参数 混合型 当事件触发时传递给事件处理程序的数据。当事件处理程序被调用时，该数据可以通过Event::data进行访问
      *
-     * @param boolean $append whether to append new event handler to the end of the existing
+     * @param bool $append whether to append new event handler to the end of the existing
      * handler list. If `false`, the new handler will be inserted at the beginning of the existing
      * handler list.
      * 参数 boolean 是否添加新的事件处理程序到已经存在的事件处理程序列表的最后。如果为false，新的事件处理程序会被添加到事件处理
@@ -232,7 +232,7 @@ class Event extends BaseObject
      * If it is `null`, all handlers attached to the named event will be removed.
      * 参数 被删除的事件处理程序，如果为null，所有的事件处理程序都会被删除
      *
-     * @return boolean whether a handler is found and detached.
+     * @return bool whether a handler is found and detached.
      * 返回值 boolean 事件处理程序是否被找到并删除。
      * @see on()
      */
@@ -327,7 +327,7 @@ class Event extends BaseObject
      * @param string $name the event name.
      * 参数 字符串 事件名
      *
-     * @return boolean whether there is any handler attached to the event.
+     * @return bool whether there is any handler attached to the event.
      * 返回值 boolean 是否有事件处理程序绑定到了该事件
      */
     public static function hasHandlers($class, $name)

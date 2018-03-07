@@ -222,6 +222,7 @@ class FileCache extends Cache
             if ($duration <= 0) {
                 $duration = 31536000; // 1 year
             }
+
             // 通过设置文件最后修改时间的方式设置缓存过期时间
             return @touch($cacheFile, $duration + time());
         }
@@ -252,6 +253,7 @@ class FileCache extends Cache
         if (@filemtime($cacheFile) > time()) {
             return false;
         }
+
         // 通过调用 setValue() 设置缓存
         return $this->setValue($key, $value, $duration);
     }
@@ -268,6 +270,7 @@ class FileCache extends Cache
     {
         // 获取缓存文件名（包含路径）
         $cacheFile = $this->getCacheFile($key);
+
         // 删除缓存文件
         return @unlink($cacheFile);
     }
@@ -290,6 +293,7 @@ class FileCache extends Cache
                     $base .= DIRECTORY_SEPARATOR . $prefix;
                 }
             }
+
             // 拼接缓存文件的路径
             return $base . DIRECTORY_SEPARATOR . $key . $this->cacheFileSuffix;
         }

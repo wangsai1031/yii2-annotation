@@ -460,6 +460,7 @@ class Security extends Component
             $hash = StringHelper::byteSubstr($data, 0, $hashLength);
             // 截取之后的字符为有效数据
             $pureData = StringHelper::byteSubstr($data, $hashLength, null);
+
             // 重新使用 HMAC 方法生成带有密钥的哈希值
             $calculatedHash = hash_hmac($this->macHash, $pureData, $key, $rawHash);
 
@@ -485,7 +486,7 @@ class Security extends Component
      * @see generateRandomString() if you need a string.
      *
      * 生成的字节数
-     * @param integer $length the number of bytes to generate
+     * @param int $length the number of bytes to generate
      * 生成的随机字节
      * @return string the generated random bytes
      * @throws InvalidArgumentException if wrong length is specified
@@ -513,7 +514,7 @@ class Security extends Component
 
         // The recent LibreSSL RNGs are faster and likely better than /dev/urandom.
         // Parse OPENSSL_VERSION_TEXT because OPENSSL_VERSION_NUMBER is no use for LibreSSL.
-        // @see https://bugs.php.net/bug.php?id=71143
+        // https://bugs.php.net/bug.php?id=71143
         // 最近的LibreSSL RNGs 比 /dev/urandom 更快，而且可能更好。
         // 解析 OPENSSL_VERSION_TEXT，因为 OPENSSL_VERSION_NUMBER 对 LibreSSL 没有任何用处.
         if ($this->_useLibreSSL === null) {

@@ -110,6 +110,7 @@ abstract class Dependency extends \yii\base\BaseObject
             // 若依赖不可重用, 直接生成所需的依赖项数据
             $data = $this->generateDependencyData($cache);
         }
+
         // 新生成的依赖数据与缓存中的依赖数据进行比较
         return $data !== $this->data;
     }

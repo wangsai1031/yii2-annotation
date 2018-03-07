@@ -27,7 +27,7 @@ use yii\helpers\Html;
  * You can modify its configuration by adding an array to your application config under `components`
  * as it is shown in the following example:
  * 您可以通过在 应用程序组件 `components` 配置中添加一个数组来修改它的配置,示例如下
- * 
+ *
  * ```php
  * 'view' => [
  *     'theme' => 'app\themes\MyTheme',
@@ -664,6 +664,7 @@ class View extends \yii\base\View
         if (!empty($this->metaTags)) {
             $lines[] = implode("\n", $this->metaTags);
         }
+
         // link 标签
         if (!empty($this->linkTags)) {
             $lines[] = implode("\n", $this->linkTags);
@@ -707,6 +708,7 @@ class View extends \yii\base\View
         if (!empty($this->js[self::POS_BEGIN])) {
             $lines[] = Html::script(implode("\n", $this->js[self::POS_BEGIN]));
         }
+
         // 返回转换后的字符串
         return empty($lines) ? '' : implode("\n", $lines);
     }

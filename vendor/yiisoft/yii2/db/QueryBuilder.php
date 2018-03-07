@@ -638,6 +638,7 @@ class QueryBuilder extends \yii\base\BaseObject
     /**
      * Creates an UPDATE SQL statement.
      * 创建一个UPDATE语句。
+     *
      * For example,
      * 例如，
      *

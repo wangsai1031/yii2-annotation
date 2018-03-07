@@ -391,6 +391,7 @@ class BaseFileHelper
      * @param string $dir the directory to be deleted recursively.
      * 删除目录的配置选项，有效的选项有：
      * @param array $options options for directory remove. Valid options are:
+     *
      *   是否遍历删除文件夹中通过软链接连接到的目录。默认是false，只会删除该软链接。
      * - traverseSymlinks: boolean, whether symlinks to the directories should be traversed too.
      *   Defaults to `false`, meaning the content of the symlinked directory would not be deleted.

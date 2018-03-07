@@ -512,7 +512,8 @@ class Session extends Component implements \IteratorAggregate, \ArrayAccess, \Co
      *
      * session_regenerate_id(): 使用新生成的会话 ID 更新现有会话 ID
      * headers_sent() ： 检查是否已经发送了头信息
-     * Updates the current session ID with a newly generated one .
+     * Updates the current session ID with a newly generated one.
+     *
      * Please refer to <http://php.net/session_regenerate_id> for more details.
      *
      * 是否删除关联的旧的会话文件
@@ -713,6 +714,7 @@ class Session extends Component implements \IteratorAggregate, \ArrayAccess, \Co
      */
     public function setUseCookies($value)
     {
+        $this->freeze();
         /**
          * session.use_cookies:
          * session id在客户端采用的存储方式，置1代表使用cookie记录客户端的sessionid，同时，$_COOKIE变量里才会有$_COOKIE['PHPSESSIONID']这个元素存在。
@@ -1280,6 +1282,7 @@ class Session extends Component implements \IteratorAggregate, \ArrayAccess, \Co
         unset($counters[$key], $_SESSION[$key]);
         // 会话记录空的flash消息计数器
         $_SESSION[$this->flashParam] = $counters;
+
         // 返回被删除的flash消息值
         return $value;
     }

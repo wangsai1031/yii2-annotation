@@ -26,7 +26,7 @@ use yii\di\ServiceLocator;
  * 组件注册模块后，就可以在整个模块中访问了
  *
  * For more details and usage information on Module, see the [guide article on modules](guide:structure-modules).
-
+ *
  * @property array $aliases List of path aliases to be defined. The array keys are alias names (must start
  * with `@`) and the array values are the corresponding paths or aliases. See [[setAliases()]] for an example.
  * This property is write-only.
@@ -87,7 +87,7 @@ class Module extends ServiceLocator
      */
     public $module;
     /**
-     * @var string|boolean the layout that should be applied for views within this module. This refers to a view name
+     * @var string|bool the layout that should be applied for views within this module. This refers to a view name
      * relative to [[layoutPath]]. If this is not set, it means the layout value of the [[module|parent module]]
      * will be taken. If this is `false`, layout will be disabled within this module.
      * 属性 字符串|boolean 该模块用于视图的布局文件。这个是指布局目录下的视图名。如果没有设置，默认会采用父模块的布局，如果是false，该模块就不再
@@ -330,7 +330,7 @@ class Module extends ServiceLocator
      * This method can only be invoked at the beginning of the constructor.
      * 该方法只能在构造函数的开头调用
      *
-     * @param string $path the root directory of the module. This can be either a directory name or a path alias.
+     * @param string $path the root directory of the module. This can be either a directory name or a [path alias](guide:concept-aliases).
      * 参数 字符串 模块的根目录。该参数可以是目录名或者一个路径别名
      *
      * @throws InvalidArgumentException if the directory does not exist.
@@ -419,7 +419,7 @@ class Module extends ServiceLocator
      * Sets the directory that contains the layout files.
      * 设置布局文件所在的目录
      *
-     * @param string $path the root directory or path alias of layout files.
+     * @param string $path the root directory or [path alias](guide:concept-aliases) of layout files.
      * 参数 字符串 布局文件的根目录或者路径别名
      * @throws InvalidArgumentException if the directory is invalid
      * 如果目录不合法，抛出不合法的参数异常
@@ -506,8 +506,10 @@ class Module extends ServiceLocator
      *
      * ```php
      * [
-     *     '@models' => '@app/models', // an existing alias 已经存在的别名
-     *     '@backend' => __DIR__ . '/../backend',  // a directory 目录
+     *      // 已经存在的别名
+     *     '@models' => '@app/models', // an existing alias
+     *      // 目录
+     *     '@backend' => __DIR__ . '/../backend',  // a directory
      * ]
      * ```
      */
@@ -528,7 +530,7 @@ class Module extends ServiceLocator
      * @param string $id module ID. For grand child modules, use ID path relative to this module (e.g. `admin/content`).
      * 参数 字符串 如果是孙模块，使用该模块的ID相对路径（例如 admin/content）
      *
-     * @return boolean whether the named module exists. Both loaded and unloaded modules
+     * @return bool whether the named module exists. Both loaded and unloaded modules
      * are considered.
      * 返回值 boolean 给定的模块是否存在，不论模块是否被加载都在范围之内
      */
@@ -555,7 +557,7 @@ class Module extends ServiceLocator
      * use ID path relative to this module (e.g. `admin/content`).
      * 参数 字符串 模块ID（大小写敏感），需要获取孙模块的实例，使用ID的相对路径写法，（例如admin/content）
      *
-     * @param boolean $load whether to load the module if it is not yet loaded.
+     * @param bool $load whether to load the module if it is not yet loaded.
      * 参数 boolean 如果模块没有被加载，是否加载它
      *
      * @return Module|null the module instance, `null` if the module does not exist.
@@ -626,7 +628,7 @@ class Module extends ServiceLocator
      * Returns the sub-modules in this module.
      * 返回该模块中的子模块
      *
-     * @param boolean $loadedOnly whether to return the loaded sub-modules only. If this is set `false`,
+     * @param bool $loadedOnly whether to return the loaded sub-modules only. If this is set `false`,
      * then all sub-modules registered in this module will be returned, whether they are loaded or not.
      * Loaded modules will be returned as objects, while unloaded modules as configuration arrays.
      * 参数 boolean 是否只返回加载过的子模块。如果设置为false，该模块注册的所有子模块都会被返回，不管他们有没有被加载。
@@ -765,7 +767,7 @@ class Module extends ServiceLocator
      * @param string $route the route consisting of module, controller and action IDs.
      * 参数 字符串 由模块，控制器，动作组成的路由
      *
-     * @return array|boolean If the controller is created successfully, it will be returned together
+     * @return array|bool If the controller is created successfully, it will be returned together
      * with the requested action ID. Otherwise `false` will be returned.
      * 返回值 数组|boolean 如果控制器成功创建，就会将请求的ID一并返回，否则返回的就是false
      *
@@ -818,6 +820,7 @@ class Module extends ServiceLocator
             // 最后一个 '/'后的字符串为 $route
             $route = substr($route, $pos + 1);
         }
+
         // 根据给定的控制器ID创建一个控制器
         $controller = $this->createControllerByID($id);
         // 若 $controller 为 null, 但是 $route 不是空字符串
@@ -826,6 +829,7 @@ class Module extends ServiceLocator
             $controller = $this->createControllerByID($id . '/' . $route);
             $route = '';
         }
+
         // 返回 [$controller, $route]
         return $controller === null ? false : [$controller, $route];
     }
@@ -886,6 +890,7 @@ class Module extends ServiceLocator
         if (strpos($className, '-') !== false || !class_exists($className)) {
             return null;
         }
+
         /**
          * is_subclass_of() : 如果此对象是该类的子类，则返回 TRUE
          * @link http://php.net/manual/zh/function.is-subclass-of.php
@@ -950,14 +955,15 @@ class Module extends ServiceLocator
      *     // your custom code here
      *     // 你的自定义代码
      *
-     *     return true; // or false to not run the action  // 或者返回false，不执行该动作
+     *     return true; // or false to not run the action
+     *     // 或者返回false，不执行该动作
      * }
      * ```
      *
      * @param Action $action the action to be executed.
      * 参数 将要执行的动作
      *
-     * @return boolean whether the action should continue to be executed.
+     * @return bool whether the action should continue to be executed.
      * 返回值 boolean 该方法是否需要继续执行
      */
     public function beforeAction($action)

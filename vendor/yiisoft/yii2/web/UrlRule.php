@@ -558,6 +558,7 @@ class UrlRule extends BaseObject implements UrlRuleInterface
                 return false;
             }
         }
+
         // 规则定义了主机信息，即 http://www.digpage.com 之类，那要把主机信息接回去。
         if ($this->host !== null) {
             $pathInfo = strtolower($request->getHostInfo()) . ($pathInfo === '' ? '' : '/' . $pathInfo);

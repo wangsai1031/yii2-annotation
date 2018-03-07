@@ -231,10 +231,12 @@ class View extends Component implements DynamicContentAwareInterface
             $file = Yii::getAlias($view);
         // $view 以 '//' 开头
         } elseif (strncmp($view, '//', 2) === 0) {
+            // e.g. "//layouts/main"
             // e.g. "//layouts/main" => @module/views/layouts/main
             $file = Yii::$app->getViewPath() . DIRECTORY_SEPARATOR . ltrim($view, '/');
         // $view 以 '/' 开头
         } elseif (strncmp($view, '/', 1) === 0) {
+            // e.g. "/site/index"
             // e.g. "/site/index" => @module/views/site/index
             if (Yii::$app->controller !== null) {
                 $file = Yii::$app->controller->module->getViewPath() . DIRECTORY_SEPARATOR . ltrim($view, '/');
@@ -248,6 +250,7 @@ class View extends Component implements DynamicContentAwareInterface
         } else {
             throw new InvalidCallException("Unable to resolve view file for view '$view': no active view context.");
         }
+
         /**
          * @see http://www.w3school.com.cn/php/func_filesystem_pathinfo.asp
          * pathinfo() : 以数组的形式返回文件路径的信息。
@@ -378,7 +381,7 @@ class View extends Component implements DynamicContentAwareInterface
      * @param array $params the parameter array passed to the [[render()]] method.
      * 参数 数组 传递给[[render()]]方法的参数数组。
      *
-     * @return boolean whether to continue rendering the view file.
+     * @return bool whether to continue rendering the view file.
      * 返回值 boolean 是否继续渲染视图文件。
      */
     public function beforeRender($viewFile, $params)
@@ -513,6 +516,7 @@ class View extends Component implements DynamicContentAwareInterface
 
             return $placeholder;
         }
+
         // 运行给定的 PHP 动态语句，返回运行结果
         return $this->evaluateDynamicContent($statements);
     }
@@ -566,7 +570,7 @@ class View extends Component implements DynamicContentAwareInterface
         }
         // 将占位符赋值给当前view对象
         $this->dynamicPlaceholders[$placeholder] = $statements;
-    }
+}
 
     /**
      * Evaluates the given PHP statements.
@@ -727,7 +731,7 @@ class View extends Component implements DynamicContentAwareInterface
      * @param array $properties initial property values for [[FragmentCache]]
      * 参数 数组 片段缓存的初始属性值。
      *
-     * @return boolean whether you should generate the content for caching.
+     * @return bool whether you should generate the content for caching.
      * False if the cached version is available.
      * 返回值 boolean 你是否应该生成缓存内容。如果缓存的版本还可用，就返回false。
      */

@@ -79,7 +79,8 @@ use yii\helpers\StringHelper;
  * ```php
  * $user = new User();
  * $user->name = 'Qiang';
- * $user->save();  // a new row is inserted into user table // 向用户表里边添加一行
+ * // 向用户表里边添加一行
+ * $user->save();  // a new row is inserted into user table
  *
  * // the following will retrieve the user 'CeBe' from the database
  * // 下边的语句将会从数据库中检索用户名为CeBe的用户
@@ -137,7 +138,7 @@ class ActiveRecord extends BaseActiveRecord
      *
      * You may call this method to load default values after creating a new instance:
      * 你可以在创建一个新实例以后调用该方法载入默认值：
-     * 
+     *
      * ```php
      * // class Customer extends \yii\db\ActiveRecord
      * $customer = new Customer();
@@ -335,6 +336,7 @@ class ActiveRecord extends BaseActiveRecord
         $command = static::getDb()->createCommand();
         // 创建update语句
         $command->update(static::tableName(), $attributes, $condition, $params);
+
         // 执行update语句
         return $command->execute();
     }
@@ -384,6 +386,7 @@ class ActiveRecord extends BaseActiveRecord
         $command = static::getDb()->createCommand();
         // 创建update语句
         $command->update(static::tableName(), $counters, $condition, $params);
+
         // 执行update语句
         return $command->execute();
     }
@@ -437,6 +440,7 @@ class ActiveRecord extends BaseActiveRecord
         $command = static::getDb()->createCommand();
         // 创建delete语句
         $command->delete(static::tableName(), $condition, $params);
+
         // 执行命令
         return $command->execute();
     }
@@ -678,11 +682,13 @@ class ActiveRecord extends BaseActiveRecord
             Yii::info('Model not inserted due to validation error.', __METHOD__);
             return false;
         }
+
         // 这里调用了 isTransactional()，判断当前场景下，插入操作是否需要事务支持
         if (!$this->isTransactional(self::OP_INSERT)) {
             // 无需事务支持，那就直接insert了事
             return $this->insertInternal($attributes);
         }
+
         // 以下是需要事务支持的情况，那就启用事务
         $transaction = static::getDb()->beginTransaction();
         try {
@@ -835,6 +841,7 @@ class ActiveRecord extends BaseActiveRecord
             Yii::info('Model not updated due to validation error.', __METHOD__);
             return false;
         }
+
         // 这里调用了 isTransactional()，判断当前场景下，修改操作是否需要事务支持
         if (!$this->isTransactional(self::OP_UPDATE)) {
             // 无需事务支持，那就直接update了事
@@ -900,6 +907,7 @@ class ActiveRecord extends BaseActiveRecord
             // 若不需要事务，则直接删除
             return $this->deleteInternal();
         }
+
         // 开启事务
         $transaction = static::getDb()->beginTransaction();
         try {
@@ -1005,6 +1013,7 @@ class ActiveRecord extends BaseActiveRecord
         // 获取当前的scenario
         $scenario = $this->getScenario();
         $transactions = $this->transactions();
+
         // 场景存在，并且指定的操作设置了事务性
         return isset($transactions[$scenario]) && ($transactions[$scenario] & $operation);
     }

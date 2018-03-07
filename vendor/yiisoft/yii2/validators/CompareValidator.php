@@ -199,6 +199,7 @@ class CompareValidator extends Validator
             // 获取属性标签
             $compareLabel = $compareValueOrAttribute = $model->getAttributeLabel($compareAttribute);
         }
+
         // 比较值
         if (!$this->compareValues($this->operator, $this->type, $value, $compareValue)) {
             $this->addError($model, $attribute, $this->message, [

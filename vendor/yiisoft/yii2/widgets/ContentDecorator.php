@@ -32,7 +32,7 @@ use yii\base\Widget;
  * There are [[\yii\base\View::beginContent()]] and [[\yii\base\View::endContent()]] wrapper methods in the
  * [[\yii\base\View]] component to make syntax more friendly. In the view these could be used as follows:
  * 在视图中可以使用以下方法
- * 
+ *
  * ```php
  * <?php $this->beginContent('@app/views/layouts/base.php') ?>
  *

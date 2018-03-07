@@ -89,6 +89,7 @@ class ChainedDependency extends Dependency
                 return false;
             }
         }
+
         // 若 $this->dependOnAll 为true，但是每个子依赖都没有发生改变，则认为该依赖没有改变，返回false
         // 若 $this->dependOnAll 为false，但是每个子依赖都发生改变，则认为该依赖发生改变，返回true
         return !$this->dependOnAll;

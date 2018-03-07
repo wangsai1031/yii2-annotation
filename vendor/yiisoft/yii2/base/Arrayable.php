@@ -110,7 +110,7 @@ interface Arrayable
      * will be returned.
      * 参数 数组 额外需要返回的字段。没有在[[extraFields()]]方法中指定的字段会被忽略。如果此参数为空，就不会返回额外的字段
      *
-     * @param boolean $recursive whether to recursively return array representation of embedded objects.
+     * @param bool $recursive whether to recursively return array representation of embedded objects.
      * 参数 boolean 是否递归地内层嵌套对象
      *
      * @return array the array representation of the object

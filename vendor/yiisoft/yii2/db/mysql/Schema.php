@@ -270,6 +270,7 @@ SQL;
          * 创建ColumnSchema对象
          */
         $column = $this->createColumnSchema();
+
         // 字段名
         $column->name = $info['field'];
         // 是否允许为NULL

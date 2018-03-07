@@ -19,6 +19,7 @@ use yii\web\TooManyRequestsHttpException;
  *
  * You may use RateLimiter by attaching it as a behavior to a controller or module, like the following,
  * 您可以将RateLimiter作为一个控制器或模块的行为附加到控制器或模块中，如下所作
+ *
  * ```php
  * public function behaviors()
  * {
@@ -29,6 +30,7 @@ use yii\web\TooManyRequestsHttpException;
  *     ];
  * }
  * ```
+ *
  * 当用户已经超过他的速率限制,RateLimiter将抛出一个[[TooManyRequestsHttpException]]异常。
  * When the user has exceeded his rate limit, RateLimiter will throw a [[TooManyRequestsHttpException]] exception.
  *

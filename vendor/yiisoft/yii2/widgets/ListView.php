@@ -83,6 +83,7 @@ class ListView extends BaseListView
      *
      * If this property is specified as a callback, it should have the following signature:
      * 如果该属性被指定为回调函数，那么它应该具有以下参数：
+     *
      * ```php
      * function ($model, $key, $index, $widget)
      * ```

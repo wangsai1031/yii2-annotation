@@ -176,7 +176,7 @@ class Controller extends Component implements ViewContextInterface
         }
 
         Yii::debug('Route to run: ' . $action->getUniqueId(), __METHOD__);
-        
+
         if (Yii::$app->requestedAction === null) {
             // 将 $action 对象赋给 requestedAction
             Yii::$app->requestedAction = $action;
@@ -207,6 +207,7 @@ class Controller extends Component implements ViewContextInterface
 
         // 触发 控制器的 beforeAction 事件
         if ($runAction && $this->beforeAction($action)) {
+            // run the action
             /**
              * 运行动作 这里才是真正执行action的地方
              * @var InlineAction $action
@@ -308,6 +309,7 @@ class Controller extends Component implements ViewContextInterface
         if ($id === '') {
             $id = $this->defaultAction;
         }
+
         // 获取控制器的外部动作列表
         $actionMap = $this->actions();
         if (isset($actionMap[$id])) {
@@ -369,14 +371,15 @@ class Controller extends Component implements ViewContextInterface
      *     // other custom code here
      *     // 其他自定义代码
      *
-     *     return true; // or false to not run the action //或者返回false阻止动作的执行
+     *     return true; // or false to not run the action
+     *     //或者返回false阻止动作的执行
      * }
      * ```
      *
      * @param Action $action the action to be executed.
      * 参数 即将执行的动作
      *
-     * @return boolean whether the action should continue to run.
+     * @return bool whether the action should continue to run.
      * 返回值 boolean 是否继续执行动作
      */
     public function beforeAction($action)
@@ -445,6 +448,7 @@ class Controller extends Component implements ViewContextInterface
             array_unshift($modules, $module->module);
             $module = $module->module;
         }
+
         return $modules;
     }
 
@@ -479,7 +483,7 @@ class Controller extends Component implements ViewContextInterface
      * The view to be rendered can be specified in one of the following formats:
      * 要渲染的视图可以通过如下的方式指定：
      *
-     * - path alias (e.g. "@app/views/site/index");
+     * - [path alias](guide:concept-aliases) (e.g. "@app/views/site/index");
      * - 路径别名，例如"@app/views/site/index"
      *
      * - absolute path within application (e.g. "//site/index"): the view name starts with double slashes.
@@ -517,7 +521,7 @@ class Controller extends Component implements ViewContextInterface
      *    and context module. The layout name can be:
      * 2 第二步，根据先前找到的布局文件和当前模块，决定采用的布局文件。布局文件名可以是：
      *
-     * - a path alias (e.g. "@app/views/layouts/main");
+     * - a [path alias](guide:concept-aliases) (e.g. "@app/views/layouts/main");
      * - 路径别名 例如 "@app/views/layouts/main"
      *
      * - an absolute path (e.g. "/main"): the layout name starts with a slash. The actual layout file will be
@@ -600,7 +604,7 @@ class Controller extends Component implements ViewContextInterface
      * Renders a view file.
      * 渲染一个视图文件
      *
-     * @param string $file the view file to be rendered. This can be either a file path or a path alias.
+     * @param string $file the view file to be rendered. This can be either a file path or a [path alias](guide:concept-aliases).
      * 参数 字符串 即将被渲染的视图文件。可以是一个文件路径或者路径别名
      *
      * @param array $params the parameters (name-value pairs) that should be made available in the view.
@@ -635,6 +639,7 @@ class Controller extends Component implements ViewContextInterface
         if ($this->_view === null) {
             $this->_view = Yii::$app->getView();
         }
+
         return $this->_view;
     }
 
@@ -666,6 +671,7 @@ class Controller extends Component implements ViewContextInterface
         if ($this->_viewPath === null) {
             $this->_viewPath = $this->module->getViewPath() . DIRECTORY_SEPARATOR . $this->id;
         }
+
         return $this->_viewPath;
     }
 
@@ -692,7 +698,7 @@ class Controller extends Component implements ViewContextInterface
      * @param View $view the view object to render the layout file.
      * 参数 渲染布局的视图对象
      *
-     * @return string|boolean the layout file path, or false if layout is not needed.
+     * @return string|bool the layout file path, or false if layout is not needed.
      * Please refer to [[render()]] on how to specify this parameter.
      * 返回值 字符串或者boolean 布局文件路径，如果不需要布局文件，返回false。
      * 请参考render方法关于如何指定此参数
