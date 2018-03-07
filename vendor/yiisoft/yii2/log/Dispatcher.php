@@ -12,13 +12,16 @@ use yii\base\Component;
 use yii\base\ErrorHandler;
 
 /**
+ * Dispatcher（分配器） 管理一组 [[Target|log targets]] 集合。
  * Dispatcher manages a set of [[Target|log targets]].
  *
- * Dispatcher implements the [[dispatch()]]-method that forwards the log messages from a [[Logger]] to
- * the registered log [[targets]].
+ * Dispatcher 实现[[dispatch()]]-method，该方法将日志消息从日志记录器[[Logger]]转发到已注册的日志[[targets]]。
+ * Dispatcher implements the [[dispatch()]]-method that forwards the log messages from a [[Logger]] to the registered log [[targets]].
  *
+ * Dispatcher 实例注册为一个核心应用程序组件，可以使用`Yii::$app->log`访问
  * An instance of Dispatcher is registered as a core application component and can be accessed using `Yii::$app->log`.
  *
+ * 您可以在应用程序配置中做出如下配置
  * You may configure the targets in application configuration, like the following:
  *
  * ```php
@@ -44,6 +47,7 @@ use yii\base\ErrorHandler;
  * ]
  * ```
  *
+ * 每个日志目标都可以有一个名称，并且可以通过[[targets]]属性引用：
  * Each log target can have a name and can be referenced via the [[targets]] property as follows:
  *
  * ```php

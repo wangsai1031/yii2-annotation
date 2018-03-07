@@ -16,6 +16,9 @@ use yii\validators\NumberValidator;
 use yii\validators\StringValidator;
 
 /**
+ * AttributeTypecastBehavior 行为是yii2在v2.0.10版本时增加的，
+ * 主要提供了一个自动转换模型属性格式的行为，这针对于类似MongoDB或Redis等无模式的数据库来说是非常有用的。
+ *
  * AttributeTypecastBehavior provides an ability of automatic model attribute typecasting.
  * This behavior is very useful in case of usage of ActiveRecord for the schema-less databases like MongoDB or Redis.
  * It may also come in handy for regular [[\yii\db\ActiveRecord]] or even [[\yii\base\Model]], allowing to maintain
@@ -105,6 +108,8 @@ use yii\validators\StringValidator;
  * $model->typecastAttributes();
  * ```
  *
+ * @property Model|BaseActiveRecord $owner the owner of this behavior.
+ *
  * @author Paul Klimov <klimov.paul@gmail.com>
  * @since 2.0.10
  */
@@ -115,10 +120,6 @@ class AttributeTypecastBehavior extends Behavior
     const TYPE_BOOLEAN = 'boolean';
     const TYPE_STRING = 'string';
 
-    /**
-     * @var Model|BaseActiveRecord the owner of this behavior.
-     */
-    public $owner;
     /**
      * @var array attribute typecast map in format: attributeName => type.
      * Type can be set via PHP callable, which accept raw value as an argument and should return

@@ -8,11 +8,12 @@
 namespace yii\web;
 
 /**
+ * 429 "Too Many Requests" 请求频率过快异常。
+ * 使用这个异常来表示客户在给定的时间内发送了太多的请求。
+ * 例如，当“节流”API用户时，您将抛出这个异常。
  * TooManyRequestsHttpException represents a "Too Many Requests" HTTP exception with status code 429
  *
- * Use this exception to indicate that a client has made too many requests in a
- * given period of time. For example, you would throw this exception when
- * 'throttling' an API user.
+ * Use this exception to indicate that a client has made too many requests in a given period of time. For example, you would throw this exception when 'throttling' an API user.
  *
  * @link http://tools.ietf.org/search/rfc6585#section-4
  * @author Dan Schmidt <danschmidt5189@gmail.com>

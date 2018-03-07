@@ -14,11 +14,14 @@ use yii\base\InvalidConfigException;
 use yii\helpers\FormatConverter;
 
 /**
+ * 该验证器检查输入值是否为适当格式的 date，time，或者 datetime。
  * DateValidator verifies if the attribute represents a date, time or datetime in a proper [[format]].
  *
+ * 它还可以在特定的语言环境中解析国际化的日期。
  * It can also parse internationalized dates in a specific [[locale]] like e.g. `12 мая 2014` when [[format]]
  * is configured to use a time pattern in ICU format.
  *
+ * 可以使用最小和最大值来限制某个范围内的日期
  * It is further possible to limit the date within a certain range using [[min]] and [[max]].
  *
  * Additional to validating the date it can also export the parsed timestamp as a machine readable format
@@ -123,12 +126,6 @@ class DateValidator extends Validator
      *
      * This can be the same attribute as the one being validated. If this is the case,
      * the original value will be overwritten with the timestamp value after successful validation.
-     *
-     * Note, that when using this property, the input value will be converted to a unix timestamp,
-     * which by definition is in UTC, so a conversion from the [[$timeZone|input time zone]] to UTC
-     * will be performed. When defining [[$timestampAttributeFormat]] you can control the conversion by
-     * setting [[$timestampAttributeTimeZone]] to a different value than `'UTC'`.
-     *
      * @see timestampAttributeFormat
      * @see timestampAttributeTimeZone
      */

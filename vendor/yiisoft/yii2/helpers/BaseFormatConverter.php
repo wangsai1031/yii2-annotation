@@ -22,8 +22,11 @@ use Yii;
 class BaseFormatConverter
 {
     /**
+     * 用于ICU短模式的php后备定义
      * @var array the php fallback definition to use for the ICU short patterns `short`, `medium`, `long` and `full`.
      * This is used as fallback when the intl extension is not installed.
+     *
+     * 这是没有开启 intl 扩展时的后备属相
      */
     public static $phpFallbackDatePatterns = [
         'short' => [
@@ -48,8 +51,11 @@ class BaseFormatConverter
         ],
     ];
     /**
+     * 用于ICU短模式的jQuery UI 回退定义
+     *
      * @var array the jQuery UI fallback definition to use for the ICU short patterns `short`, `medium`, `long` and `full`.
      * This is used as fallback when the intl extension is not installed.
+     * 这是没有开启 intl 扩展时的后备属相
      */
     public static $juiFallbackDatePatterns = [
         'short' => [
@@ -83,12 +89,14 @@ class BaseFormatConverter
 
 
     /**
+     * 转换日期格式模式  [ICU format][] to [php date() function format]
      * Converts a date format pattern from [ICU format][] to [php date() function format][].
      *
+     * 转换仅限于不使用转义字符的日期模式
      * The conversion is limited to date patterns that do not use escaped characters.
-     * Patterns like `d 'of' MMMM yyyy` which will result in a date like `1 of December 2014` may not be converted correctly
-     * because of the use of escaped characters.
+     * Patterns like `d 'of' MMMM yyyy` which will result in a date like `1 of December 2014` may not be converted correctly because of the use of escaped characters.
      *
+     * 不支持PHP格式的模式结构将被移除
      * Pattern constructs that are not supported by the PHP format will be removed.
      *
      * [php date() function format]: http://php.net/manual/en/function.date.php

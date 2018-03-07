@@ -60,6 +60,7 @@ defined('STDERR') or define('STDERR', fopen('php://stderr', 'w'));
 class Application extends \yii\base\Application
 {
     /**
+     * 指定应用程序配置文件路径的选项名。
      * The option name for specifying the application configuration file path.
      */
     const OPTION_APPCONFIG = 'appconfig';
@@ -70,11 +71,13 @@ class Application extends \yii\base\Application
      */
     public $defaultRoute = 'help';
     /**
+     * 是否启用核心框架提供的命令。
      * @var boolean whether to enable the commands provided by the core framework.
      * Defaults to true.
      */
     public $enableCoreCommands = true;
     /**
+     * 当前活动的控制器实例。
      * @var Controller the currently active controller instance
      */
     public $controller;

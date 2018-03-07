@@ -12,11 +12,15 @@ use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 
 /**
+ * 检查输入值是否存在于给定列表的范围之中。
  * RangeValidator validates that the attribute value is among a list of values.
  *
  * The range can be specified via the [[range]] property.
  * If the [[not]] property is set true, the validator will ensure the attribute value
  * is NOT among the specified range.
+ *
+ *  // 检查 "level" 是否为 1、2 或 3 中的一个
+    ['level', 'in', 'range' => [1, 2, 3]],
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
@@ -24,6 +28,7 @@ use yii\helpers\ArrayHelper;
 class RangeValidator extends Validator
 {
     /**
+     * 用于检查输入值的给定值列表。
      * @var array|\Traversable|\Closure a list of valid values that the attribute value should be among or an anonymous function that returns
      * such a list. The signature of the anonymous function should be as follows,
      *
@@ -36,15 +41,24 @@ class RangeValidator extends Validator
      */
     public $range;
     /**
+     * 输入值与给定值直接的比较是否为严格模式（也就是类型与值都要相同，即全等）。
+     * 默认为 false。
      * @var boolean whether the comparison is strict (both type and value must be the same)
      */
     public $strict = false;
     /**
+     * 是否对验证的结果取反。
+     * 默认为 false。
+     * 当该属性被设置为 true， 验证器检查输入值是否不在给定列表内。
+     *
      * @var boolean whether to invert the validation logic. Defaults to false. If set to true,
      * the attribute value should NOT be among the list of values defined via [[range]].
      */
     public $not = false;
     /**
+     * 是否接受输入值为数组。
+     * 当该值为 true 且输入值为数组时， 数组内的每一个元素都必须在给定列表内存在，
+     * 否则返回验证失败。
      * @var boolean whether to allow array type attribute.
      */
     public $allowArray = false;

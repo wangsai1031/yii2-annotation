@@ -11,17 +11,24 @@ use Yii;
 use yii\base\InvalidConfigException;
 
 /**
+ * Instance 表示依赖注入(DI)容器或服务定位器中的指定对象的引用
  * Instance represents a reference to a named object in a dependency injection (DI) container or a service locator.
  *
+ * 您可以使用[[get()]]获取[[id]]引用的实际对象。
  * You may use [[get()]] to obtain the actual object referenced by [[id]].
  *
+ * 实例主要用于两个地方:
+ * - 在配置依赖注入容器时，您可以使用Instance来引用类名、接口名或别名。
+ *   稍后可以通过容器将引用解析为实际的对象。
+ * - 在类中使用服务定位器获取相关对象。
  * Instance is mainly used in two places:
  *
- * - When configuring a dependency injection container, you use Instance to reference a class name, interface name
- *   or alias name. The reference can later be resolved into the actual object by the container.
+ * - When configuring a dependency injection container, you use Instance to reference a class name, interface name or alias name.
+ *   The reference can later be resolved into the actual object by the container.
  * - In classes which use service locator to obtain dependent objects.
  *
  * The following example shows how to configure a DI container with Instance:
+ * 面的例子展示了如何使用实例配置DI容器
  *
  * ```php
  * $container = new \yii\di\Container;
@@ -36,6 +43,7 @@ use yii\base\InvalidConfigException;
  * ```
  *
  * And the following example shows how a class retrieves a component from a service locator:
+ * 下面的例子展示了一个类如何从服务定位器中检索组件
  *
  * ```php
  * class DbCache extends Cache
@@ -56,12 +64,14 @@ use yii\base\InvalidConfigException;
 class Instance
 {
     /**
+     * 仅有的属性，用于保存类名、接口名或者别名
      * @var string the component ID, class name, interface name or alias name
      */
     public $id;
 
 
     /**
+     * 构造函数，仅将传入的ID赋值给 $id 属性
      * Constructor.
      * @param string $id the component ID
      */
@@ -71,6 +81,7 @@ class Instance
     }
 
     /**
+     * 静态方法创建一个Instance实例
      * Creates a new Instance object.
      * @param string $id the component ID
      * @return Instance the new Instance object.
@@ -81,12 +92,16 @@ class Instance
     }
 
     /**
+     * 将指定的引用解析成实际的对象，并确保这个对象的类型
      * Resolves the specified reference into the actual object and makes sure it is of the specified type.
      *
-     * The reference may be specified as a string or an Instance object. If the former,
-     * it will be treated as a component ID, a class/interface name or an alias, depending on the container type.
+     * 引用可以指定为字符串或实例对象。
+     * 如果是前者，它将被视为一个组件ID、一个类/接口名或别名，这取决于容器类型。
+     * The reference may be specified as a string or an Instance object.
+     * If the former, it will be treated as a component ID, a class/interface name or an alias, depending on the container type.
      *
      * If you do not specify a container, the method will first try `Yii::$app` followed by `Yii::$container`.
+     * 如果您没有指定容器，该方法将首先尝试`Yii::$app`，然后是`Yii::$container`。
      *
      * For example,
      *
@@ -96,13 +111,20 @@ class Instance
      * // returns Yii::$app->db
      * $db = Instance::ensure('db', Connection::className());
      * // returns an instance of Connection using the given configuration
+     * // 使用给定的配置返回一个连接实例
      * $db = Instance::ensure(['dsn' => 'sqlite:path/to/my.db'], Connection::className());
      * ```
      *
+     * 一个对象或一个对所期望对象的引用.
+     * 您可以使用组件ID或实例对象来指定引用。
+     * 从2.0.2版本开始，您也可以通过配置数组来创建对象。
+     * 如果在配置数组中没有指定“class”值，那么它将使用$type的值。
      * @param object|string|array|static $reference an object or a reference to the desired object.
      * You may specify a reference in terms of a component ID or an Instance object.
      * Starting from version 2.0.2, you may also pass in a configuration array for creating the object.
      * If the "class" value is not specified in the configuration array, it will use the value of `$type`.
+     *
+     * 要检查的类/接口名.如果是null，则不会执行类型检查
      * @param string $type the class/interface name to be checked. If null, type check will not be performed.
      * @param ServiceLocator|Container $container the container. This will be passed to [[get()]].
      * @return object the object referenced by the Instance, or `$reference` itself if it is an object.
@@ -110,24 +132,32 @@ class Instance
      */
     public static function ensure($reference, $type = null, $container = null)
     {
+        // $reference 是一个配置数组
         if (is_array($reference)) {
+            // 如果在配置数组中没有指定“class”值，那么它将使用$type的值。
             $class = isset($reference['class']) ? $reference['class'] : $type;
+            // 如果没有指定容器，默认为`Yii::$container`。
             if (!$container instanceof Container) {
                 $container = Yii::$container;
             }
             unset($reference['class']);
+            // 使用依赖注入容器返回被请求类的实例
             return $container->get($class, [], $reference);
         } elseif (empty($reference)) {
             throw new InvalidConfigException('The required component is not specified.');
         }
 
+        // 如果是字符串
         if (is_string($reference)) {
+            // 创建 Instance 的实例
             $reference = new static($reference);
         } elseif ($type === null || $reference instanceof $type) {
+            // 不是字符串，且 $type 为null或者 $reference 是 $type 的实例，直接返回 $reference
             return $reference;
         }
 
         if ($reference instanceof self) {
+            // 使用容器获取实例
             $component = $reference->get($container);
             if ($type === null || $component instanceof $type) {
                 return $component;
@@ -141,6 +171,7 @@ class Instance
     }
 
     /**
+     * 获取这个实例所引用的实际对象，事实上它调用的是 yii\di\Container::get()来获取实际对象
      * Returns the actual object referenced by this Instance object.
      * @param ServiceLocator|Container $container the container used to locate the referenced object.
      * If null, the method will first try `Yii::$app` then `Yii::$container`.
@@ -149,8 +180,10 @@ class Instance
     public function get($container = null)
     {
         if ($container) {
+            // 若容器存在，则返回直接通过容器获取的实例
             return $container->get($this->id);
         }
+        // 首先尝试`Yii::$app`，然后是`Yii::$container`。
         if (Yii::$app && Yii::$app->has($this->id)) {
             return Yii::$app->get($this->id);
         } else {

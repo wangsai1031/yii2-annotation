@@ -37,6 +37,8 @@ use yii\caching\TagDependency;
  */
 abstract class Schema extends Object
 {
+    // 预定义20种抽象字段类型
+    // 这20种类型与DBMS无关，在具体到特定的DBMS时，Yii会自动转换成合适的数据库字段类型 。
     // The following are the supported abstract column data types.
     const TYPE_PK = 'pk';
     const TYPE_UPK = 'upk';
@@ -60,6 +62,7 @@ abstract class Schema extends Object
     const TYPE_MONEY = 'money';
 
     /**
+     * 数据库连接实例
      * @var Connection the database connection
      */
     public $db;
@@ -68,6 +71,8 @@ abstract class Schema extends Object
      */
     public $defaultSchema;
     /**
+     * DB错误和对应异常的映射
+     * 如果在DB错误消息中找到了左部分，则使用了右边部分的异常类。
      * @var array map of DB errors and corresponding exceptions
      * If left part is found in DB error message exception class from the right part is used.
      */
@@ -76,18 +81,22 @@ abstract class Schema extends Object
     ];
 
     /**
+     * 数据库中所有模式名的列表，除了系统模式
      * @var array list of ALL schema names in the database, except system schemas
      */
     private $_schemaNames;
     /**
+     * 数据库中所有表名的列表
      * @var array list of ALL table names in the database
      */
     private $_tableNames = [];
     /**
+     * 加载表元数据的列表(表名 => TableSchema)
      * @var array list of loaded table metadata (table name => TableSchema)
      */
     private $_tables = [];
     /**
+     * 这个数据库的查询构建器
      * @var QueryBuilder the query builder for this database
      */
     private $_builder;
@@ -110,17 +119,21 @@ abstract class Schema extends Object
     abstract protected function loadTableSchema($name);
 
     /**
+     * 获得已命名表的元数据
      * Obtains the metadata for the named table.
+     * 表名
      * @param string $name table name. The table name may contain schema name if any. Do not quote the table name.
      * @param boolean $refresh whether to reload the table schema even if it is found in the cache.
      * @return null|TableSchema table metadata. Null if the named table does not exist.
      */
     public function getTableSchema($name, $refresh = false)
     {
+        // 如果该实例中已经缓存了该表的模式信息，则直接返回。
         if (array_key_exists($name, $this->_tables) && !$refresh) {
             return $this->_tables[$name];
         }
 
+        // 获取数据库连接实例
         $db = $this->db;
         $realName = $this->getRawTableName($name);
 
@@ -163,6 +176,7 @@ abstract class Schema extends Object
     }
 
     /**
+     * 返回缓存 标签 名
      * Returns the cache tag name.
      * This allows [[refresh()]] to invalidate all cached table schemas.
      * @return string the cache tag name
@@ -245,6 +259,8 @@ abstract class Schema extends Object
     }
 
     /**
+     * 将一个PHP数据类型转换成PDO数据类型
+     *
      * Determines the PDO type for the given PHP data value.
      * @param mixed $data the data whose PDO type is to be determined
      * @return integer the PDO type
@@ -252,6 +268,7 @@ abstract class Schema extends Object
      */
     public function getPdoType($data)
     {
+        // 定义一个PHP类型到PDO类型的映射表
         static $typeMap = [
             // php type => PDO type
             'boolean' => \PDO::PARAM_BOOL,
@@ -262,6 +279,7 @@ abstract class Schema extends Object
         ];
         $type = gettype($data);
 
+        // 在匹配不上映射表时，采用字符串类型..double 类型 用 PDO::PARAM_STR 来表示
         return isset($typeMap[$type]) ? $typeMap[$type] : \PDO::PARAM_STR;
     }
 
@@ -437,10 +455,13 @@ abstract class Schema extends Object
     }
 
     /**
+     * 执行INSERT命令，返回主键值。
+     * 插入成功，返回主键值，失败则返回false
+     *
      * Executes the INSERT command, returning primary key values.
      * @param string $table the table that new rows will be inserted into.
      * @param array $columns the column data (name => value) to be inserted into the table.
-     * @return array|false primary key values or false if the command fails
+     * @return array primary key values or false if the command fails
      * @since 2.0.4
      */
     public function insert($table, $columns)
@@ -560,17 +581,20 @@ abstract class Schema extends Object
     }
 
     /**
+     * 返回给定表名的实际名称。
+     * 这个方法将从给定的表名中去掉花括号，用[[Connection::tablePrefix]]前缀替换百分比字符'%'。
      * Returns the actual name of a given table name.
-     * This method will strip off curly brackets from the given table name
-     * and replace the percentage character '%' with [[Connection::tablePrefix]].
+     * This method will strip off curly brackets from the given table name and replace the percentage character '%' with [[Connection::tablePrefix]].
      * @param string $name the table name to be converted
      * @return string the real name of the given table name
      */
     public function getRawTableName($name)
     {
+        // 若表名中存在 '{{'，则
         if (strpos($name, '{{') !== false) {
+            // {{%table_name}} 匹配出 %table_name
             $name = preg_replace('/\\{\\{(.*?)\\}\\}/', '\1', $name);
-
+            // 将 % 替换为 表前缀
             return str_replace('%', $this->db->tablePrefix, $name);
         } else {
             return $name;
@@ -578,12 +602,15 @@ abstract class Schema extends Object
     }
 
     /**
+     * 从抽象的数据库类型提取PHP类型
+     *
      * Extracts the PHP type from abstract DB type.
      * @param ColumnSchema $column the column schema information
      * @return string PHP type name
      */
     protected function getColumnPhpType($column)
     {
+        // 定义从抽象类型到PHP类型的映射
         static $typeMap = [
             // abstract type => php type
             'smallint' => 'integer',
@@ -594,8 +621,23 @@ abstract class Schema extends Object
             'double' => 'double',
             'binary' => 'resource',
         ];
+
+        // 除了上面的映射关系外，还有几个特殊情况：
+        // 1. bigint字段，在64位环境下，且为singed时，使用integer来表示，否则string
+        // 2. integer字段，在32位环境下，且为unsinged时，使用string表示，否则integer
+        // 3. 映射中不存在的字段类型均使用string
         if (isset($typeMap[$column->type])) {
             if ($column->type === 'bigint') {
+                /**
+                 *  PHP_INT_SIZE：表示整数integer值的字长
+                    PHP_INT_MAX：表示整数integer值的最大值
+
+                 *  主要用于区分当前php运行所在的系统环境是32位还是64位
+                 * 注：
+                    输出下32位中PHP_INT_SIZE：4，PHP_INT_MAX：2147483647
+                    输出下64位中PHP_INT_SIZE：8，PHP_INT_MAX：9223372036854775807
+                 *
+                 */
                 return PHP_INT_SIZE === 8 && !$column->unsigned ? 'integer' : 'string';
             } elseif ($column->type === 'integer') {
                 return PHP_INT_SIZE === 4 && $column->unsigned ? 'string' : 'integer';

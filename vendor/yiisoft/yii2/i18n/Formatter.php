@@ -22,6 +22,24 @@ use yii\helpers\HtmlPurifier;
 use yii\helpers\Html;
 
 /**
+ * Formatter提供一组常用的数据格式化方法
+ *
+ *  // output: January 1, 2014
+    echo $formatter->asDate('2014-01-01', 'long');
+
+    // output: 12.50%
+    echo $formatter->asPercent(0.125, 2);
+
+    // output: <a href="mailto:cebe@example.com">cebe@example.com</a>
+    echo $formatter->asEmail('cebe@example.com');
+
+    // output: Yes
+    echo $formatter->asBoolean(true);
+    // it also handles display of null values:
+
+    // output: (Not set)
+    echo $formatter->asDate(null);
+ *
  * Formatter provides a set of commonly used data formatting methods.
  *
  * The formatting methods provided by Formatter are all named in the form of `asXyz()`.
@@ -47,12 +65,14 @@ use yii\helpers\Html;
 class Formatter extends Component
 {
     /**
+     * 在内容为 null 值时要显示的文本
      * @var string the text to be displayed when formatting a `null` value.
      * Defaults to `'<span class="not-set">(not set)</span>'`, where `(not set)`
      * will be translated according to [[locale]].
      */
     public $nullDisplay;
     /**
+     * 在格式化布尔值时要显示的文本
      * @var array the text to be displayed when formatting a boolean value. The first element corresponds
      * to the text displayed for `false`, the second element for `true`.
      * Defaults to `['No', 'Yes']`, where `Yes` and `No`
@@ -286,6 +306,7 @@ class Formatter extends Component
     }
 
     /**
+     * 根据给定的格式类型对值进行格式化
      * Formats the value based on the given format type.
      * This method will call one of the "as" methods available in this class to do the formatting.
      * For type "xyz", the method "asXyz" will be used. For example, if the format is "html",
@@ -324,6 +345,8 @@ class Formatter extends Component
 
 
     /**
+     * 除了 null 会被 nullDisplay 格式化外，原样输出
+     *
      * Formats the value as is without any formatting.
      * This method simply returns back the parameter without any format.
      * The only exception is a `null` value which will be formatted using [[nullDisplay]].
@@ -339,6 +362,7 @@ class Formatter extends Component
     }
 
     /**
+     * 将值格式化为html编码的文本。同时这也是 GridView DataColumn 默认使用的方法。
      * Formats the value as an HTML-encoded plain text.
      * @param string $value the value to be formatted.
      * @return string the formatted result.
@@ -352,6 +376,7 @@ class Formatter extends Component
     }
 
     /**
+     * 将值格式化为html编码的文本，并将换行符转换为<br/>
      * Formats the value as an HTML-encoded plain text with newlines converted into breaks.
      * @param string $value the value to be formatted.
      * @return string the formatted result.
@@ -365,6 +390,7 @@ class Formatter extends Component
     }
 
     /**
+     * 编码为 HTML 格式，以 <p> 标签包裹
      * Formats the value as HTML-encoded text paragraphs.
      * Each text paragraph is enclosed within a `<p>` tag.
      * One or multiple consecutive empty lines divide two paragraphs.
@@ -380,6 +406,9 @@ class Formatter extends Component
     }
 
     /**
+     * 这个数值将会被 HtmlPurifier 来进行过滤来防御 XSS 攻击，
+     * 你可以添加一些配置例如 ['html', ['Attr.AllowedFrameTargets' => ['_blank']]]。
+     *
      * Formats the value as HTML text.
      * The value will be purified using [[HtmlPurifier]] to avoid XSS attacks.
      * Use [[asRaw()]] if you do not want any purification of the value.
@@ -396,6 +425,8 @@ class Formatter extends Component
     }
 
     /**
+     * 这个数值将被转换为 mailto 链接。
+     *
      * Formats the value as a mailto link.
      * @param string $value the value to be formatted.
      * @param array $options the tag options in terms of name-value pairs. See [[Html::mailto()]].
@@ -424,6 +455,7 @@ class Formatter extends Component
     }
 
     /**
+     * 将值格式化为超链接
      * Formats the value as a hyperlink.
      * @param mixed $value the value to be formatted.
      * @param array $options the tag options in terms of name-value pairs. See [[Html::a()]].
@@ -462,6 +494,13 @@ class Formatter extends Component
 
 
     /**
+     * 将值格式化为一个日期
+     *
+     *  echo Yii::$app->formatter->asDate('now', 'yyyy-MM-dd'); // 2014-10-06
+
+        // PHP date()-format
+        echo Yii::$app->formatter->asDate('now', 'php:Y-m-d'); // 2014-10-06
+     *
      * Formats the value as a date.
      * @param integer|string|DateTime $value the value to be formatted. The following
      * types of value are supported:
@@ -494,6 +533,19 @@ class Formatter extends Component
     }
 
     /**
+     * 这个变量将被格式化为时间
+     *
+     * 下面使用 Europe/Berlin 作为默认 time zone
+
+        // formatting a UNIX timestamp as a time
+        echo Yii::$app->formatter->asTime(1412599260); // 14:41:00
+
+        // formatting a datetime string (in UTC) as a time
+        echo Yii::$app->formatter->asTime('2014-10-06 12:41:00'); // 14:41:00
+
+        // formatting a datetime string (in CEST) as a time
+        echo Yii::$app->formatter->asTime('2014-10-06 14:41:00 CEST'); // 14:41:00
+     *
      * Formats the value as a time.
      * @param integer|string|DateTime $value the value to be formatted. The following
      * types of value are supported:
@@ -526,6 +578,8 @@ class Formatter extends Component
     }
 
     /**
+     * 这个变量将被格式化为日期+时间
+     *
      * Formats the value as a datetime.
      * @param integer|string|DateTime $value the value to be formatted. The following
      * types of value are supported:
@@ -640,6 +694,8 @@ class Formatter extends Component
     }
 
     /**
+     * 将给定的datetime值规范化为一个datetime对象，它可以被各种日期/时间格式化方法所采用
+     *
      * Normalizes the given datetime value as a DateTime object that can be taken by various date/time formatting methods.
      *
      * @param integer|string|DateTime $value the datetime value to be normalized. The following
@@ -694,6 +750,7 @@ class Formatter extends Component
     }
 
     /**
+     * 这个变量将被格式化为 UNIX 时间戳 unix timestamp
      * Formats a date, time or datetime in a float number as UNIX timestamp (seconds since 01-01-1970).
      * @param integer|string|DateTime $value the value to be formatted. The following
      * types of value are supported:
@@ -715,6 +772,7 @@ class Formatter extends Component
     }
 
     /**
+     * 这个变量将被格式化为人类可读的当前相对时间间隔
      * Formats the value as the time interval between a date and now in human readable form.
      *
      * This method can be used in three different ways:
@@ -817,6 +875,7 @@ class Formatter extends Component
     }
 
     /**
+     *  这个变量将被格式化为人类可读的时长
      * Represents the value as duration in human readable format.
      *
      * @param DateInterval|string|integer $value the value to be formatted. Acceptable formats:
@@ -887,6 +946,7 @@ class Formatter extends Component
 
 
     /**
+     * 在没有四舍五入的情况下，将数值格式化为整数。
      * Formats the value as an integer number by removing any decimal digits without rounding.
      *
      * @param mixed $value the value to be formatted.
@@ -914,6 +974,7 @@ class Formatter extends Component
     }
 
     /**
+     * 将值格式化为带着逗号的指定精度的浮点型 e.g. 2,542.123 or 2.542,123.
      * Formats the value as a decimal number.
      *
      * Property [[decimalSeparator]] will be used to represent the decimal point. The
@@ -952,6 +1013,8 @@ class Formatter extends Component
 
 
     /**
+     * 这个变量将被格式化为百分比 e.g. 42%.
+     *
      * Formats the value as a percent number with "%" sign.
      *
      * @param mixed $value the value to be formatted. It must be a factor e.g. `0.75` will result in `75%`.
@@ -984,6 +1047,7 @@ class Formatter extends Component
     }
 
     /**
+     * 这个变量将被格式化为科学计数法 e.g. 4.2E4
      * Formats the value as a scientific number.
      *
      * @param mixed $value the value to be formatted.
@@ -1016,6 +1080,7 @@ class Formatter extends Component
     }
 
     /**
+     *  这个变量将被格式化为货币 £420.00. 使用这个方法前请确认是否已经正确配置 locale
      * Formats the value as a currency number.
      *
      * This function does not require the [PHP intl extension](http://php.net/manual/en/book.intl.php) to be installed
@@ -1118,6 +1183,8 @@ class Formatter extends Component
     }
 
     /**
+     * 这个变量将被格式化为人类可读的字节数（缩写） size, e.g. 410 KiB.
+     *
      * Formats the value in bytes as a size in human readable form for example `12 KB`.
      *
      * This is the short form of [[asSize]].
@@ -1176,6 +1243,8 @@ class Formatter extends Component
     }
 
     /**
+     * 这个变量将被格式化为人类可读的字节数 e.g. 410 kibibytes
+     *
      * Formats the value in bytes as a size in human readable form, for example `12 kilobytes`.
      *
      * If [[sizeFormatBase]] is 1024, [binary prefixes](http://en.wikipedia.org/wiki/Binary_prefix) (e.g. kibibyte/KiB, mebibyte/MiB, ...)

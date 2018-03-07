@@ -8,6 +8,7 @@
 namespace yii\web;
 
 /**
+ * 404 "Not Found" 异常
  * NotFoundHttpException represents a "Not Found" HTTP exception with status code 404.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>

@@ -100,15 +100,7 @@
          *  - jqXHR: a jqXHR object
          *  - textStatus: the status of the request ("success", "notmodified", "error", "timeout", "abort", or "parsererror").
          */
-        ajaxComplete: 'ajaxComplete',
-        /**
-         * afterInit event is triggered after yii activeForm init.
-         * The signature of the event handler should be:
-         *     function (event)
-         * where
-         *  - event: an Event object.
-         */        
-        afterInit: 'afterInit'
+        ajaxComplete: 'ajaxComplete'
     };
 
     // NOTE: If you change any of these defaults, make sure you update yii\widgets\ActiveForm::getClientOptions() as well
@@ -225,8 +217,6 @@
                     });
                     $form.on('submit.yiiActiveForm', methods.submitForm);
                 }
-                var event = $.Event(events.afterInit);
-                $form.trigger(event);
             });
         },
 
@@ -292,11 +282,7 @@
         },
 
         // validate all applicable inputs in the form
-        validate: function (forceValidate) {
-            if (forceValidate) {
-                $(this).data('yiiActiveForm').submitting = true;
-            }
-
+        validate: function () {
             var $form = $(this),
                 data = $form.data('yiiActiveForm'),
                 needAjaxValidation = false,
@@ -351,7 +337,7 @@
                         delete messages[i];
                     }
                 }
-                if (needAjaxValidation && ($.isEmptyObject(messages) || data.submitting)) {
+                if ($.isEmptyObject(messages) && needAjaxValidation) {
                     var $button = data.submitObject,
                         extData = '&' + data.settings.ajaxParam + '=' + $form.attr('id');
                     if ($button && $button.length && $button.attr('name')) {
@@ -567,7 +553,7 @@
      */
     var getFormOptions = function ($form) {
         var attributes = {};
-        for (var i = 0; i < buttonOptions.length; i++) {
+        for (var i in buttonOptions) {
             attributes[buttonOptions[i]] = $form.attr(buttonOptions[i]);
         }
         return attributes;
@@ -579,7 +565,7 @@
      * @param $button the button jQuery object
      */
     var applyButtonOptions = function ($form, $button) {
-        for (var i = 0; i < buttonOptions.length; i++) {
+        for (var i in buttonOptions) {
             var value = $button.attr('form' + buttonOptions[i]);
             if (value) {
                 $form.attr(buttonOptions[i], value);
@@ -594,7 +580,7 @@
     var restoreButtonOptions = function ($form) {
         var data = $form.data('yiiActiveForm');
 
-        for (var i = 0; i < buttonOptions.length; i++) {
+        for (var i in buttonOptions) {
             $form.attr(buttonOptions[i], data.options[buttonOptions[i]] || null);
         }
     };
@@ -607,10 +593,6 @@
      */
     var updateInputs = function ($form, messages, submitting) {
         var data = $form.data('yiiActiveForm');
-
-        if (data === undefined) {
-            return false;
-        }
 
         if (submitting) {
             var errorAttributes = [];

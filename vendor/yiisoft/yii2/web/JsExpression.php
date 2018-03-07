@@ -10,6 +10,7 @@ namespace yii\web;
 use yii\base\Object;
 
 /**
+ * 将字符串标记为JavaScript表达式
  * JsExpression marks a string as a JavaScript expression.
  *
  * When using [[\yii\helpers\Json::encode()]] or [[\yii\helpers\Json::htmlEncode()]] to encode a value, JsonExpression objects
@@ -28,6 +29,7 @@ class JsExpression extends Object
 
     /**
      * Constructor.
+     * 由这个对象表示的JavaScript表达式
      * @param string $expression the JavaScript expression represented by this object
      * @param array $config additional configurations for this object
      */
@@ -38,8 +40,12 @@ class JsExpression extends Object
     }
 
     /**
+     * PHP魔术函数将一个对象转换为字符串
+     * __toString() 方法用于一个类被当成字符串时应怎样回应。例如 echo $obj; 应该显示些什么。
+     *
      * The PHP magic function converting an object into a string.
      * @return string the JavaScript expression.
+     * @link http://php.net/manual/zh/language.oop5.magic.php#object.tostring
      */
     public function __toString()
     {

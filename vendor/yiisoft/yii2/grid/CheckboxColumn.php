@@ -13,25 +13,32 @@ use yii\helpers\Html;
 use yii\helpers\Json;
 
 /**
+ * Checkbox column 显示一个复选框列。
  * CheckboxColumn displays a column of checkboxes in a grid view.
  *
  * To add a CheckboxColumn to the [[GridView]], add it to the [[GridView::columns|columns]] configuration as follows:
+ *
+ * 想要添加一个复选框到网格视图中，将它添加到 columns 的配置中，如下所示：
  *
  * ```php
  * 'columns' => [
  *     // ...
  *     [
  *         'class' => 'yii\grid\CheckboxColumn',
- *         // you may configure additional properties here
+ *          // 你可以在这配置更多的属性
+ *          // you may configure additional properties here
  *     ],
  * ]
  * ```
  *
- * Users may click on the checkboxes to select rows of the grid. The selected rows may be
- * obtained by calling the following JavaScript code:
+ * 用户可点击复选框来选择网格中的一些行。
+ * 被选择的行可通过调用下面的 JavaScript代码来获得：
+ * Users may click on the checkboxes to select rows of the grid.
+ * The selected rows may be obtained by calling the following JavaScript code:
  *
  * ```javascript
  * var keys = $('#grid').yiiGridView('getSelectedRows');
+ * // keys 为一个由与被选行相关联的键组成的数组
  * // keys is an array consisting of the keys associated with the selected rows
  * ```
  *

@@ -18,10 +18,35 @@ use yii\widgets\BaseListView;
 use yii\base\Model;
 
 /**
+ * 数据网格或者说 GridView 小部件是Yii中最强大的部件之一。
+ * 如果你需要快速建立系统的管理后台， GridView 非常有用。
+ * 它从数据提供者 data provider 中取得数据并使用 columns 属性的一组列配置，在一个表格中渲染每一行数据。
+ *
+ * 表中的每一行代表一个数据项的数据，并且一列通常表示该项的属性 （某些列可以对应于属性或静态文本的复杂表达式）。
+ *
+ * 使用GridView的最少代码如下：
+ *
+    ```
+    $dataProvider = new ActiveDataProvider([
+        'query' => Post::find(),
+        'pagination' => [
+            'pageSize' => 20,
+        ],
+    ]);
+    echo GridView::widget([
+        'dataProvider' => $dataProvider,
+    ]);
+ * ```
+ * 上面的代码首先创建了一个数据提供者，然后使用GridView显示每一行的每个属性，每一行的数据是从数据提供者取来的。
+ * 展现出来的表格封装了排序以及分页功能。
+ *
+ * GridView小部件用于在网格中显示数据
  * The GridView widget is used to display data in a grid.
  *
+ * 它提供了诸如排序[[sorter|sorting]]、分页[[pager|paging]]和过滤数据[[filterModel|filtering]]等功能。
  * It provides features like [[sorter|sorting]], [[pager|paging]] and also [[filterModel|filtering]] the data.
  *
+ * 基本的用法如下
  * A basic usage looks like the following:
  *
  * ```php
@@ -36,9 +61,11 @@ use yii\base\Model;
  * ]) ?>
  * ```
  *
+ * 表格的列是通过 yii\grid\Column 类来配置的，这个类是通过 GridView 配置项中的 columns 属性配置的。
  * The columns of the grid table are configured in terms of [[Column]] classes,
  * which are configured via [[columns]].
  *
+ * 网格视图的外观和感觉可以使用大量的属性进行定制。
  * The look and feel of a grid view can be customized using the large amount of properties.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
@@ -136,8 +163,11 @@ class GridView extends BaseListView
      */
     public $formatter;
     /**
-     * @var array grid column configuration. Each array element represents the configuration
-     * for one particular grid column. For example,
+     * 网格列配置.
+     * 每个数组元素表示一个特定网格列的配置.
+     *
+     * @var array grid column configuration.
+     * Each array element represents the configuration for one particular grid column. For example,
      *
      * ```php
      * [
@@ -150,16 +180,37 @@ class GridView extends BaseListView
      *     ],
      *     ['class' => CheckboxColumn::className()],
      * ]
+     *
+     *  [
+            ['class' => 'yii\grid\SerialColumn'],
+            // 数据提供者中所含数据所定义的简单的列
+            // 使用的是模型的列的数据
+            'id',
+            'username',
+            // 更复杂的列数据
+            [
+                'class' => 'yii\grid\DataColumn', //由于是默认类型，可以省略
+                'value' => function ($data) {
+                    return $data->name; // 如果是数组数据则为 $data['name'] ，例如，使用 SqlDataProvider 的情形。
+                },
+            ],
+        ],
      * ```
      *
+     * 如果一个列属于类[[DataColumn]]，则可以忽略 "class"元素。
      * If a column is of class [[DataColumn]], the "class" element can be omitted.
      *
-     * As a shortcut format, a string may be used to specify the configuration of a data column
-     * which only contains [[DataColumn::attribute|attribute]], [[DataColumn::format|format]],
-     * and/or [[DataColumn::label|label]] options: `"attribute:format:label"`.
+     * 作为一种快捷方式，可以用一个字符串来指定数据列的配置，而数据列只包含
+     * [[DataColumn::attribute|attribute]], [[DataColumn::format|format]], and/or [[DataColumn::label|label]] 选项:“属性:格式:标签”
+     * 例如，上面的“name”列也可以指定为:“name:text:name”
+     * "format" and "label"都是可选的。如果没有，他们将采用默认值。
+     *
+     * As a shortcut format, a string may be used to specify the configuration of a data column which only contains
+     * [[DataColumn::attribute|attribute]], [[DataColumn::format|format]], and/or [[DataColumn::label|label]] options: `"attribute:format:label"`.
      * For example, the above "name" column can also be specified as: `"name:text:Name"`.
      * Both "format" and "label" are optional. They will take default values if absent.
      *
+     * 在简单的情况下，使用快捷方式对列的配置如下所列
      * Using the shortcut format the configuration for columns in simple cases would look like this:
      *
      * ```php
@@ -170,6 +221,8 @@ class GridView extends BaseListView
      * ]
      * ```
      *
+     * 在使用具有活动记录的数据提供程序时，还可以显示相关记录的值。
+     * 例如，作者关联的名称属性:
      * When using a [[dataProvider]] with active records, you can also display values from related records,
      * e.g. the `name` attribute of the `author` relation:
      *
@@ -182,6 +235,8 @@ class GridView extends BaseListView
      *     // ...
      * ]
      * ```
+     *
+     * 请注意，假如配置中没有指定 columns 属性， 那么Yii会试图显示数据提供者的模型中所有可能的列。
      */
     public $columns = [];
     /**

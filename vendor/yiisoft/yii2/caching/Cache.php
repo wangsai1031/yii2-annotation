@@ -11,15 +11,25 @@ use yii\base\Component;
 use yii\helpers\StringHelper;
 
 /**
+ * Cache是支持不同缓存存储实现的缓存类的基类
+ *
+ * 你可以在同一个应用程序中使用不同的缓存存储器。
+ * 一个常见的策略是使用基于内存的缓存存储器 存储小而常用的数据（例如：统计数据），
+ * 使用基于文件 或数据库的缓存存储器存储大而不太常用的数据（例如：网页内容）。
+ *
  * Cache is the base class for cache classes supporting different cache storage implementations.
  *
- * A data item can be stored in the cache by calling [[set()]] and be retrieved back
- * later (in the same or different request) by [[get()]]. In both operations,
- * a key identifying the data item is required. An expiration time and/or a [[Dependency|dependency]]
- * can also be specified when calling [[set()]]. If the data item expires or the dependency
- * changes at the time of calling [[get()]], the cache will return no data.
+ * 可以通过调用[[set()]]将数据项存储在缓存中，然后调用[[get()]]获取缓存数据(在相同或不同的请求中)。
+ * 在这两个操作中，都需要一个标识数据项的key。
+ * 过期时间和/或[[Dependency|dependency]]依赖项仅可以在调用 [[set()]] 时指定。
+ * 如果数据项过期，或者在调用get()时依赖项发生变化，那么缓存将不会返回任何数据。
+ * A data item can be stored in the cache by calling [[set()]] and be retrieved back later (in the same or different request) by [[get()]].
+ * In both operations, a key identifying the data item is required.
+ * An expiration time and/or a [[Dependency|dependency]] an also be specified when calling [[set()]].
+ * If the data item expires or the dependency changes at the time of calling [[get()]], the cache will return no data.
  *
  * A typical usage pattern of cache is like the following:
+ * 缓存的典型使用模式如下：
  *
  * ```php
  * $key = 'demo';
@@ -30,12 +40,21 @@ use yii\helpers\StringHelper;
  * }
  * ```
  *
+ * 因为缓存实现了[[\ArrayAccess]]接口,它可以像数组一样使用.
  * Because Cache implements the [[\ArrayAccess]] interface, it can be used like an array. For example,
  *
  * ```php
  * $cache['foo'] = 'some data';
  * echo $cache['foo'];
  * ```
+ *
+ * 派生类应该实现以下方法来执行实际的缓存存储操作：
+ *
+ * - [[getValue()]]: 用一个键(如果有的话)从缓存中检索值
+ * - [[setValue()]]: 将值存储到缓存中
+ * - [[addValue()]]: 只有当缓存没有这个键时才存储该值
+ * - [[deleteValue()]]: 从缓存中删除指定的键值
+ * - [[flushValues()]]: 删除缓存中的所有数据
  *
  * Derived classes should implement the following methods which do the actual cache storage operations:
  *
@@ -51,32 +70,46 @@ use yii\helpers\StringHelper;
 abstract class Cache extends Component implements \ArrayAccess
 {
     /**
+     * 每个缓存键的唯一键前缀
      * @var string a string prefixed to every cache key so that it is unique globally in the whole cache storage.
      * It is recommended that you set a unique cache key prefix for each application if the same cache
      * storage is being used by different applications.
      *
      * To ensure interoperability, only alphanumeric characters should be used.
+     * 为了确保互操作性，只能使用字母数字字符。
      */
     public $keyPrefix;
     /**
-     * @var null|array|false the functions used to serialize and unserialize cached data. Defaults to null, meaning
-     * using the default PHP `serialize()` and `unserialize()` functions. If you want to use some more efficient
-     * serializer (e.g. [igbinary](http://pecl.php.net/package/igbinary)), you may configure this property with
-     * a two-element array. The first element specifies the serialization function, and the second the deserialization
-     * function. If this property is set false, data will be directly sent to and retrieved from the underlying
-     * cache component without any serialization or deserialization. You should not turn off serialization if
-     * you are using [[Dependency|cache dependency]], because it relies on data serialization. Also, some
-     * implementations of the cache can not correctly save and retrieve data different from a string type.
+     * 用于序列化和非序列化缓存数据的函数。
+     * 默认为null,即使用php默认方法`serialize()` and `unserialize()`。
+     * 如果你想使用更高效的序列化方式，例如：[igbinary](http://pecl.php.net/package/igbinary)，
+     * 可以使用一个双元素数组来配置该属性。
+     * 第一个元素指定了序列化函数，第二个元素是反序列化函数。
+     * 如果该属性设置为false，则将直接从底层缓存组件发送数据，而不进行序列化或反序列化。
+     * 如果使用[[Dependency|cache dependency]]缓存依赖，就不应该关闭序列化，因为它依赖于数据序列化。
+     * 另外，缓存的某些实现不能正确地保存和检索与字符串类型不同的数据。
+     *
+     * @var null|array|false the functions used to serialize and unserialize cached data.
+     * Defaults to null, meaning using the default PHP `serialize()` and `unserialize()` functions.
+     * If you want to use some more efficient serializer (e.g. [igbinary](http://pecl.php.net/package/igbinary)),
+     * you may configure this property with a two-element array.
+     * The first element specifies the serialization function, and the second the deserialization function.
+     * If this property is set false, data will be directly sent to and retrieved from the underlying cache component without any serialization or deserialization.
+     * You should not turn off serialization if you are using [[Dependency|cache dependency]], because it relies on data serialization.
+     * Also, some implementations of the cache can not correctly save and retrieve data different from a string type.
      */
     public $serializer;
 
 
     /**
+     * 根据给定的键构建一个规范化的高速缓存键。
      * Builds a normalized cache key from a given key.
      *
+     * 如果给定的键是一个只包含字母数字字符的字符串，并且不超过32个字符，将直接返回该关键字，前缀为[[keyPrefix]].。
+     * 否则，将通过序列化给定键、应用MD5哈希和使用前缀[[keyPrefix]]生成规范化键。
      * If the given key is a string containing alphanumeric characters only and no more than 32 characters,
-     * then the key will be returned back prefixed with [[keyPrefix]]. Otherwise, a normalized key
-     * is generated by serializing the given key, applying MD5 hashing, and prefixing with [[keyPrefix]].
+     * then the key will be returned back prefixed with [[keyPrefix]].
+     * Otherwise, a normalized key is generated by serializing the given key, applying MD5 hashing, and prefixing with [[keyPrefix]].
      *
      * @param mixed $key the key to be normalized
      * @return string the generated cache key
@@ -84,15 +117,23 @@ abstract class Cache extends Component implements \ArrayAccess
     public function buildKey($key)
     {
         if (is_string($key)) {
+            /**
+             * @see http://php.net/manual/zh/function.ctype-alnum.php
+             * ctype_alnum($key)： 判断$key是否全部为字母和(或)数字字符.
+             *
+             * 若给定的$key只包含字母数字，且长度小于32位，则直接使用该字符串。否则对字符串进行MD5
+             */
             $key = ctype_alnum($key) && StringHelper::byteLength($key) <= 32 ? $key : md5($key);
         } else {
+            // json 编码，在进行MD5
             $key = md5(json_encode($key));
         }
-
+        // 添加前缀
         return $this->keyPrefix . $key;
     }
 
     /**
+     * 通过一个指定的键（key）从缓存中取回一项数据。如果该项数据 不存在于缓存中或者已经过期/失效，则返回值 false。
      * Retrieves a value from cache with a specified key.
      * @param mixed $key a key identifying the cached value. This can be a simple string or
      * a complex data structure consisting of factors representing the key.
@@ -101,15 +142,21 @@ abstract class Cache extends Component implements \ArrayAccess
      */
     public function get($key)
     {
+        // 根据给定的键构建一个规范化的高速缓存键。
         $key = $this->buildKey($key);
+        // 获取缓存值
         $value = $this->getValue($key);
+        // 若缓存中不存在该键或者 serializer 序列化器为 false,则直接返回结果
         if ($value === false || $this->serializer === false) {
             return $value;
         } elseif ($this->serializer === null) {
+            // 若 serializer 序列化器 为空，则使用php反序列化方法 unserialize()
             $value = unserialize($value);
         } else {
+            // 否则调用自定义的反序列化方法解析数据
             $value = call_user_func($this->serializer[1], $value);
         }
+        // 检查关联的依赖是否已变化。
         if (is_array($value) && !($value[1] instanceof Dependency && $value[1]->getHasChanged($this))) {
             return $value[0];
         } else {
@@ -118,30 +165,38 @@ abstract class Cache extends Component implements \ArrayAccess
     }
 
     /**
+     * 返回一个值，指明某个键是否存在于缓存中。
+     * 如果缓存的数据很大，这个方法比从缓存中获取值要快。
+     * 如果使用的缓存组件支持这个特性，则应该使用缓存组件更加适用的方法覆盖本方法。
+     * 如果一个缓存不支持这个特性，那么这个方法将尝试模拟它，但是在获得它的过程中没有性能上的改进。
+     * 注意，该方法不检查与缓存数据相关的依赖关系是否已经发生了变化。
+     * 因此，当该函数返回true时，调用[[get]]可能返回false。
      * Checks whether a specified key exists in the cache.
      * This can be faster than getting the value from the cache if the data is big.
-     * In case a cache does not support this feature natively, this method will try to simulate it
-     * but has no performance improvement over getting it.
-     * Note that this method does not check whether the dependency associated
-     * with the cached data, if there is any, has changed. So a call to [[get]]
-     * may return false while exists returns true.
+     * In case a cache does not support this feature natively, this method will try to simulate it but has no performance improvement over getting it.
+     * Note that this method does not check whether the dependency associated with the cached data, if there is any, has changed.
+     * So a call to [[get]] may return false while exists returns true.
      * @param mixed $key a key identifying the cached value. This can be a simple string or
      * a complex data structure consisting of factors representing the key.
      * @return boolean true if a value exists in cache, false if the value is not in the cache or expired.
      */
     public function exists($key)
     {
+        // 根据给定的键构建一个规范化的高速缓存键。
         $key = $this->buildKey($key);
+        // 使用指定的键从缓存中检索值。
         $value = $this->getValue($key);
 
         return $value !== false;
     }
 
     /**
+     * 通过指定的多个键从缓存中取回多项数据。
+     * 一些缓存(比如memcache，apc)允许同时检索多个缓存值，这可能会提高性能。
+     * 如果一个缓存不支持这个特性，那么这个方法将尝试模拟它。
      * Retrieves multiple values from cache with the specified keys.
-     * Some caches (such as memcache, apc) allow retrieving multiple cached values at the same time,
-     * which may improve the performance. In case a cache does not support this feature natively,
-     * this method will try to simulate it.
+     * Some caches (such as memcache, apc) allow retrieving multiple cached values at the same time, which may improve the performance.
+     * In case a cache does not support this feature natively, this method will try to simulate it.
      *
      * @param string[] $keys list of string keys identifying the cached values
      * @return array list of cached values corresponding to the specified keys. The array
@@ -155,33 +210,48 @@ abstract class Cache extends Component implements \ArrayAccess
     }
 
     /**
+     * 使用指定的多个键从缓存中检索多个值。
+     * 一些缓存(比如memcache，apc)允许同时检索多个缓存值，这可能会提高性能。
+     * 如果一个缓存不支持这个特性，那么这个方法将尝试模拟它。
      * Retrieves multiple values from cache with the specified keys.
-     * Some caches (such as memcache, apc) allow retrieving multiple cached values at the same time,
-     * which may improve the performance. In case a cache does not support this feature natively,
-     * this method will try to simulate it.
+     * Some caches (such as memcache, apc) allow retrieving multiple cached values at the same time, which may improve the performance.
+     * In case a cache does not support this feature natively, this method will try to simulate it.
      * @param string[] $keys list of string keys identifying the cached values
-     * @return array list of cached values corresponding to the specified keys. The array
-     * is returned in terms of (key, value) pairs.
+     * 返回 与指定键对应的缓存值列表。数组是键值对。
+     * 如果一个值没有被缓存或过期，那么相应的数组值将是false。
+     * @return array list of cached values corresponding to the specified keys.
+     * The array is returned in terms of (key, value) pairs.
      * If a value is not cached or expired, the corresponding array value will be false.
      * @since 2.0.7
      */
     public function multiGet($keys)
     {
         $keyMap = [];
+        // 遍历给定的所有键
         foreach ($keys as $key) {
+            // 根据给定的键构建一个规范化的高速缓存键。
             $keyMap[$key] = $this->buildKey($key);
         }
+        // 使用指定的多个键键从缓存中检索多个值。
         $values = $this->getValues(array_values($keyMap));
         $results = [];
+        /**
+         * 遍历 $keyMap
+         * $key : 原始 $key
+         * $newKey : 经过规范化后的 $key
+         */
         foreach ($keyMap as $key => $newKey) {
             $results[$key] = false;
             if (isset($values[$newKey])) {
+                // 若关闭了序列化，则直接 将值赋给 $results[$key]
                 if ($this->serializer === false) {
                     $results[$key] = $values[$newKey];
                 } else {
+                    // 若 serializer 序列化器 为空，则使用php反序列化方法 unserialize()
+                    // 否则适用用户自定义的反序列化方法
                     $value = $this->serializer === null ? unserialize($values[$newKey])
                         : call_user_func($this->serializer[1], $values[$newKey]);
-
+                    // 检查依赖项是否发生改变
                     if (is_array($value) && !($value[1] instanceof Dependency && $value[1]->getHasChanged($this))) {
                         $results[$key] = $value[0];
                     }
@@ -193,38 +263,49 @@ abstract class Cache extends Component implements \ArrayAccess
     }
 
     /**
+     * 将一项数据指定一个键，存放到缓存中。
+     * 如果缓存已经包含了相同的键，那么现有的值和过期时间将分别替换为新的值和过期时间。
      * Stores a value identified by a key into cache.
-     * If the cache already contains such a key, the existing value and
-     * expiration time will be replaced with the new ones, respectively.
+     * If the cache already contains such a key, the existing value and expiration time will be replaced with the new ones, respectively.
      *
      * @param mixed $key a key identifying the value to be cached. This can be a simple string or
      * a complex data structure consisting of factors representing the key.
      * @param mixed $value the value to be cached
+     * 缓存过期的秒数，若为0，则永不过期
      * @param integer $duration the number of seconds in which the cached value will expire. 0 means never expire.
-     * @param Dependency $dependency dependency of the cached item. If the dependency changes,
-     * the corresponding value in the cache will be invalidated when it is fetched via [[get()]].
+     * 缓存项的依赖。如果依赖项发生了变化，那么当通过get()获取缓存时，缓存中的相应值就会失效。
+     * 如果[[serializer]]是false，则忽略该参数。
+     * @param Dependency $dependency dependency of the cached item.
+     * If the dependency changes, the corresponding value in the cache will be invalidated when it is fetched via [[get()]].
      * This parameter is ignored if [[serializer]] is false.
      * @return boolean whether the value is successfully stored into cache
      */
     public function set($key, $value, $duration = 0, $dependency = null)
     {
+        // 若设置了缓存依赖，且没有关闭序列化
         if ($dependency !== null && $this->serializer !== false) {
+            // 生成和保存与依赖相关的数据。
             $dependency->evaluateDependency($this);
         }
+        // 若没有设置自定义序列化函数，则使用默认的 serialize 函数将要缓存的值和依赖实例一起进行序列化
         if ($this->serializer === null) {
             $value = serialize([$value, $dependency]);
         } elseif ($this->serializer !== false) {
+            // 使用自定义的序列化函数进行序列化
             $value = call_user_func($this->serializer[0], [$value, $dependency]);
         }
+        // 根据给定的键构建一个规范化的高速缓存键。
         $key = $this->buildKey($key);
 
+        // 将值存储到缓存中
         return $this->setValue($key, $value, $duration);
     }
 
     /**
+     * 将多项数据存储到缓存中，每项数据对应一个键。
+     * 如果缓存已经包含了这样一个键，那么现有的值和过期时间将分别替换为新的值和过期时间。
      * Stores multiple items in cache. Each item contains a value identified by a key.
-     * If the cache already contains such a key, the existing value and
-     * expiration time will be replaced with the new ones, respectively.
+     * If the cache already contains such a key, the existing value and expiration time will be replaced with the new ones, respectively.
      *
      * @param array $items the items to be cached, as key-value pairs.
      * @param integer $duration default number of seconds in which the cached values will expire. 0 means never expire.
@@ -236,44 +317,53 @@ abstract class Cache extends Component implements \ArrayAccess
      */
     public function mset($items, $duration = 0, $dependency = null)
     {
+        // 批量缓存
         return $this->multiSet($items, $duration, $dependency);
     }
 
     /**
+     * 将多项数据存储到缓存中，每项数据对应一个键。
+     * 如果缓存已经包含了这样一个键，那么现有的值和过期时间将分别替换为新的值和过期时间。
      * Stores multiple items in cache. Each item contains a value identified by a key.
-     * If the cache already contains such a key, the existing value and
-     * expiration time will be replaced with the new ones, respectively.
+     * If the cache already contains such a key, the existing value and expiration time will be replaced with the new ones, respectively.
      *
      * @param array $items the items to be cached, as key-value pairs.
      * @param integer $duration default number of seconds in which the cached values will expire. 0 means never expire.
      * @param Dependency $dependency dependency of the cached items. If the dependency changes,
      * the corresponding values in the cache will be invalidated when it is fetched via [[get()]].
      * This parameter is ignored if [[serializer]] is false.
+     *
      * @return boolean whether the items are successfully stored into cache
      * @since 2.0.7
      */
     public function multiSet($items, $duration = 0, $dependency = null)
     {
         if ($dependency !== null && $this->serializer !== false) {
+            // 如果设置了依赖，生成和保存与依赖相关的数据。
             $dependency->evaluateDependency($this);
         }
 
         $data = [];
+        // 遍历 需要缓存的键值对,依次缓存
         foreach ($items as $key => $value) {
+            // 若没有设置自定义序列化函数，则使用默认的 serialize 函数将要缓存的值和依赖实例一起进行序列化
             if ($this->serializer === null) {
                 $value = serialize([$value, $dependency]);
             } elseif ($this->serializer !== false) {
+                // 使用自定义的序列化函数进行序列化
                 $value = call_user_func($this->serializer[0], [$value, $dependency]);
             }
-
+            // 根据给定的键构建一个规范化的高速缓存键。
             $key = $this->buildKey($key);
             $data[$key] = $value;
         }
-
+        // 批量缓存，并返回缓存失败的键
         return $this->setValues($data, $duration);
     }
 
     /**
+     * 将多项数据存储到缓存中，每项数据对应一个键。
+     * 如果某个键已经存在于缓存中，则该项数据会被跳过。
      * Stores multiple items in cache. Each item contains a value identified by a key.
      * If the cache already contains such a key, the existing value and expiration time will be preserved.
      *
@@ -283,6 +373,7 @@ abstract class Cache extends Component implements \ArrayAccess
      * the corresponding values in the cache will be invalidated when it is fetched via [[get()]].
      * This parameter is ignored if [[serializer]] is false.
      * @return boolean whether the items are successfully stored into cache
+     * 注意：这个方法是multiAdd()的别名，将在2.1.0中删除。
      * @deprecated This method is an alias for [[multiAdd()]] and will be removed in 2.1.0.
      */
     public function madd($items, $duration = 0, $dependency = null)
@@ -291,6 +382,9 @@ abstract class Cache extends Component implements \ArrayAccess
     }
 
     /**
+     *
+     * 将多项数据存储到缓存中，每项数据对应一个键。
+     * 如果某个键已经存在于缓存中，则该项数据会被跳过。
      * Stores multiple items in cache. Each item contains a value identified by a key.
      * If the cache already contains such a key, the existing value and expiration time will be preserved.
      *
@@ -305,25 +399,31 @@ abstract class Cache extends Component implements \ArrayAccess
     public function multiAdd($items, $duration = 0, $dependency = null)
     {
         if ($dependency !== null && $this->serializer !== false) {
+            // 如果设置了依赖，生成和保存与依赖相关的数据。
             $dependency->evaluateDependency($this);
         }
 
         $data = [];
+        // 遍历 需要缓存的键值对,依次缓存
         foreach ($items as $key => $value) {
+            // 若没有设置自定义序列化函数，则使用默认的 serialize 函数将要缓存的值和依赖实例一起进行序列化
             if ($this->serializer === null) {
                 $value = serialize([$value, $dependency]);
             } elseif ($this->serializer !== false) {
+                // 使用自定义的序列化函数进行序列化
                 $value = call_user_func($this->serializer[0], [$value, $dependency]);
             }
-
+            // 根据给定的键构建一个规范化的高速缓存键。
             $key = $this->buildKey($key);
             $data[$key] = $value;
         }
-
+        // 批量缓存，并返回缓存失败的键
         return $this->addValues($data, $duration);
     }
 
     /**
+     * 如果缓存中未找到该键，则将指定数据存放到缓存中。
+     * 如果缓存已经包含了该键，则什么都不做。
      * Stores a value identified by a key into cache if the cache does not contain this key.
      * Nothing will be done if the cache already contains the key.
      * @param mixed $key a key identifying the value to be cached. This can be a simple string or
@@ -338,45 +438,58 @@ abstract class Cache extends Component implements \ArrayAccess
     public function add($key, $value, $duration = 0, $dependency = null)
     {
         if ($dependency !== null && $this->serializer !== false) {
+            // 如果设置了依赖，生成和保存与依赖相关的数据。
             $dependency->evaluateDependency($this);
         }
         if ($this->serializer === null) {
+            // 若没有设置自定义序列化函数，则使用默认的 serialize 函数将要缓存的值和依赖实例一起进行序列化
             $value = serialize([$value, $dependency]);
         } elseif ($this->serializer !== false) {
+            // 使用自定义的序列化函数进行序列化
             $value = call_user_func($this->serializer[0], [$value, $dependency]);
         }
+        // 根据给定的键构建一个规范化的高速缓存键。
         $key = $this->buildKey($key);
-
+        // 存储缓存数据
         return $this->addValue($key, $value, $duration);
     }
 
     /**
+     * 通过一个键，删除缓存中对应的值。
      * Deletes a value with the specified key from cache
-     * @param mixed $key a key identifying the value to be deleted from cache. This can be a simple string or
-     * a complex data structure consisting of factors representing the key.
+     *
+     * 要从缓存中删除的值的键。
+     * 这可以是一个简单的字符串或表示键的因素组成的复杂的数据结构。
+     * @param mixed $key a key identifying the value to be deleted from cache.
+     * This can be a simple string or a complex data structure consisting of factors representing the key.
      * @return boolean if no error happens during deletion
      */
     public function delete($key)
     {
+        // 规范化键
         $key = $this->buildKey($key);
 
+        // 从缓存中删除数据
         return $this->deleteValue($key);
     }
 
     /**
+     * 删除缓存中的所有数据。
      * Deletes all values from cache.
      * Be careful of performing this operation if the cache is shared among multiple applications.
      * @return boolean whether the flush operation was successful.
      */
     public function flush()
     {
+        // 删除缓存中的所有数据。
         return $this->flushValues();
     }
 
     /**
+     * 使用指定的键从缓存中检索值。
+     * 这个方法应该由子类来实现，以从特定的缓存存储器中检索数据
      * Retrieves a value from cache with a specified key.
-     * This method should be implemented by child classes to retrieve the data
-     * from specific cache storage.
+     * This method should be implemented by child classes to retrieve the data from specific cache storage.
      * @param string $key a unique key identifying the cached value
      * @return mixed|false the value stored in cache, false if the value is not in the cache or expired. Most often
      * value is a string. If you have disabled [[serializer]], it could be something else.
@@ -384,18 +497,21 @@ abstract class Cache extends Component implements \ArrayAccess
     abstract protected function getValue($key);
 
     /**
+     * 在缓存中存储一个键对应的值。
+     * 这个方法应该由子类实现，以便在特定的缓存存储中存储数据。
      * Stores a value identified by a key in cache.
-     * This method should be implemented by child classes to store the data
-     * in specific cache storage.
+     * This method should be implemented by child classes to store the data in specific cache storage.
      * @param string $key the key identifying the value to be cached
-     * @param mixed $value the value to be cached. Most often it's a string. If you have disabled [[serializer]],
-     * it could be something else.
+     * 缓存的值。通常它是一个字符串。如果你禁用了序列化器[[serializer]]，它可能是别的类型。
+     * @param mixed $value the value to be cached. Most often it's a string. If you have disabled [[serializer]], it could be something else.
+     * 缓存值将过期的秒数。0意味着永远不会过期。
      * @param integer $duration the number of seconds in which the cached value will expire. 0 means never expire.
      * @return boolean true if the value is successfully stored into cache, false otherwise
      */
     abstract protected function setValue($key, $value, $duration);
 
     /**
+     * 如果缓存不包含该键，则存储该键和对应的值
      * Stores a value identified by a key into cache if the cache does not contain this key.
      * This method should be implemented by child classes to store the data
      * in specific cache storage.
@@ -408,6 +524,8 @@ abstract class Cache extends Component implements \ArrayAccess
     abstract protected function addValue($key, $value, $duration);
 
     /**
+     * 从缓存中删除指定键的值。
+     * 子类可以实现这个方法来实现从实际的缓存存储中删除数据。
      * Deletes a value with the specified key from cache
      * This method should be implemented by child classes to delete the data from actual cache storage.
      * @param string $key the key of the value to be deleted
@@ -416,6 +534,8 @@ abstract class Cache extends Component implements \ArrayAccess
     abstract protected function deleteValue($key);
 
     /**
+     * 删除缓存中的所有数据。
+     * 子类可以实现这个方法来实现清空缓存。
      * Deletes all values from cache.
      * Child classes may implement this method to realize the flush operation.
      * @return boolean whether the flush operation was successful.
@@ -423,10 +543,12 @@ abstract class Cache extends Component implements \ArrayAccess
     abstract protected function flushValues();
 
     /**
+     * 使用指定的多个键键从缓存中检索多个值。
+     * 默认的实现多次调用getValue()一个一个来检索缓存的值。
+     * 如果底层的缓存存储支持批量获取值，则应该覆盖该方法以利用缓存的特性。
      * Retrieves multiple values from cache with the specified keys.
-     * The default implementation calls [[getValue()]] multiple times to retrieve
-     * the cached values one by one. If the underlying cache storage supports multiget,
-     * this method should be overridden to exploit that feature.
+     * The default implementation calls [[getValue()]] multiple times to retrieve the cached values one by one.
+     * If the underlying cache storage supports multiget, this method should be overridden to exploit that feature.
      * @param array $keys a list of keys identifying the cached values
      * @return array a list of cached values indexed by the keys
      */
@@ -434,6 +556,7 @@ abstract class Cache extends Component implements \ArrayAccess
     {
         $results = [];
         foreach ($keys as $key) {
+            // 遍历键，依次获取值
             $results[$key] = $this->getValue($key);
         }
 
@@ -441,9 +564,12 @@ abstract class Cache extends Component implements \ArrayAccess
     }
 
     /**
+     * 在缓存中存储多个键值对。
+     * 默认的实现多次调用[[setValue()]]一个一个来存储值。
+     * 如果底层的缓存存储支持批量缓存值，则应该覆盖该方法以利用缓存的特性。
      * Stores multiple key-value pairs in cache.
-     * The default implementation calls [[setValue()]] multiple times store values one by one. If the underlying cache
-     * storage supports multi-set, this method should be overridden to exploit that feature.
+     * The default implementation calls [[setValue()]] multiple times store values one by one.
+     * If the underlying cache storage supports multi-set, this method should be overridden to exploit that feature.
      * @param array $data array where key corresponds to cache key while value is the value stored
      * @param integer $duration the number of seconds in which the cached values will expire. 0 means never expire.
      * @return array array of failed keys
@@ -452,15 +578,19 @@ abstract class Cache extends Component implements \ArrayAccess
     {
         $failedKeys = [];
         foreach ($data as $key => $value) {
+            // 遍历要缓存的键值对数组，依次缓存，并存储缓存失败的键
             if ($this->setValue($key, $value, $duration) === false) {
                 $failedKeys[] = $key;
             }
         }
-
+        // 返回缓存失败的键
         return $failedKeys;
     }
 
     /**
+     * 将多个键值对添加到缓存中。
+     * 默认的实现多次调用[[addValue()]]一个一个来存储值。
+     * 如果底层的缓存存储支持批量缓存值，则应该覆盖该方法以利用缓存的特性。
      * Adds multiple key-value pairs to cache.
      * The default implementation calls [[addValue()]] multiple times add values one by one. If the underlying cache
      * storage supports multi-add, this method should be overridden to exploit that feature.
@@ -472,6 +602,7 @@ abstract class Cache extends Component implements \ArrayAccess
     {
         $failedKeys = [];
         foreach ($data as $key => $value) {
+            // 遍历要缓存的键值对数组，依次缓存，并存储缓存失败的键
             if ($this->addValue($key, $value, $duration) === false) {
                 $failedKeys[] = $key;
             }
@@ -481,6 +612,8 @@ abstract class Cache extends Component implements \ArrayAccess
     }
 
     /**
+     * 返回是否有一个带有指定键的缓存条目。
+     * 这个方法是实现[[\ArrayAccess]]接口必须的
      * Returns whether there is a cache entry with a specified key.
      * This method is required by the interface [[\ArrayAccess]].
      * @param string $key a key identifying the cached value
@@ -492,6 +625,8 @@ abstract class Cache extends Component implements \ArrayAccess
     }
 
     /**
+     * 使用指定的键从缓存中检索值。
+     * 这个方法是实现[[\ArrayAccess]]接口必须的
      * Retrieves the value from cache with a specified key.
      * This method is required by the interface [[\ArrayAccess]].
      * @param string $key a key identifying the cached value
@@ -503,9 +638,12 @@ abstract class Cache extends Component implements \ArrayAccess
     }
 
     /**
+     * 将指定键和值存储到缓存中。
+     * 如果缓存已经包含了这样一个键，那么现有的值和过期时间将分别替换为新的值和过期时间。
+     * 这个方法是实现[[\ArrayAccess]]接口必须的
      * Stores the value identified by a key into cache.
-     * If the cache already contains such a key, the existing value will be
-     * replaced with the new ones. To add expiration and dependencies, use the [[set()]] method.
+     * If the cache already contains such a key, the existing value will be replaced with the new ones.
+     * To add expiration and dependencies, use the [[set()]] method.
      * This method is required by the interface [[\ArrayAccess]].
      * @param string $key the key identifying the value to be cached
      * @param mixed $value the value to be cached
@@ -516,6 +654,8 @@ abstract class Cache extends Component implements \ArrayAccess
     }
 
     /**
+     * 从缓存中删除指定的键值
+     * 这个方法是实现[[\ArrayAccess]]接口必须的
      * Deletes the value with the specified key from cache
      * This method is required by the interface [[\ArrayAccess]].
      * @param string $key the key of the value to be deleted

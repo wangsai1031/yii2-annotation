@@ -10,10 +10,14 @@ namespace yii\db;
 use yii\base\InvalidConfigException;
 
 /**
+ * ActiveQuery表示一个与活动记录类相关联的DB查询
  * ActiveQuery represents a DB query associated with an Active Record class.
  *
+ * ActiveQuery可以是一个普通的查询，也可以在关联查询中使用
  * An ActiveQuery can be a normal query or be used in a relational context.
  *
+ * ActiveQuery实例通常由ActiveRecord::find()和ActiveRecord::findBySql()创建
+ * 关联查询是由ActiveRecord::hasOne()和ActiveRecord::hasMany()创建
  * ActiveQuery instances are usually created by [[ActiveRecord::find()]] and [[ActiveRecord::findBySql()]].
  * Relational queries are created by [[ActiveRecord::hasOne()]] and [[ActiveRecord::hasMany()]].
  *
@@ -76,16 +80,23 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     use ActiveRelationTrait;
 
     /**
+     * 当通过init()初始化查询时触发的事件
      * @event Event an event that is triggered when the query is initialized via [[init()]].
      */
     const EVENT_INIT = 'init';
 
     /**
+     * 为获取AR记录而执行的SQL语句
+     * 由[[ActiveRecord::findBySql()]]设置
      * @var string the SQL statement to be executed for retrieving AR records.
      * This is set by [[ActiveRecord::findBySql()]].
      */
     public $sql;
     /**
+     * 关联查询时使用的连接条件。
+     * 该条件将在ActiveQuery::joinWith()被调用时使用。
+     * 否则，条件将在查询的WHERE部分中使用
+     * 关于如何指定该参数，请参考 @see Query::where()
      * @var string|array the join condition to be used when this query is used in a relational context.
      * The condition will be used in the ON part when [[ActiveQuery::joinWith()]] is called.
      * Otherwise, the condition will be used in the WHERE part of a query.
@@ -94,14 +105,16 @@ class ActiveQuery extends Query implements ActiveQueryInterface
      */
     public $on;
     /**
+     * 应该与此查询关联的的关系列表
      * @var array a list of relations that this query should be joined with
      */
     public $joinWith;
 
 
     /**
+     * 构造方法
      * Constructor.
-     * @param string $modelClass the model class associated with this query
+     * @param string $modelClass the model class associated with this query 与此查询相关联的模型类
      * @param array $config configurations to be applied to the newly created query object
      */
     public function __construct($modelClass, $config = [])
@@ -111,10 +124,12 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     }
 
     /**
+     * 初始化对象
+     * 这个方法在构造函数的末尾被调用。
+     * 如果您覆盖了这个方法，确保您在最后调用parent::init()来确保事件的触发
      * Initializes the object.
-     * This method is called at the end of the constructor. The default implementation will trigger
-     * an [[EVENT_INIT]] event. If you override this method, make sure you call the parent implementation at the end
-     * to ensure triggering of the event.
+     * This method is called at the end of the constructor. The default implementation will trigger an [[EVENT_INIT]] event.
+     * If you override this method, make sure you call the parent implementation at the end to ensure triggering of the event.
      */
     public function init()
     {
@@ -123,6 +138,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     }
 
     /**
+     * 执行查询并返回所有结果组成的数组
      * Executes query and returns all results as an array.
      * @param Connection $db the DB connection used to create the DB command.
      * If null, the DB connection returned by [[modelClass]] will be used.
@@ -134,19 +150,25 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     }
 
     /**
+     * 创建SQL前的预处理
      * @inheritdoc
      */
     public function prepare($builder)
     {
+        // 因为相同的ActiveQuery可能用于构建不同的SQL语句
+        // 例如，通过ActiveDataProvider，一个用于计数查询，另一个用于行数据查询
+        // 确保相同的ActiveQuery可以多次用于构建SQL语句，这一点很重要
         // NOTE: because the same ActiveQuery may be used to build different SQL statements
         // (e.g. by ActiveDataProvider, one for count query, the other for row data query,
-        // it is important to make sure the same ActiveQuery can be used to build SQL statements
-        // multiple times.
+        // it is important to make sure the same ActiveQuery can be used to build SQL statements multiple times.
+
+        // 当存在joinWith时，进行联表
         if (!empty($this->joinWith)) {
             $this->buildJoinWith();
             $this->joinWith = null;    // clean it up to avoid issue https://github.com/yiisoft/yii2/issues/2687
         }
 
+        // 当from为空，则获取modelClass的表名
         if (empty($this->from)) {
             /* @var $modelClass ActiveRecord */
             $modelClass = $this->modelClass;
@@ -154,15 +176,19 @@ class ActiveQuery extends Query implements ActiveQueryInterface
             $this->from = [$tableName];
         }
 
+        // 若果select为空，并且jion不为空
         if (empty($this->select) && !empty($this->join)) {
+            // 获取表别名，为select设值
             list(, $alias) = $this->getQueryTableName($this);
             $this->select = ["$alias.*"];
         }
 
         if ($this->primaryModel === null) {
-            // eager loading
+            // eager loading 预先加载
+            // 创建一个新的查询对象
             $query = Query::create($this);
         } else {
+            // 延迟加载
             // lazy loading of a relation
             $where = $this->where;
 
@@ -199,6 +225,8 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     }
 
     /**
+     * 将查询到的内容 $rows 填充到ActiveRecord中
+     *
      * @inheritdoc
      */
     public function populate($rows)
@@ -207,19 +235,27 @@ class ActiveQuery extends Query implements ActiveQueryInterface
             return [];
         }
 
+        // 将查询到的行数据转换为模型实例数组
         $models = $this->createModels($rows);
+        // 若join不为空却 indexBy为空
         if (!empty($this->join) && $this->indexBy === null) {
+            // 当执行连接查询时，这可能会导致返回的重复行。该方法通过检查它们的主键值来删除重复的模型
             $models = $this->removeDuplicatedModels($models);
         }
         if (!empty($this->with)) {
+            // 若with 不为空
             $this->findWith($this->with, $models);
         }
 
         if ($this->inverseOf !== null) {
+            // 若存在逆向关联关系
             $this->addInverseRelations($models);
         }
 
+        // 注意：使用 asArray() 将不会触发 AfterFind()事件
         if (!$this->asArray) {
+            // afterFind()不干别的，就是专门调用 $this->trigger(self::EVENT_AFTER_FIND) 来触发事件的。
+            // 在完成查询之后，查询到了多少个记录， 就会触发多少次实例级别的 EVENT_AFTER_FIND 事件
             foreach ($models as $model) {
                 $model->afterFind();
             }
@@ -229,7 +265,9 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     }
 
     /**
+     * 通过检查它们的主键值来删除重复的模型
      * Removes duplicated models by checking their primary key values.
+     * 当执行连接查询时，这可能会导致返回的重复行。该方法主要在此时被调用。
      * This method is mainly called when a join query is performed, which may cause duplicated rows being returned.
      * @param array $models the models to be checked
      * @throws InvalidConfigException if model primary key is empty
@@ -243,11 +281,13 @@ class ActiveQuery extends Query implements ActiveQueryInterface
         $pks = $class::primaryKey();
 
         if (count($pks) > 1) {
+            // 复合主键
             // composite primary key
             foreach ($models as $i => $model) {
                 $key = [];
                 foreach ($pks as $pk) {
                     if (!isset($model[$pk])) {
+                        // 如果主键不是结果集的一部分，就不要继续执行
                         // do not continue if the primary key is not part of the result set
                         break 2;
                     }
@@ -263,10 +303,12 @@ class ActiveQuery extends Query implements ActiveQueryInterface
         } elseif (empty($pks)) {
             throw new InvalidConfigException("Primary key of '{$class}' can not be empty.");
         } else {
+            // 单列主键
             // single column primary key
             $pk = reset($pks);
             foreach ($models as $i => $model) {
                 if (!isset($model[$pk])) {
+                    // 如果主键不是结果集的一部分，就不要继续执行
                     // do not continue if the primary key is not part of the result set
                     break;
                 }
@@ -283,18 +325,26 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     }
 
     /**
+     * 执行查询并返回一行结果
      * Executes query and returns a single row of result.
+     * 用于创建DB命令的DB连接
      * @param Connection $db the DB connection used to create the DB command.
      * If null, the DB connection returned by [[modelClass]] will be used.
+     * 单行查询结果。 返回类型取决于 [[asArray]] 设置。
+     * 如果没查询到数据，将会返回 null
      * @return ActiveRecord|array|null a single row of query result. Depending on the setting of [[asArray]],
      * the query result may be either an array or an ActiveRecord object. Null will be returned
      * if the query results in nothing.
      */
     public function one($db = null)
     {
+        // 执行查询，并返回一行数据，若没查到，则返回false
         $row = parent::one($db);
         if ($row !== false) {
+            // 若查到了，则将查询到的内容 $rows 填充到ActiveRecord中
+            // 此时返回的数据是只有一个ActiveRecord的数组
             $models = $this->populate([$row]);
+            // 获取第一个元素，即查到的 ActiveRecord
             return reset($models) ?: null;
         } else {
             return null;
@@ -302,7 +352,9 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     }
 
     /**
+     * 创建可以用于执行此查询的DB命令
      * Creates a DB command that can be used to execute this query.
+     * 用于创建DB命令的DB连接。
      * @param Connection $db the DB connection used to create the DB command.
      * If null, the DB connection returned by [[modelClass]] will be used.
      * @return Command the created DB command instance.
@@ -312,12 +364,15 @@ class ActiveQuery extends Query implements ActiveQueryInterface
         /* @var $modelClass ActiveRecord */
         $modelClass = $this->modelClass;
         if ($db === null) {
+            // 若 数据库链接为空，则默认使用ActiveRecord的设定的数据库链接
             $db = $modelClass::getDb();
         }
 
         if ($this->sql === null) {
+            // 若sql为空，则从查询对象的属性中生成一个SELECT语句
             list ($sql, $params) = $db->getQueryBuilder()->build($this);
         } else {
+            // 若sql不为空，则获取sql和参数（预处理字段等，用于防止sql注入）
             $sql = $this->sql;
             $params = $this->params;
         }
@@ -346,6 +401,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     }
 
     /**
+     * 与指定的关系表进行关联
      * Joins with the specified relations.
      *
      * This method allows you to reuse existing relation definitions to perform JOIN queries.
@@ -375,8 +431,10 @@ class ActiveQuery extends Query implements ActiveQueryInterface
      * In the following you find some examples:
      *
      * ```php
+     * // 查找包括书籍的所有订单，并以 `INNER JOIN` 的连接方式即时加载 "books" 表
      * // find all orders that contain books, and eager loading "books"
      * Order::find()->joinWith('books', true, 'INNER JOIN')->all();
+     * // 找到所有的订单，贪婪加载“书籍”，并将订单和书籍按照书名进行排序。
      * // find all orders, eager loading "books", and sort the orders and books by the book names.
      * Order::find()->joinWith([
      *     'books' => function (\yii\db\ActiveQuery $query) {
@@ -385,6 +443,23 @@ class ActiveQuery extends Query implements ActiveQueryInterface
      * ])->all();
      * // find all orders that contain books of the category 'Science fiction', using the alias "b" for the books table
      * Order::find()->joinWith(['books b'], true, 'INNER JOIN')->where(['b.category' => 'Science fiction'])->all();
+     *
+     *  // 连接多重关系
+        // 找出24小时内注册客户包含书籍的订单
+        $orders = Order::find()->innerJoinWith([
+            'books',
+            'customer' => function ($query) {
+                $query->where('customer.created_at > ' . (time() - 24 * 3600));
+            }
+        ])->all();
+        // 连接嵌套关系：连接 books 表及其 author 列
+        $orders = Order::find()->joinWith('books.author')->all();
+     *
+     * // 查找包括书籍的所有订单，但 "books" 表不使用贪婪加载
+        $orders = Order::find()->innerJoinWith('books', false)->all();
+        // 等价于：
+        $orders = Order::find()->joinWith('books', false, 'INNER JOIN')->all();
+     *
      * ```
      *
      * The alias syntax is available since version 2.0.7.
@@ -401,8 +476,12 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     {
         $relations = [];
         foreach ((array) $with as $name => $callback) {
+
+            // $with = ['books'], $name = 0, $callback = 'book'
             if (is_int($name)) {
+                // $name = 'book'
                 $name = $callback;
+                // $callback = null
                 $callback = null;
             }
 
@@ -419,6 +498,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
                 };
             }
 
+            // $callback === null， $name = 'book'
             if ($callback === null) {
                 $relations[] = $name;
             } else {
@@ -429,6 +509,9 @@ class ActiveQuery extends Query implements ActiveQueryInterface
         return $this;
     }
 
+    /**
+     * 构建 JoinWith
+     */
     private function buildJoinWith()
     {
         $join = $this->join;
@@ -472,6 +555,10 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     }
 
     /**
+     * 与指定关联关系的内连接。
+     * 这是一个使用连接类型设置为"INNER JOIN"的[[joinWith()]]的快捷方法。
+     * 关于这个方法的详细用法，请参阅joinWith()。
+     *
      * Inner joins with the specified relations.
      * This is a shortcut method to [[joinWith()]] with the join type set as "INNER JOIN".
      * Please refer to [[joinWith()]] for detailed usage of this method.
@@ -486,6 +573,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     }
 
     /**
+     * 通过添加基于给定关系的连接片段来修改当前查询
      * Modifies the current query by adding join fragments based on the given relations.
      * @param ActiveRecord $model the primary model
      * @param array $with the relations to be joined
@@ -535,6 +623,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     }
 
     /**
+     * 根据给定的连接类型参数和关系名称返回连接类型
      * Returns the join type based on the given join type parameter and the relation name.
      * @param string|array $joinType the given join type(s)
      * @param string $name relation name
@@ -550,6 +639,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     }
 
     /**
+     * 返回表名和表别名
      * Returns the table name and the table alias for [[modelClass]].
      * @param ActiveQuery $query
      * @return array the table name and the table alias.
@@ -581,6 +671,8 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     }
 
     /**
+     * 使用子查询连接父查询
+     * 当前的查询对象将被相应地修改
      * Joins a parent query with a child query.
      * The current query object will be modified accordingly.
      * @param ActiveQuery $parent
@@ -656,6 +748,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     }
 
     /**
+     * 设置关系查询的ON条件
      * Sets the ON condition for a relational query.
      * The condition will be used in the ON part when [[ActiveQuery::joinWith()]] is called.
      * Otherwise, the condition will be used in the WHERE part of a query.
@@ -686,6 +779,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     }
 
     /**
+     * 在现有的条件下添加附加 ON 条件
      * Adds an additional ON condition to the existing one.
      * The new condition and the existing one will be joined using the 'AND' operator.
      * @param string|array $condition the new ON condition. Please refer to [[where()]]
@@ -728,7 +822,9 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     }
 
     /**
+     * 指定关系查询的中间连接表
      * Specifies the junction table for a relational query.
+     * 有时，两个表通过中间表关联，定义这样的关联关系， 可以通过调用 yii\db\ActiveQuery::via() 方法或 viaTable() 方法来定制 yii\db\ActiveQuery 对象 。
      *
      * Use this method to specify a junction table when declaring a relation in the [[ActiveRecord]] class:
      *
@@ -766,6 +862,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     }
 
     /**
+     * 为模型类中的表定义别名
      * Define an alias for the table defined in [[modelClass]].
      *
      * This method will adjust [[from]] so that an already defined alias will be overwritten.

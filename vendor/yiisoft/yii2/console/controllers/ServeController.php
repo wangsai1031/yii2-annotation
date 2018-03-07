@@ -22,6 +22,16 @@ use yii\helpers\Console;
  */
 class ServeController extends Controller
 {
+    public function beforeAction($action)
+    {/*{{{*/
+        if (parent::beforeAction($action)) {
+
+            //... UserController 的 beforeAction 需要做的。
+
+            return true;
+        }
+        return false;
+    }/*}}}*/
     const EXIT_CODE_NO_DOCUMENT_ROOT = 2;
     const EXIT_CODE_NO_ROUTING_FILE = 3;
     const EXIT_CODE_ADDRESS_TAKEN_BY_ANOTHER_SERVER = 4;

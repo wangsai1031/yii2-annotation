@@ -35,6 +35,7 @@ class TableSchema extends Object
      */
     public $fullName;
     /**
+     * 这个表的主键。
      * @var string[] primary keys of this table.
      */
     public $primaryKey = [];
@@ -55,6 +56,7 @@ class TableSchema extends Object
      */
     public $foreignKeys = [];
     /**
+     * 这个表的列元数据。每个数组元素都是[[ColumnSchema]] 对象，由列名索引
      * @var ColumnSchema[] column metadata of this table. Each array element is a [[ColumnSchema]] object, indexed by column names.
      */
     public $columns = [];

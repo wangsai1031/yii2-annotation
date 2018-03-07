@@ -24,6 +24,8 @@ use yii\base\InvalidParamException;
 trait ActiveRelationTrait
 {
     /**
+     * 这个查询是否表示与多个记录的关系
+     * 该属性仅在关联表方法中使用
      * @var boolean whether this query represents a relation to more than one record.
      * This property is only used in relational context. If true, this relation will
      * populate all query results into AR instances using [[Query::all()|all()]].
@@ -31,19 +33,27 @@ trait ActiveRelationTrait
      */
     public $multiple;
     /**
+     * 关系查询的主要模型
+     * 这仅在使用动态查询选项的延迟加载中使用
      * @var ActiveRecord the primary model of a relational query.
      * This is used only in lazy loading with dynamic query options.
      */
     public $primaryModel;
     /**
+     * 建立关系的主表和外表的列
+     * 数组键必须是这个关联表相应的列，而数组的值必须是主表中相应的列。
+     * 不要添加前缀或引用列名，因为这将由Yii自动完成。
+     * 该属性仅在关联表方法中使用
      * @var array the columns of the primary and foreign tables that establish a relation.
-     * The array keys must be columns of the table for this relation, and the array values
-     * must be the corresponding columns from the primary table.
+     * The array keys must be columns of the table for this relation, and the array values must be the corresponding columns from the primary table.
      * Do not prefix or quote the column names as this will be done automatically by Yii.
      * This property is only used in relational context.
      */
     public $link;
     /**
+     * 与连接表关联的查询
+     * 通过调用 via() 方法设置这个属性而不是直接设置它
+     * 该属性仅在关联表方法中使用
      * @var array|object the query associated with the junction table. Please call [[via()]]
      * to set this property instead of directly setting it.
      * This property is only used in relational context.
@@ -51,12 +61,17 @@ trait ActiveRelationTrait
      */
     public $via;
     /**
+     * 当前关联的逆向关联的名称
+     * 有时，两个表通过中间表关联，定义这样的关联关系， 可以通过调用 yii\db\ActiveQuery::via() 方法或 viaTable() 方法来定制 yii\db\ActiveQuery 对象 。
+     *
+     * 例如，一个订单有一个客户，这意味着“客户”关系的反向是“订单”，而“订单”关系的反向是“顾客”。
+     * 如果设置了该属性，则主记录将通过指定的关系被引用。
+     * 例如，`$customer->orders[0]->customer` and `$customer` 将是相同的对象，访问订单的客户将不会触发新的DB查询。
+     * 该属性仅在关系上下文中使用
      * @var string the name of the relation that is the inverse of this relation.
-     * For example, an order has a customer, which means the inverse of the "customer" relation
-     * is the "orders", and the inverse of the "orders" relation is the "customer".
+     * For example, an order has a customer, which means the inverse of the "customer" relation is the "orders", and the inverse of the "orders" relation is the "customer".
      * If this property is set, the primary record(s) will be referenced through the specified relation.
-     * For example, `$customer->orders[0]->customer` and `$customer` will be the same object,
-     * and accessing the customer of an order will not trigger new DB query.
+     * For example, `$customer->orders[0]->customer` and `$customer` will be the same object, and accessing the customer of an order will not trigger new DB query.
      * This property is only used in relational context.
      * @see inverseOf()
      */
@@ -78,8 +93,11 @@ trait ActiveRelationTrait
     }
 
     /**
+     * 指定与连接表关联的关系
      * Specifies the relation associated with the junction table.
+     * 有时，两个表通过中间表关联，定义这样的关联关系， 可以通过调用 yii\db\ActiveQuery::via() 方法或 viaTable() 方法来定制 yii\db\ActiveQuery 对象 。
      *
+     * 当在ActiveRecord类中声明一个关系时，使用该方法指定一个中间记录/表。
      * Use this method to specify a pivot record/table when declaring a relation in the [[ActiveRecord]] class:
      *
      * ```php
@@ -111,6 +129,83 @@ trait ActiveRelationTrait
     }
 
     /**
+     * 将关系的名称设置为这个关系的逆关系
+     *
+     * 关联关系通常成对定义，如：Customer 可以有个名为 orders 关联项， 而 Order 也有个名为customer 的关联项：
+
+        class Customer extends ActiveRecord
+        {
+            ....
+            public function getOrders()
+            {
+                return $this->hasMany(Order::className(), ['customer_id' => 'id']);
+            }
+        }
+
+        class Order extends ActiveRecord
+        {
+            ....
+            public function getCustomer()
+            {
+                return $this->hasOne(Customer::className(), ['id' => 'customer_id']);
+            }
+        }
+
+     * 如果我们执行以下查询，可以发现订单的 customer 和 找到这些订单的客户对象并不是同一个。连接 customer->orders 将触发一条 SQL 语句 而连接一个订单的 customer 将触发另一条 SQL 语句。
+
+        // SELECT * FROM customer WHERE id=1
+        $customer = Customer::findOne(1);
+
+        // SELECT * FROM order WHERE customer_id=1
+        // SELECT * FROM customer WHERE id=1
+        if ($customer->orders[0]->customer === $customer) {
+            echo '相同';
+        } else {
+            echo '不相同';
+        }
+     *  // 输出 "不相同"
+     *
+     * 为避免多余执行的后一条语句，我们可以为 customer或 orders 关联关系定义相反的关联关系，通过调用 yii\db\ActiveQuery::inverseOf() 方法可以实现。
+
+        class Customer extends ActiveRecord
+        {
+            ....
+            public function getOrders()
+            {
+                return $this->hasMany(Order::className(), ['customer_id' => 'id'])->inverseOf('customer');
+            }
+        }
+
+     * 现在我们同样执行上面的查询，我们将得到：
+
+        // SELECT * FROM customer WHERE id=1
+        $customer = Customer::findOne(1);
+
+        // SELECT * FROM order WHERE customer_id=1
+        if ($customer->orders[0]->customer === $customer) {
+            echo '相同';
+        } else {
+            echo '不相同';
+        }
+     *
+     * // 输出相同
+
+     * 以上我们展示了如何在延迟加载中使用相对关联关系， 相对关系也可以用在即时加载中：
+
+        // SELECT * FROM customer
+        // SELECT * FROM order WHERE customer_id IN (1, 2, ...)
+        $customers = Customer::find()->with('orders')->all();
+
+        if ($customers[0]->orders[0]->customer === $customers[0]) {
+            echo '相同';
+        } else {
+            echo '不相同';
+        }
+     * // 输出相同
+     *
+     * Note: 相对关系不能在包含中间表的关联关系中定义。
+     * 即是，如果你的关系是通过yii\db\ActiveQuery::via() 或 viaTable()方法定义的， 就不能调用yii\db\ActiveQuery::inverseOf()方法了。
+     *
      * Sets the name of the relation that is the inverse of this relation.
      * For example, an order has a customer, which means the inverse of the "customer" relation
      * is the "orders", and the inverse of the "orders" relation is the "customer".
@@ -137,6 +232,8 @@ trait ActiveRelationTrait
     }
 
     /**
+     * 查找指定的主记录的相关记录
+     * 当以惰性方式访问ActiveRecord的关系时，就会调用该方法。
      * Finds the related records for the specified primary record.
      * This method is invoked when a relation of an ActiveRecord is being accessed in a lazy fashion.
      * @param string $name the relation name
@@ -146,6 +243,7 @@ trait ActiveRelationTrait
      */
     public function findFor($name, $model)
     {
+        // 主要是验证方法名是否符合规范
         if (method_exists($model, 'get' . $name)) {
             $method = new \ReflectionMethod($model, 'get' . $name);
             $realName = lcfirst(substr($method->getName(), 3));
@@ -158,6 +256,7 @@ trait ActiveRelationTrait
     }
 
     /**
+     * 将查询的主模型填充到相关活动记录的逆关系中
      * If applicable, populate the query's primary model into the related records' inverse relationship
      * @param array $result the array of related records as generated by [[populate()]]
      * @since 2.0.9
@@ -184,6 +283,7 @@ trait ActiveRelationTrait
     }
 
     /**
+     * 找到相关的记录并将它们填充到主要模型中
      * Finds the related records and populates them into the primary models.
      * @param string $name the relation name
      * @param array $primaryModels primary models
@@ -393,6 +493,7 @@ trait ActiveRelationTrait
 
 
     /**
+     * 按列名称进行索引
      * Indexes buckets by column name.
      *
      * @param array $buckets

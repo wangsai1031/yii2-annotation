@@ -20,19 +20,23 @@ use yii\base\InvalidParamException;
 abstract class BaseManager extends Component implements ManagerInterface
 {
     /**
+     * 在不调用[[assign()]]分配的情况下自动分配给每个用户的角色名称列表
      * @var array a list of role names that are assigned to every user automatically without calling [[assign()]].
      */
     public $defaultRoles = [];
 
 
     /**
+     * 返回指定名称的授权项
      * Returns the named auth item.
      * @param string $name the auth item name.
+     * 与指定名称对应的授权项。如果没有，则返回Null
      * @return Item the auth item corresponding to the specified name. Null is returned if no such item.
      */
     abstract protected function getItem($name);
 
     /**
+     * 返回指定类型的授权项
      * Returns the items of the specified type.
      * @param integer $type the auth item type (either [[Item::TYPE_ROLE]] or [[Item::TYPE_PERMISSION]]
      * @return Item[] the auth items of the specified type.
@@ -40,14 +44,18 @@ abstract class BaseManager extends Component implements ManagerInterface
     abstract protected function getItems($type);
 
     /**
+     * 向RBAC系统添加一个授权项
      * Adds an auth item to the RBAC system.
      * @param Item $item the item to add
+     * 是否成功地将授权证项添加到系统中
      * @return boolean whether the auth item is successfully added to the system
+     * 如果数据验证或保存失败(例如角色或权限的名称不是唯一的)，则抛异常。
      * @throws \Exception if data validation or saving fails (such as the name of the role or permission is not unique)
      */
     abstract protected function addItem($item);
 
     /**
+     * 向RBAC系统添加一条规则
      * Adds a rule to the RBAC system.
      * @param Rule $rule the rule to add
      * @return boolean whether the rule is successfully added to the system
@@ -56,6 +64,7 @@ abstract class BaseManager extends Component implements ManagerInterface
     abstract protected function addRule($rule);
 
     /**
+     * 从RBAC系统中删除一个授权项
      * Removes an auth item from the RBAC system.
      * @param Item $item the item to remove
      * @return boolean whether the role or permission is successfully removed
@@ -64,6 +73,7 @@ abstract class BaseManager extends Component implements ManagerInterface
     abstract protected function removeItem($item);
 
     /**
+     * 从RBAC系统中删除一条规则
      * Removes a rule from the RBAC system.
      * @param Rule $rule the rule to remove
      * @return boolean whether the rule is successfully removed
@@ -72,6 +82,7 @@ abstract class BaseManager extends Component implements ManagerInterface
     abstract protected function removeRule($rule);
 
     /**
+     * 在RBAC系统中修改一个授权项
      * Updates an auth item in the RBAC system.
      * @param string $name the name of the item being updated
      * @param Item $item the updated item
@@ -81,6 +92,7 @@ abstract class BaseManager extends Component implements ManagerInterface
     abstract protected function updateItem($name, $item);
 
     /**
+     * 在 RBAC 系统中修改一条规则
      * Updates a rule to the RBAC system.
      * @param string $name the name of the rule being updated
      * @param Rule $rule the updated rule
@@ -90,6 +102,9 @@ abstract class BaseManager extends Component implements ManagerInterface
     abstract protected function updateRule($name, $rule);
 
     /**
+     * 创建一个新的角色对象。
+     * 注意，新创建的角色并没有添加到RBAC系统中。
+     * 您必须填充所需的数据，并调用[[add()]]将其添加到系统中
      * @inheritdoc
      */
     public function createRole($name)
@@ -100,6 +115,9 @@ abstract class BaseManager extends Component implements ManagerInterface
     }
 
     /**
+     * 创建一个新的权限对象。
+     * 注意，新创建的权限对象并没有添加到RBAC系统中。
+     * 您必须填充所需的数据，并调用[[add()]]将其添加到系统中
      * @inheritdoc
      */
     public function createPermission($name)
@@ -110,6 +128,7 @@ abstract class BaseManager extends Component implements ManagerInterface
     }
 
     /**
+     * 在RBAC系统中添加一个角色、权限或规则
      * @inheritdoc
      */
     public function add($object)
@@ -129,6 +148,7 @@ abstract class BaseManager extends Component implements ManagerInterface
     }
 
     /**
+     * 从RBAC系统中删除一个角色、权限或规则。
      * @inheritdoc
      */
     public function remove($object)
@@ -143,6 +163,7 @@ abstract class BaseManager extends Component implements ManagerInterface
     }
 
     /**
+     * 更新系统中指定的角色、权限或规则。
      * @inheritdoc
      */
     public function update($name, $object)
@@ -162,6 +183,7 @@ abstract class BaseManager extends Component implements ManagerInterface
     }
 
     /**
+     * 返回指定的角色
      * @inheritdoc
      */
     public function getRole($name)
@@ -171,6 +193,7 @@ abstract class BaseManager extends Component implements ManagerInterface
     }
 
     /**
+     * 返回指定的权限
      * @inheritdoc
      */
     public function getPermission($name)
@@ -180,6 +203,7 @@ abstract class BaseManager extends Component implements ManagerInterface
     }
 
     /**
+     * 返回系统中的所有角色
      * @inheritdoc
      */
     public function getRoles()
@@ -188,6 +212,7 @@ abstract class BaseManager extends Component implements ManagerInterface
     }
 
     /**
+     * 返回系统中的所有权限
      * @inheritdoc
      */
     public function getPermissions()
@@ -196,10 +221,13 @@ abstract class BaseManager extends Component implements ManagerInterface
     }
 
     /**
+     * 执行与指定的认证项相关联的规则
      * Executes the rule associated with the specified auth item.
      *
-     * If the item does not specify a rule, this method will return true. Otherwise, it will
-     * return the value of [[Rule::execute()]].
+     * 如果条目没有指定规则，那么该方法将返回true。
+     * 否则，它将返回[[Rule::execute()]]的值
+     * If the item does not specify a rule, this method will return true.
+     * Otherwise, it will return the value of [[Rule::execute()]].
      *
      * @param string|integer $user the user ID. This should be either an integer or a string representing
      * the unique identifier of a user. See [[\yii\web\User::id]].

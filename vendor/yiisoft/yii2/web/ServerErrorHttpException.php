@@ -8,6 +8,7 @@
 namespace yii\web;
 
 /**
+ * 500 服务器内部异常
  * ServerErrorHttpException represents an "Internal Server Error" HTTP exception with status code 500.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>

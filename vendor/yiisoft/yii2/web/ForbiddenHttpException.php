@@ -8,6 +8,7 @@
 namespace yii\web;
 
 /**
+ * 表示状态码403 "Forbidden"HTTP异常。
  * ForbiddenHttpException represents a "Forbidden" HTTP exception with status code 403.
  *
  * Use this exception when a user has been authenticated but is not allowed to

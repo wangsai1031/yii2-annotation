@@ -125,6 +125,7 @@ class Logger extends Component
     }
 
     /**
+     * 根据给定的类型和类别记录日志
      * Logs a message with the given type and category.
      * If [[traceLevel]] is greater than 0, additional call stack information about
      * the application code will be logged as well.

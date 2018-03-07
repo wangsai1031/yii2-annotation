@@ -8,6 +8,7 @@
 namespace yii\caching;
 
 /**
+ * 使用 PHP XCache扩展。
  * XCache provides XCache caching in terms of an application component.
  *
  * To use this application component, the [XCache PHP extension](http://xcache.lighttpd.net/) must be loaded.
@@ -22,6 +23,12 @@ namespace yii\caching;
 class XCache extends Cache
 {
     /**
+     * 检查一个指定的键是否存在于缓存中.
+     * 如果缓存的数据很大，这个方法比从缓存中获取值要快。
+     * 如果使用的缓存组件支持这个特性，则应该使用缓存组件更加适用的方法覆盖本方法。
+     * 如果一个缓存不支持这个特性，那么这个方法将尝试模拟它，但是在获得它的过程中没有性能上的改进。
+     * 注意，该方法不检查与缓存数据相关的依赖关系是否已经发生了变化。
+     * 因此，当该函数返回true时，调用[[get]]可能返回false。
      * Checks whether a specified key exists in the cache.
      * This can be faster than getting the value from the cache if the data is big.
      * Note that this method does not check whether the dependency associated
@@ -39,6 +46,8 @@ class XCache extends Cache
     }
 
     /**
+     * 使用指定的键从缓存中检索值
+     * 这是在父类中声明的方法的实现
      * Retrieves a value from cache with a specified key.
      * This is the implementation of the method declared in the parent class.
      * @param string $key a unique key identifying the cached value
@@ -50,6 +59,8 @@ class XCache extends Cache
     }
 
     /**
+     * 在缓存中存储一个键对应的值。
+     * 这是在父类中声明的方法的实现.
      * Stores a value identified by a key in cache.
      * This is the implementation of the method declared in the parent class.
      *
@@ -65,6 +76,8 @@ class XCache extends Cache
     }
 
     /**
+     * 如果缓存不包含该键，则缓存该键和值。
+     * 这是在父类中声明的方法的实现.
      * Stores a value identified by a key into cache if the cache does not contain this key.
      * This is the implementation of the method declared in the parent class.
      *
@@ -80,6 +93,8 @@ class XCache extends Cache
     }
 
     /**
+     * 从缓存中删除指定键的值。
+     * 这是在父类中声明的方法的实现.
      * Deletes a value with the specified key from cache
      * This is the implementation of the method declared in the parent class.
      * @param string $key the key of the value to be deleted
@@ -91,6 +106,8 @@ class XCache extends Cache
     }
 
     /**
+     * 清空所有缓存
+     * 这是在父类中声明的方法的实现.
      * Deletes all values from cache.
      * This is the implementation of the method declared in the parent class.
      * @return boolean whether the flush operation was successful.

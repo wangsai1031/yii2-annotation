@@ -57,14 +57,17 @@ use yii\base\NotSupportedException;
 class Command extends Component
 {
     /**
+     * 与该命令关联的DB连接
      * @var Connection the DB connection that this command is associated with
      */
     public $db;
     /**
+     * 与这个命令相关联的PDOStatement对象
      * @var \PDOStatement the PDOStatement object that this command is associated with
      */
     public $pdoStatement;
     /**
+     * 这个命令的默认获取模式
      * @var integer the default fetch mode for this command.
      * @see http://www.php.net/manual/en/function.PDOStatement-setFetchMode.php
      */
@@ -76,33 +79,40 @@ class Command extends Component
      */
     public $params = [];
     /**
+     * 查询结果可以在缓存中保持有效的默认秒数
+     * 使用0表示缓存的数据永远不会过期，使用负数来表示不应该使用查询缓存
      * @var integer the default number of seconds that query results can remain valid in cache.
-     * Use 0 to indicate that the cached data will never expire. And use a negative number to indicate
-     * query cache should not be used.
+     * Use 0 to indicate that the cached data will never expire.
+     * And use a negative number to indicate query cache should not be used.
      * @see cache()
      */
     public $queryCacheDuration;
     /**
+     * 与此命令的缓存查询结果相关联的依赖关系
      * @var \yii\caching\Dependency the dependency to be associated with the cached query result for this command
      * @see cache()
      */
     public $queryCacheDependency;
 
     /**
+     * 绑定到当前的PDO语句的待定参数
      * @var array pending parameters to be bound to the current PDO statement.
      */
     private $_pendingParams = [];
     /**
+     * 这个命令所表示的SQL语句
      * @var string the SQL statement that this command represents
      */
     private $_sql;
     /**
+     * 表的名称，在执行命令后重新刷新该表模式缓存
      * @var string name of the table, which schema, should be refreshed after command execution.
      */
     private $_refreshTableName;
 
 
     /**
+     * 为该命令启用查询缓存
      * Enables query cache for this command.
      * @param integer $duration the number of seconds that query result of this command can remain valid in the cache.
      * If this is not set, the value of [[Connection::queryCacheDuration]] will be used instead.
@@ -307,6 +317,7 @@ class Command extends Component
     }
 
     /**
+     * 将一个值列表绑定到相应的参数
      * Binds a list of values to the corresponding parameters.
      * This is similar to [[bindValue()]] except that it binds multiple values at a time.
      * Note that the SQL data type of each value is determined by its PHP type.
@@ -363,12 +374,18 @@ class Command extends Component
     }
 
     /**
+     * 执行SQL语句并返回结果的第一行
+     * 当查询只需要第一行结果时，就可以使用该方法
      * Executes the SQL statement and returns the first row of the result.
      * This method is best used when only the first row of result is needed for a query.
+     *
+     * $fetchMode 结果获取模式
      * @param integer $fetchMode the result fetch mode. Please refer to [PHP manual](http://www.php.net/manual/en/function.PDOStatement-setFetchMode.php)
      * for valid fetch modes. If this parameter is null, the value set in [[fetchMode]] will be used.
+     * 返回查询结果的第一行(以数组的形式)，若未查询到数据则返回false
      * @return array|false the first row (in terms of an array) of the query result. False is returned if the query
      * results in nothing.
+     * // 执行失败会抛异常
      * @throws Exception execution failed
      */
     public function queryOne($fetchMode = null)
@@ -463,15 +480,17 @@ class Command extends Component
     }
 
     /**
+     * 创建update语句
      * Creates an UPDATE command.
      * For example,
      *
      * ```php
      * $connection->createCommand()->update('user', ['status' => 1], 'age > 30')->execute();
      * ```
-     *
+     * 该方法将正确编码列名和绑定要更新的值。
      * The method will properly escape the column names and bind the values to be updated.
      *
+     * 注意，创建的命令语句在调用 [[execute()]] 前不会执行
      * Note that the created command is not executed until [[execute()]] is called.
      *
      * @param string $table the table to be updated.
@@ -856,11 +875,14 @@ class Command extends Component
     }
 
     /**
+     * 执行SQL语句的实际DB查询
      * Performs the actual DB query of a SQL statement.
+     * $method 被调用的PDOStatement方法
      * @param string $method method of PDOStatement to be called
      * @param integer $fetchMode the result fetch mode. Please refer to [PHP manual](http://www.php.net/manual/en/function.PDOStatement-setFetchMode.php)
      * for valid fetch modes. If this parameter is null, the value set in [[fetchMode]] will be used.
      * @return mixed the method execution result
+     * 如果查询导致任何问题会抛异常
      * @throws Exception if the query causes any problem
      * @since 2.0.1 this method is protected (was private before).
      */
@@ -905,7 +927,24 @@ class Command extends Component
                 if ($fetchMode === null) {
                     $fetchMode = $this->fetchMode;
                 }
+                /**
+                 * 通过PDO获取其中一个记录
+                 *  array(10) {
+                        ["id"]=> string(1) "7"
+                        ["userid"]=> string(1) "1"
+                        ["status"]=> string(5) "Draft"
+                        ["tags"]=> string(4) "test"
+                        ["createtime"]=> string(10) "1382152003"
+                        ["publishtime"]=> string(10) "1381161600"
+                        ["abstract"]=> string(3) "abs"
+                        ["content"]=> string(12) "<p>cont</p>"
+                        ["lastupdate"]=> string(10) "1382152003"
+                    }
+                 *
+                 * 所有的字段通过PDO读取后，再DUMP出来都是以 string 保存的.
+                 */
                 $result = call_user_func_array([$this->pdoStatement, $method], (array) $fetchMode);
+
                 $this->pdoStatement->closeCursor();
             }
 

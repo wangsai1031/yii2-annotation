@@ -13,6 +13,7 @@ use yii\di\Instance;
 use yii\mail\MailerInterface;
 
 /**
+ * 发送日志消息到预先指定的邮箱地址。
  * EmailTarget sends selected log messages to the specified email addresses.
  *
  * You may configure the email to be sent by setting the [[message]] property, through which

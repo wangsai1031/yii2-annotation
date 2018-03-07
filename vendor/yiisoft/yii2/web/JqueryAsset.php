@@ -8,6 +8,7 @@
 namespace yii\web;
 
 /**
+ * 包含从jQuery bower 包的jquery.js文件。
  * This asset bundle provides the [jQuery](http://jquery.com/) JavaScript library.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>

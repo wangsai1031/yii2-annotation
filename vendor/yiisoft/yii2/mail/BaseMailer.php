@@ -55,9 +55,10 @@ abstract class BaseMailer extends Component implements MailerInterface, ViewCont
      */
     public $textLayout = 'layouts/text';
     /**
-     * @var array the configuration that should be applied to any newly created
-     * email message instance by [[createMessage()]] or [[compose()]]. Any valid property defined
-     * by [[MessageInterface]] can be configured, such as `from`, `to`, `subject`, `textBody`, `htmlBody`, etc.
+     * 应该通过[[createMessage()]] or [[compose()]]来应用到任何新创建的电子邮件消息实例的配置
+     * 可以配置由[[MessageInterface]]定义的任何有效属性，如`from`, `to`, `subject`, `textBody`, `htmlBody`, 等等。
+     * @var array the configuration that should be applied to any newly created email message instance by [[createMessage()]] or [[compose()]].
+     * Any valid property defined by [[MessageInterface]] can be configured, such as `from`, `to`, `subject`, `textBody`, `htmlBody`, etc.
      *
      * For example:
      *
@@ -75,8 +76,10 @@ abstract class BaseMailer extends Component implements MailerInterface, ViewCont
      */
     public $messageClass = 'yii\mail\BaseMessage';
     /**
-     * @var boolean whether to save email messages as files under [[fileTransportPath]] instead of sending them
-     * to the actual recipients. This is usually used during development for debugging purpose.
+     * 是否将电子邮件消息保存为[[fileTransportPath]]路径下的文件，而不是将它们实际发送到接收方。
+     * 这通常在开发期间用于调试目的。
+     * @var boolean whether to save email messages as files under [[fileTransportPath]] instead of sending them  to the actual recipients.
+     * This is usually used during development for debugging purpose.
      * @see fileTransportPath
      */
     public $useFileTransport = false;

@@ -11,9 +11,11 @@ use yii\base\InvalidCallException;
 use yii\db\BaseActiveRecord;
 
 /**
+ * TimestampBehavior 自动用当前的时间戳填充指定的属性。
  * TimestampBehavior automatically fills the specified attributes with the current timestamp.
  *
  * To use TimestampBehavior, insert the following code to your ActiveRecord class:
+ * 要使用TimestampBehavior，请将以下代码插入到ActiveRecord类:
  *
  * ```php
  * use yii\behaviors\TimestampBehavior;
@@ -72,11 +74,15 @@ use yii\db\BaseActiveRecord;
 class TimestampBehavior extends AttributeBehavior
 {
     /**
+     * 将获得时间戳值的属性
+     * 如果您不想记录创建时间，则将该属性设置为false。
      * @var string the attribute that will receive timestamp value
      * Set this property to false if you do not want to record the creation time.
      */
     public $createdAtAttribute = 'created_at';
     /**
+     * 将获得时间戳值的属性
+     * 如果您不想记录修改时间，则将该属性设置为false。
      * @var string the attribute that will receive timestamp value.
      * Set this property to false if you do not want to record the update time.
      */
@@ -84,8 +90,8 @@ class TimestampBehavior extends AttributeBehavior
     /**
      * @inheritdoc
      *
-     * In case, when the value is `null`, the result of the PHP function [time()](http://php.net/manual/en/function.time.php)
-     * will be used as value.
+     * 如果该值是null，则将使用 [time()] 值
+     * In case, when the value is `null`, the result of the PHP function [time()](http://php.net/manual/en/function.time.php) will be used as value.
      */
     public $value;
 
@@ -99,7 +105,9 @@ class TimestampBehavior extends AttributeBehavior
 
         if (empty($this->attributes)) {
             $this->attributes = [
+                // 默认 beforeInsert事件对应要自动赋值的属性为 created_at updated_at
                 BaseActiveRecord::EVENT_BEFORE_INSERT => [$this->createdAtAttribute, $this->updatedAtAttribute],
+                // 默认 beforeUpdate事件对应要自动赋值的属性为 updated_at
                 BaseActiveRecord::EVENT_BEFORE_UPDATE => $this->updatedAtAttribute,
             ];
         }
@@ -108,6 +116,7 @@ class TimestampBehavior extends AttributeBehavior
     /**
      * @inheritdoc
      *
+     * 如果[[value]]值是null，则将使用 [time()] 值
      * In case, when the [[value]] is `null`, the result of the PHP function [time()](http://php.net/manual/en/function.time.php)
      * will be used as value.
      */
@@ -121,11 +130,15 @@ class TimestampBehavior extends AttributeBehavior
 
     /**
      * Updates a timestamp attribute to the current timestamp.
-     *
+     * 将时间戳属性更新为当前时间戳
      * ```php
      * $model->touch('lastVisit');
+     *
+     * // 这里好像也可以用数组
+     * $model->touch(['updated_at', 'refresh_at']);
      * ```
      * @param string $attribute the name of the attribute to update.
+     *
      * @throws InvalidCallException if owner is a new record (since version 2.0.6).
      */
     public function touch($attribute)
@@ -135,6 +148,15 @@ class TimestampBehavior extends AttributeBehavior
         if ($owner->getIsNewRecord()) {
             throw new InvalidCallException('Updating the timestamp is not possible on a new record.');
         }
+        /**
+         * @link http://www.w3school.com.cn/php/func_array_fill_keys.asp
+         * array_fill_keys((array) $attribute, $this->getValue(null));
+         * 将后面的值赋给前面$attribute数组中每个元素。
+         * [
+         *      'updated_at' => time(),
+         *      'refresh_at' => time()
+         * ]
+         */
         $owner->updateAttributes(array_fill_keys((array) $attribute, $this->getValue(null)));
     }
 }

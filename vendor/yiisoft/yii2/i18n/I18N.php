@@ -95,6 +95,7 @@ class I18N extends Component
     }
 
     /**
+     * 使用 [[MessageFormatter]] 格式化消息。
      * Formats a message using [[MessageFormatter]].
      *
      * @param string $message the message to be formatted.

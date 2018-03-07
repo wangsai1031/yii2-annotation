@@ -14,6 +14,65 @@ use yii\validators\UniqueValidator;
 use Yii;
 
 /**
+ * 使用 SluggableBehavior 可以让我们的URL美化更加语义化。
+ * e.g.   http://abc.com/member/view/3  => http://abc.com/member/zhang-san
+ * 这个行为类有一个缺点就是不支持中文
+ *
+ * 使用方法：
+ * 1. 首先我需要在member表中增加一个叫做 slug 的字段。
+ *
+ * ```
+ *  // migrate 代码如下
+    $this->addColumn('member','slug',$this->string(64)->notNull());
+ * ```
+ *
+ * 2.将SluggableBehavior 注入到Member模型中，增强其功能。
+ *
+ * ```
+    class Member extends \yii\db\ActiveRecord
+    {
+        ...
+
+        public function behaviors(){
+            return [
+                [
+                    'class' => \yii\behaviors\SluggableBehavior::className(),
+                    'attribute' => 'username',
+                    // 要注意的是，yii2框架的slugAttribute默认为slug，而我们刚刚在数据表中增加的字段也叫slug，因此不需要再设置slugAttribute了。
+                    // 'slugAttribute' => 'slug',
+                ],
+            ];
+        }
+    }
+ * ```
+ *
+ * 3. 接下来我们生成一个username=Zhang San的记录，你会发现该记录的slug自动被填充为zhang-san了
+ * 4. 配置文件中 urlManager 添加配置
+ *
+ * ```
+    'urlManager' => [
+        'enablePrettyUrl' => true,
+        'showScriptName' => false,
+        'rules' => [
+            'member/<slug>' => 'member/slug',
+ *          ...
+        ],
+    ],
+ * ```
+ *
+ * 5. 在MemberController控制器中添加 actionSlug()
+ *
+ * ```
+ *  public function actionSlug($slug)
+    {
+        $model = Member::findOne(['slug' => $slug]);
+
+ *      ... other ...
+    }
+ *
+ * ```
+ *
+ *
  * SluggableBehavior automatically fills the specified attribute with a value that can be used a slug in a URL.
  *
  * To use SluggableBehavior, insert the following code to your ActiveRecord class:
@@ -81,12 +140,14 @@ class SluggableBehavior extends AttributeBehavior
      */
     public $value;
     /**
+     * immutable 此参数默认为假，当设置为真时，一旦一个记录被生成，以后就算更更新了 'attribute' => 'username' 字段，slug值也不会改变。
      * @var boolean whether to generate a new slug if it has already been generated before.
      * If true, the behavior will not generate a new slug even if [[attribute]] is changed.
      * @since 2.0.2
      */
     public $immutable = false;
     /**
+     * ensureUnique 此参数默认为假，当设置为真时，可以有效避免slug的重复，如果两个username都叫做 zhang san，则生成的slug会是zhang-san 和 zhang-san-2
      * @var boolean whether to ensure generated slug value to be unique among owner class records.
      * If enabled behavior will validate slug uniqueness automatically. If validation fails it will attempt
      * generating unique slug value from based one until success.

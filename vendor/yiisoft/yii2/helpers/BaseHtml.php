@@ -25,6 +25,7 @@ use yii\base\Model;
 class BaseHtml
 {
     /**
+     * 空元素数组列表
      * @var array list of void elements (element name => 1)
      * @see http://www.w3.org/TR/html-markup/syntax.html#void-element
      */
@@ -47,8 +48,9 @@ class BaseHtml
         'wbr' => 1,
     ];
     /**
-     * @var array the preferred order of attributes in a tag. This mainly affects the order of the attributes
-     * that are rendered by [[renderTagAttributes()]].
+     * 标签属性的优先顺序，这主要影响属性通过[[@see renderTagAttributes()]]呈现的顺序
+     * @var array the preferred order of attributes in a tag.
+     * This mainly affects the order of the attributes that are rendered by [[renderTagAttributes()]].
      */
     public static $attributeOrder = [
         'type',
@@ -81,7 +83,9 @@ class BaseHtml
         'media',
     ];
     /**
+     * 当它们的值是数组类型时，应该特别处理的标记属性列表
      * @var array list of tag attributes that should be specially handled when their values are of array type.
+     * 尤其是，当'data'属性的值是`['name' => 'xyz', 'age' => 13]`，将生成两个属相`data-name="xyz" data-age="13"`
      * In particular, if the value of the `data` attribute is `['name' => 'xyz', 'age' => 13]`, two attributes
      * will be generated instead of one: `data-name="xyz" data-age="13"`.
      * @since 2.0.3
@@ -90,6 +94,7 @@ class BaseHtml
 
 
     /**
+     * 将特殊字符编码成HTML实体
      * Encodes special characters into HTML entities.
      * The [[\yii\base\Application::charset|application charset]] will be used for encoding.
      * @param string $content the content to be encoded
@@ -105,6 +110,7 @@ class BaseHtml
     }
 
     /**
+     * 将特殊的HTML实体解码回对应的字符
      * Decodes special HTML entities back to the corresponding characters.
      * This is the opposite of [[encode()]].
      * @param string $content the content to be decoded
@@ -118,7 +124,11 @@ class BaseHtml
     }
 
     /**
+     * 生成一个完整的HTML标签
      * Generates a complete HTML tag.
+     * 第一个参数是标签名称。如果设为 null 或 false, 对应的内容将在没有任何标记的情况下呈现.
+     * 第二个是要装入到开始和结束标签间的内容,它不会被html编码,如果这是来自终端用户的内容，那么您应该使用 [[encode()]] 以防止XSS攻击。
+     * 第三个参数是一个 HTML 配置数组，即标签属性，如果一个属性值为null，则相应的属性将不会被呈现
      * @param string|boolean|null $name the tag name. If $name is `null` or `false`, the corresponding content will be rendered without any tag.
      * @param string $content the content to be enclosed between the start and end tags. It will not be HTML-encoded.
      * If this is coming from end users, you should consider [[encode()]] it to prevent XSS attacks.
@@ -129,6 +139,7 @@ class BaseHtml
      * For example when using `['class' => 'my-class', 'target' => '_blank', 'value' => null]` it will result in the
      * html attributes rendered like this: `class="my-class" target="_blank"`.
      *
+     * 关于属性是如何被渲染的，可以通过查看 @see renderTagAttributes() 了解详情
      * See [[renderTagAttributes()]] for details on how attributes are being rendered.
      *
      * @return string the generated HTML tag
@@ -145,6 +156,7 @@ class BaseHtml
     }
 
     /**
+     * 生成一个开始标签
      * Generates a start tag.
      * @param string|boolean|null $name the tag name. If $name is `null` or `false`, the corresponding content will be rendered without any tag.
      * @param array $options the tag options in terms of name-value pairs. These will be rendered as
@@ -164,6 +176,7 @@ class BaseHtml
     }
 
     /**
+     * 生成结束标签
      * Generates an end tag.
      * @param string|boolean|null $name the tag name. If $name is `null` or `false`, the corresponding content will be rendered without any tag.
      * @return string the generated end tag
@@ -179,6 +192,8 @@ class BaseHtml
     }
 
     /**
+     * 生成一个样式标签
+     * <?= Html::style('.danger { color: #f00; }') ?>
      * Generates a style tag.
      * @param string $content the style content
      * @param array $options the tag options in terms of name-value pairs. These will be rendered as
@@ -193,6 +208,8 @@ class BaseHtml
     }
 
     /**
+     * 生成一个脚本标签
+     * <?= Html::script('alert("Hello!");', ['defer' => true]);
      * Generates a script tag.
      * @param string $content the script content
      * @param array $options the tag options in terms of name-value pairs. These will be rendered as
@@ -207,7 +224,23 @@ class BaseHtml
     }
 
     /**
+     * 生成一个指向外部CSS文件的链接标签
+     *  <?= Html::cssFile('@web/css/ie5.css', ['condition' => 'IE 5']) ?>
+
+        generates
+
+        <!--[if IE 5]>
+        <link href="http://example.com/css/ie5.css" />
+        <![endif]-->
+     *
      * Generates a link tag that refers to an external CSS file.
+     *
+     * 第一个参数是 URL。
+     * 第二个参数是标签属性数组。
+     * 比普通的标签配置项额外多出的是，你可以指定：
+     * - condition 来让 <link 被条件控制注释包裹（ IE hacker ）。 希望你在未来不再需要条件控制注释。
+     * - noscript 可以被设置为 true ，这样 <link就会被 <noscript>包裹，如此那么这段代码只有在浏览器不支持 JavaScript 或者被用户禁用的时候才会被引入进来。
+     *
      * @param array|string $url the URL of the external CSS file. This parameter will be processed by [[Url::to()]].
      * @param array $options the tag options in terms of name-value pairs. The following option is specially handled:
      *
@@ -242,6 +275,11 @@ class BaseHtml
     }
 
     /**
+     * 生成一个指向外部JavaScript文件的脚本标签
+     *
+     * 第一个参数是 URL。第二个参数是标签属性数组。比普通的标签配置项额外多出的是，你可以指定：
+     * - condition 来让 <link 被条件控制注释包裹（ IE hacker ）。 希望你在未来不再需要条件控制注释。
+     *
      * Generates a script tag that refers to an external JavaScript file.
      * @param string $url the URL of the external JavaScript file. This parameter will be processed by [[Url::to()]].
      * @param array $options the tag options in terms of name-value pairs. The following option is specially handled:
@@ -269,6 +307,8 @@ class BaseHtml
     }
 
     /**
+     * 将内容包含在对IE的条件注释中
+     *
      * Wraps given content into conditional comments for IE, e.g., `lt IE 9`.
      * @param string $content raw HTML content.
      * @param string $condition condition string.
@@ -283,6 +323,7 @@ class BaseHtml
     }
 
     /**
+     * 生成包含CSRF令牌信息的元标签
      * Generates the meta tags containing CSRF token information.
      * @return string the generated meta tags
      * @see Request::enableCsrfValidation
@@ -299,6 +340,16 @@ class BaseHtml
     }
 
     /**
+     * 生成一个表单开始标签
+     *
+     * e.g. <?= Html::beginForm(['order/update', 'id' => $id], 'post', ['enctype' => 'multipart/form-data']) ?>
+     *
+     * - 第一个参数为表单将要被提交的 URL 地址。它可以以 Yii 路由的形式被指定，并由 yii\helpers\Url::to() 来接收处理。
+     * - 第二个参数是使用的方法，默认为 post 方法。
+     * - 第三个参数为表单标签的属性数组。
+     *
+     * 在上面的例子中， 我们把编码 POST 请求中的表单数据的方式改为 multipart/form-data.如果是上传文件，这个调整是必须的。
+     *
      * Generates a form start tag.
      * @param array|string $action the form action URL. This parameter will be processed by [[Url::to()]].
      * @param string $method the form submission method, such as "post", "get", "put", "delete" (case-insensitive).
@@ -312,6 +363,7 @@ class BaseHtml
      *
      * Special options:
      *
+     * 是否生成CSRF隐藏输入框。默认值为true
      *  - `csrf`: whether to generate the CSRF hidden input. Defaults to true.
      *
      * @return string the generated form start tag.
@@ -325,22 +377,29 @@ class BaseHtml
 
         $request = Yii::$app->getRequest();
         if ($request instanceof Request) {
+            // strcasecmp() 二进制安全不区分大小写字符串比较
             if (strcasecmp($method, 'get') && strcasecmp($method, 'post')) {
                 // simulate PUT, DELETE, etc. via POST
+                // 通过POST方法模仿 PUT, DELETE 等方法
                 $hiddenInputs[] = static::hiddenInput($request->methodParam, $method);
                 $method = 'post';
             }
+            // 从数组中删除一个项并返回值，如果数组中不存在该键，则返回默认值 true。
             $csrf = ArrayHelper::remove($options, 'csrf', true);
 
+            // 如果启用CSRF验证，并且是POST方法，则添加带CSRF信息的隐藏输入框
             if ($csrf && $request->enableCsrfValidation && strcasecmp($method, 'post') === 0) {
                 $hiddenInputs[] = static::hiddenInput($request->csrfParam, $request->getCsrfToken());
             }
         }
 
+        // 如果是GET方法，并且带查询参数
         if (!strcasecmp($method, 'get') && ($pos = strpos($action, '?')) !== false) {
-            // query parameters in the action are ignored for GET method
-            // we use hidden fields to add them back
+            // query parameters in the action are ignored for GET method, we use hidden fields to add them back
+            // 对于GET方法，该操作中的查询参数被忽略，我们使用隐藏字段将其添加回去
+            // 遍历查询参数
             foreach (explode('&', substr($action, $pos + 1)) as $pair) {
+                // 将查询参数填入隐藏输入框
                 if (($pos1 = strpos($pair, '=')) !== false) {
                     $hiddenInputs[] = static::hiddenInput(
                         urldecode(substr($pair, 0, $pos1)),
@@ -350,12 +409,15 @@ class BaseHtml
                     $hiddenInputs[] = static::hiddenInput(urldecode($pair), '');
                 }
             }
+            // 去掉查询参数后剩余的URL部分
             $action = substr($action, 0, $pos);
         }
 
         $options['action'] = $action;
         $options['method'] = $method;
         $form = static::beginTag('form', $options);
+
+        // 将查询参数转换成的隐藏输入框拼接到<form>后
         if (!empty($hiddenInputs)) {
             $form .= "\n" . implode("\n", $hiddenInputs);
         }
@@ -364,6 +426,7 @@ class BaseHtml
     }
 
     /**
+     * 表单结束标签
      * Generates a form end tag.
      * @return string the generated tag
      * @see beginForm()
@@ -374,6 +437,11 @@ class BaseHtml
     }
 
     /**
+     * 生成一个超链接标签
+     * - 第一个参数是超链接的标题。它不会被转码，所以如果是用户输入数据， 你需要使用 Html::encode() 方法进行转码。
+     * - 第二个参数是 <a 标签的 href 属性的值。 关于该参数能够接受的更详细的数据值，请参阅 Url::to()。
+     * - 第三个参数是标签的属性数组。
+     *
      * Generates a hyperlink tag.
      * @param string $text link body. It will NOT be HTML-encoded. Therefore you can pass in HTML code
      * such as an image tag. If this is coming from end users, you should consider [[encode()]]
@@ -382,6 +450,7 @@ class BaseHtml
      * and will be used for the "href" attribute of the tag. If this parameter is null, the "href" attribute
      * will not be generated.
      *
+     * 如果您想使用绝对url，您可以在将url传递给该方法之前自己调用url::to()
      * If you want to use an absolute url you can call [[Url::to()]] yourself, before passing the URL to this method,
      * like this:
      *
@@ -405,6 +474,8 @@ class BaseHtml
     }
 
     /**
+     * 生成一个mailto链接
+     * <?= Html::mailto('Contact us', 'admin@example.com') ?>
      * Generates a mailto hyperlink.
      * @param string $text link body. It will NOT be HTML-encoded. Therefore you can pass in HTML code
      * such as an image tag. If this is coming from end users, you should consider [[encode()]]
@@ -424,6 +495,8 @@ class BaseHtml
     }
 
     /**
+     * 生成一个图片标签
+     * 第一个参数是图片URL,可以接受 路由，查询，URLs,aliases。 同 Url::to() 一样。
      * Generates an image tag.
      * @param array|string $src the image URL. This parameter will be processed by [[Url::to()]].
      * @param array $options the tag options in terms of name-value pairs. These will be rendered as
@@ -442,6 +515,9 @@ class BaseHtml
     }
 
     /**
+     * 生成一个label标签
+     * <?= Html::label('User name', 'username', ['class' => 'label username']) ?>
+     *
      * Generates a label tag.
      * @param string $content label text. It will NOT be HTML-encoded. Therefore you can pass in HTML code
      * such as an image tag. If this is is coming from end users, you should [[encode()]]
@@ -461,6 +537,9 @@ class BaseHtml
     }
 
     /**
+     * 生成一个按钮标签
+     * - 第一个参数为按钮的标题，第二个是标签属性。
+     * 标题默认没有进行转码，如果标题是由终端用输入的， 那么请自行用 yii\helpers\Html::encode() 方法进行转码。
      * Generates a button tag.
      * @param string $content the content enclosed within the button tag. It will NOT be HTML-encoded.
      * Therefore you can pass in HTML code such as an image tag. If this is is coming from end users,
@@ -480,11 +559,21 @@ class BaseHtml
     }
 
     /**
+     * 生成一个提交按钮标签
+     * - 第一个参数为按钮的标题，第二个是标签属性。
+     * 标题默认没有进行转码，如果标题是由终端用输入的， 那么请自行用 yii\helpers\Html::encode() 方法进行转码。
+     *
      * Generates a submit button tag.
      *
-     * Be careful when naming form elements such as submit buttons. According to the [jQuery documentation](https://api.jquery.com/submit/) there
-     * are some reserved names that can cause conflicts, e.g. `submit`, `length`, or `method`.
+     * 在命名表单元素时要小心，比如提交按钮。
+     * 根据 [jQuery documentation](https://api.jquery.com/submit/)
+     * 有一些保留的名称会引起冲突 e.g. `submit`, `length`, or `method`.
+     * Be careful when naming form elements such as submit buttons.
+     * According to the [jQuery documentation](https://api.jquery.com/submit/)
+     * there are some reserved names that can cause conflicts, e.g. `submit`, `length`, or `method`.
      *
+     * 第一个参数为按钮的标题，第二个是标签属性。
+     * 标题默认没有进行转码，如果标题是由终端用输入的， 那么请自行用 yii\helpers\Html::encode() 方法进行转码。
      * @param string $content the content enclosed within the button tag. It will NOT be HTML-encoded.
      * Therefore you can pass in HTML code such as an image tag. If this is is coming from end users,
      * you should consider [[encode()]] it to prevent XSS attacks.
@@ -501,6 +590,10 @@ class BaseHtml
     }
 
     /**
+     * 生成重置按钮
+     * 第一个参数为按钮的标题，第二个是标签属性。
+     * 标题默认没有进行转码，如果标题是由终端用输入的， 那么请自行用 yii\helpers\Html::encode() 方法进行转码。
+     *
      * Generates a reset button tag.
      * @param string $content the content enclosed within the button tag. It will NOT be HTML-encoded.
      * Therefore you can pass in HTML code such as an image tag. If this is is coming from end users,
@@ -518,6 +611,18 @@ class BaseHtml
     }
 
     /**
+     * 根据给定类型生成输入标签
+     * 如果你知道 input 的类型，更方便的做法是使用以下快捷方法：
+
+        yii\helpers\Html::buttonInput()
+        yii\helpers\Html::submitInput()
+        yii\helpers\Html::resetInput()
+        yii\helpers\Html::textInput(), yii\helpers\Html::activeTextInput()
+        yii\helpers\Html::hiddenInput(), yii\helpers\Html::activeHiddenInput()
+        yii\helpers\Html::passwordInput() / yii\helpers\Html::activePasswordInput()
+        yii\helpers\Html::fileInput(), yii\helpers\Html::activeFileInput()
+        yii\helpers\Html::textarea(), yii\helpers\Html::activeTextarea()
+     *
      * Generates an input type of the given type.
      * @param string $type the type attribute.
      * @param string $name the name attribute. If it is null, the name attribute will not be generated.
@@ -539,6 +644,7 @@ class BaseHtml
     }
 
     /**
+     * 生成一个输入按钮
      * Generates an input button.
      * @param string $label the value attribute. If it is null, the value attribute will not be generated.
      * @param array $options the tag options in terms of name-value pairs. These will be rendered as
@@ -555,6 +661,7 @@ class BaseHtml
     }
 
     /**
+     * 生成一个提交输入按钮
      * Generates a submit input button.
      *
      * Be careful when naming form elements such as submit buttons. According to the [jQuery documentation](https://api.jquery.com/submit/) there
@@ -575,6 +682,7 @@ class BaseHtml
     }
 
     /**
+     * 生成一个重置输入按钮
      * Generates a reset input button.
      * @param string $label the value attribute. If it is null, the value attribute will not be generated.
      * @param array $options the attributes of the button tag. The values will be HTML-encoded using [[encode()]].
@@ -590,6 +698,7 @@ class BaseHtml
     }
 
     /**
+     * 生成一个文本输入框
      * Generates a text input field.
      * @param string $name the name attribute.
      * @param string $value the value attribute. If it is null, the value attribute will not be generated.
@@ -605,6 +714,7 @@ class BaseHtml
     }
 
     /**
+     * 生成一个隐藏输入框
      * Generates a hidden input field.
      * @param string $name the name attribute.
      * @param string $value the value attribute. If it is null, the value attribute will not be generated.
@@ -620,6 +730,7 @@ class BaseHtml
     }
 
     /**
+     * 生成一个密码输入框
      * Generates a password input field.
      * @param string $name the name attribute.
      * @param string $value the value attribute. If it is null, the value attribute will not be generated.
@@ -635,10 +746,15 @@ class BaseHtml
     }
 
     /**
+     * 生成一个文件输入框
+     *
      * Generates a file input field.
+     *
+     * 要使用文件输入框，你必须设置"enctype"属性为"multipart/form-data"，
+     * 提交表单后，可以通过 $_FILES[$name] 获得上传的文件信息
      * To use a file input field, you should set the enclosing form's "enctype" attribute to
-     * be "multipart/form-data". After the form is submitted, the uploaded file information
-     * can be obtained via $_FILES[$name] (see PHP documentation).
+     * be "multipart/form-data". After the form is submitted,
+     * the uploaded file information can be obtained via $_FILES[$name] (see PHP documentation).
      * @param string $name the name attribute.
      * @param string $value the value attribute. If it is null, the value attribute will not be generated.
      * @param array $options the tag options in terms of name-value pairs. These will be rendered as
@@ -653,6 +769,7 @@ class BaseHtml
     }
 
     /**
+     * 生成一个textarea输入框
      * Generates a text area input.
      * @param string $name the input name
      * @param string $value the input value. Note that it will be encoded using [[encode()]].
@@ -669,6 +786,7 @@ class BaseHtml
     }
 
     /**
+     * 生成单选按钮输入
      * Generates a radio button input.
      * @param string $name the name attribute.
      * @param boolean $checked whether the radio button should be checked.
@@ -683,6 +801,7 @@ class BaseHtml
     }
 
     /**
+     * 生成一个复选框输入
      * Generates a checkbox input.
      * @param string $name the name attribute.
      * @param boolean $checked whether the checkbox should be checked.
@@ -697,18 +816,27 @@ class BaseHtml
     }
 
     /**
+     * 产生一个布尔值输入
+     *
      * Generates a boolean input.
+     * 输入框类型，只能是`radio` or `checkbox`.
      * @param string $type the input type. This can be either `radio` or `checkbox`.
      * @param string $name the name attribute.
      * @param boolean $checked whether the checkbox should be checked.
      * @param array $options the tag options in terms of name-value pairs. The following options are specially handled:
      *
-     * - uncheck: string, the value associated with the uncheck state of the checkbox. When this attribute
-     *   is present, a hidden input will be generated so that if the checkbox is not checked and is submitted,
+     * 与复选框的未选择状态相关联的值，当这个属性出现时，将生成一个隐藏的输入，
+     * 以便如果复选框没有被选中并提交，该属性的值仍将通过隐藏的输入提交到服务器
+     * - uncheck: string, the value associated with the uncheck state of the checkbox.
+     *   When this attribute is present, a hidden input will be generated so that if the checkbox is not checked and is submitted,
      *   the value of this attribute will still be submitted to the server via the hidden input.
-     * - label: string, a label displayed next to the checkbox.  It will NOT be HTML-encoded. Therefore you can pass
-     *   in HTML code such as an image tag. If this is is coming from end users, you should [[encode()]] it to prevent XSS attacks.
+     * 复选框旁边显示的标签，他将不会被URL编码，因此，您可以传入HTML代码，如图像标签。
+     * 如果这是来自终端用户的内容，那么您应该使用encode()以防止XSS攻击
+     * 当指定该选项时，复选框将被附上标签
+     * - label: string, a label displayed next to the checkbox.  It will NOT be HTML-encoded.
+     *   Therefore you can pass in HTML code such as an image tag. If this is is coming from end users, you should [[encode()]] it to prevent XSS attacks.
      *   When this option is specified, the checkbox will be enclosed by a label tag.
+     * 标签的HTML属性，除非你设置了“label”选项，否则不要设置这个选项
      * - labelOptions: array, the HTML attributes for the label tag. Do not set this option unless you set the "label" option.
      *
      * The rest of the options will be rendered as the attributes of the resulting checkbox tag. The values will
@@ -741,9 +869,17 @@ class BaseHtml
     }
 
     /**
+     * 生成一个下拉列表
+     *
+     * 第一个参数是 input 的名称，
+     * 第二个是当前选中的值，
+     * 第三个则是一个下标为列表值， 值为列表标签的名值对数组。
+     *
+     * <?= Html::dropDownList('list', $currentUserId, ArrayHelper::map($userModels, 'id', 'name')) ?>
+     *
      * Generates a drop-down list.
      * @param string $name the input name
-     * @param string|array|null $selection the selected value(s). String for single or array for multiple selection(s).
+     * @param string $selection the selected value
      * @param array $items the option data items. The array keys are option values, and the array values
      * are the corresponding option labels. The array can also be nested (i.e. some array values are arrays too).
      * For each sub-array, an option group will be generated whose label is the key associated with the sub-array.
@@ -790,9 +926,15 @@ class BaseHtml
     }
 
     /**
+     * 生成一个列表框
+     * 第一个参数是 input 的名称，
+     * 第二个是当前选中的值，
+     * 第三个则是一个下标为列表值， 值为列表标签的名值对数组。
+     *
+     * <?= Html::listBox('list', $currentUserId, ArrayHelper::map($userModels, 'id', 'name')) ?>
      * Generates a list box.
      * @param string $name the input name
-     * @param string|array|null $selection the selected value(s). String for single or array for multiple selection(s).
+     * @param string|array $selection the selected value(s)
      * @param array $items the option data items. The array keys are option values, and the array values
      * are the corresponding option labels. The array can also be nested (i.e. some array values are arrays too).
      * For each sub-array, an option group will be generated whose label is the key associated with the sub-array.
@@ -854,11 +996,17 @@ class BaseHtml
     }
 
     /**
+     * 生成一个复选框列表
+     * 第一个参数是 input 的名称，
+     * 第二个是当前选中的值，
+     * 第三个则是一个下标为列表值， 值为列表标签的名值对数组。
+     * <?= Html::checkboxList('roles', [16, 42], ArrayHelper::map($roleModels, 'id', 'name')) ?>
+     *
      * Generates a list of checkboxes.
      * A checkbox list allows multiple selection, like [[listBox()]].
      * As a result, the corresponding submitted value is an array.
      * @param string $name the name attribute of each checkbox.
-     * @param string|array|null $selection the selected value(s). String for single or array for multiple selection(s).
+     * @param string|array $selection the selected value(s).
      * @param array $items the data item used to generate the checkboxes.
      * The array keys are the checkbox values, while the array values are the corresponding labels.
      * @param array $options options (name => config) for the checkbox list container tag.
@@ -935,10 +1083,16 @@ class BaseHtml
     }
 
     /**
+     * 生成单选按钮列表
+     * 第一个参数是 input 的名称，
+     * 第二个是当前选中的值，
+     * 第三个则是一个下标为列表值， 值为列表标签的名值对数组。
+     * <?= Html::checkboxList('roles', [16, 42], ArrayHelper::map($roleModels, 'id', 'name')) ?>
+     *
      * Generates a list of radio buttons.
      * A radio button list is like a checkbox list, except that it only allows single selection.
      * @param string $name the name attribute of each radio button.
-     * @param string|array|null $selection the selected value(s). String for single or array for multiple selection(s).
+     * @param string|array $selection the selected value(s).
      * @param array $items the data item used to generate the radio buttons.
      * The array keys are the radio button values, while the array values are the corresponding labels.
      * @param array $options options (name => config) for the radio button list container tag.
@@ -1004,6 +1158,16 @@ class BaseHtml
     }
 
     /**
+     * 生成一个无序列表
+     *
+     * <?= Html::ul($posts, ['item' => function($item, $index) {
+            return Html::tag(
+                'li',
+                $this->render('post', ['item' => $item]),
+                ['class' => 'post']
+            );
+        }]) ?>
+     *
      * Generates an unordered list.
      * @param array|\Traversable $items the items for generating the list. Each item generates a single list item.
      * Note that items will be automatically HTML encoded if `$options['encode']` is not set or true.
@@ -1057,6 +1221,15 @@ class BaseHtml
     }
 
     /**
+     * 生成一个有序列表
+     * <?= Html::ol($posts, ['item' => function($item, $index) {
+            return Html::tag(
+                'li',
+                $this->render('post', ['item' => $item]),
+                ['class' => 'post']
+            );
+        }]) ?>
+     *
      * Generates an ordered list.
      * @param array|\Traversable $items the items for generating the list. Each item generates a single list item.
      * Note that items will be automatically HTML encoded if `$options['encode']` is not set or true.
@@ -1086,6 +1259,7 @@ class BaseHtml
     }
 
     /**
+     * 为给定的模型属性生成一个标签
      * Generates a label tag for the given model attribute.
      * The label text is the label associated with the attribute, obtained via [[Model::getAttributeLabel()]].
      * @param Model $model the model object
@@ -1113,6 +1287,7 @@ class BaseHtml
     }
 
     /**
+     * 为给定的模型属性生成一个提示标签
      * Generates a hint tag for the given model attribute.
      * The hint text is the hint associated with the attribute, obtained via [[Model::getAttributeHint()]].
      * If no hint content can be obtained, method will return an empty string.
@@ -1146,6 +1321,9 @@ class BaseHtml
     }
 
     /**
+     * 生成验证错误的摘要信息
+     * <?= Html::errorSummary($posts, ['class' => 'errors']) ?>
+     *
      * Generates a summary of the validation errors.
      * If there is no validation error, an empty error summary markup will still be generated, but it will be hidden.
      * @param Model|Model[] $models the model(s) whose validation errors are to be displayed.
@@ -1155,8 +1333,8 @@ class BaseHtml
      * - footer: string, the footer HTML for the error summary. Defaults to empty string.
      * - encode: boolean, if set to false then the error messages won't be encoded. Defaults to `true`.
      * - showAllErrors: boolean, if set to true every error message for each attribute will be shown otherwise
-     *   only the first error message for each attribute will be shown. Defaults to `false`.
-     *   Option is available since 2.0.10.
+     * only the first error message for each attribute will be shown. Defaults to `false`.
+     * Option is available since 2.0.10.
      *
      * The rest of the options will be rendered as the attributes of the container tag.
      *
@@ -1200,6 +1378,9 @@ class BaseHtml
     }
 
     /**
+     * 生成一个包含指定模型属性的第一个验证错误的标签
+     * <?= Html::error($post, 'title', ['class' => 'error']) ?>
+     *
      * Generates a tag that contains the first validation error of the specified model attribute.
      * Note that even if there is no validation error, this method will still return an empty error tag.
      * @param Model $model the model object
@@ -1228,6 +1409,8 @@ class BaseHtml
     }
 
     /**
+     * 为给定的模型属性生成一个输入签
+     *
      * Generates an input tag for the given model attribute.
      * This method will generate the "name" and "value" tag attributes automatically for the model attribute
      * unless they are explicitly specified in `$options`.
@@ -1251,6 +1434,7 @@ class BaseHtml
     }
 
     /**
+     * 如果maxlength选项设置为true，则通过字符串验证器验证模型属性
      * If `maxlength` option is set true and the model attribute is validated by a string validator,
      * the `maxlength` option will take the value of [[\yii\validators\StringValidator::max]].
      * @param Model $model the model object
@@ -1272,6 +1456,8 @@ class BaseHtml
     }
 
     /**
+     * 为给定的模型属性生成一个文本输入标签
+     *
      * Generates a text input tag for the given model attribute.
      * This method will generate the "name" and "value" tag attributes automatically for the model attribute
      * unless they are explicitly specified in `$options`.
@@ -1296,6 +1482,8 @@ class BaseHtml
     }
 
     /**
+     * 为给定的模型属性生成一个隐藏的输入标签
+     *
      * Generates a hidden input tag for the given model attribute.
      * This method will generate the "name" and "value" tag attributes automatically for the model attribute
      * unless they are explicitly specified in `$options`.
@@ -1313,6 +1501,7 @@ class BaseHtml
     }
 
     /**
+     * 为给定的模型属性生成一个密码输入标签
      * Generates a password input tag for the given model attribute.
      * This method will generate the "name" and "value" tag attributes automatically for the model attribute
      * unless they are explicitly specified in `$options`.
@@ -1337,6 +1526,8 @@ class BaseHtml
     }
 
     /**
+     * 为给定的模型属性生成一个文件上传标签
+     *
      * Generates a file input tag for the given model attribute.
      * This method will generate the "name" and "value" tag attributes automatically for the model attribute
      * unless they are explicitly specified in `$options`.
@@ -1361,6 +1552,8 @@ class BaseHtml
     }
 
     /**
+     * 为给定的模型属性生成一个textarea标签
+     *
      * Generates a textarea tag for the given model attribute.
      * The model attribute value will be used as the content in the textarea.
      * @param Model $model the model object
@@ -1394,6 +1587,8 @@ class BaseHtml
     }
 
     /**
+     * 为给定的模型属性生成一个带label的单选按钮
+     *
      * Generates a radio button tag together with a label for the given model attribute.
      * This method will generate the "checked" tag attribute according to the model attribute value.
      * @param Model $model the model object
@@ -1410,6 +1605,8 @@ class BaseHtml
     }
 
     /**
+     * 为给定的模型属性生成一个带label的复选框
+     *
      * Generates a checkbox tag together with a label for the given model attribute.
      * This method will generate the "checked" tag attribute according to the model attribute value.
      * @param Model $model the model object
@@ -1426,6 +1623,7 @@ class BaseHtml
     }
 
     /**
+     * 产生一个布尔值输入
      * Generates a boolean input
      * This method is mainly called by [[activeCheckbox()]] and [[activeRadio()]].
      * @param string $type the input type. This can be either `radio` or `checkbox`.
@@ -1462,6 +1660,7 @@ class BaseHtml
     }
 
     /**
+     * 为给定的模型属性生成一个下拉列表
      * Generates a drop-down list for the given model attribute.
      * The selection of the drop-down list is taken from the value of the model attribute.
      * @param Model $model the model object
@@ -1511,6 +1710,7 @@ class BaseHtml
     }
 
     /**
+     * 生成一个列表框
      * Generates a list box.
      * The selection of the list box is taken from the value of the model attribute.
      * @param Model $model the model object
@@ -1559,6 +1759,7 @@ class BaseHtml
     }
 
     /**
+     * 生成一个复选框列表
      * Generates a list of checkboxes.
      * A checkbox list allows multiple selection, like [[listBox()]].
      * As a result, the corresponding submitted value is an array.
@@ -1602,6 +1803,7 @@ class BaseHtml
     }
 
     /**
+     * 生成一个单选框列表
      * Generates a list of radio buttons.
      * A radio button list is like a checkbox list, except that it only allows single selection.
      * The selection of the radio buttons is taken from the value of the model attribute.
@@ -1644,6 +1846,7 @@ class BaseHtml
     }
 
     /**
+     * 生成一个输入框列表
      * Generates a list of input fields.
      * This method is mainly called by [[activeListBox()]], [[activeRadioList()]] and [[activeCheckBoxList()]].
      * @param string $type the input type. This can be 'listBox', 'radioList', or 'checkBoxList'.
@@ -1671,8 +1874,11 @@ class BaseHtml
     }
 
     /**
+     * 可以被用在[[dropDownList()]] and [[listBox()]]生成的选项标签
+     *
      * Renders the option tags that can be used by [[dropDownList()]] and [[listBox()]].
-     * @param string|array|null $selection the selected value(s). String for single or array for multiple selection(s).
+     * @param string|array $selection the selected value(s). This can be either a string for single selection
+     * or an array for multiple selections.
      * @param array $items the option data items. The array keys are option values, and the array values
      * are the corresponding option labels. The array can also be nested (i.e. some array values are arrays too).
      * For each sub-array, an option group will be generated whose label is the key associated with the sub-array.
@@ -1735,6 +1941,8 @@ class BaseHtml
     }
 
     /**
+     * 生成HTML标签属性
+     *
      * Renders the HTML tag attributes.
      *
      * Attributes whose values are of boolean type will be treated as
@@ -1805,6 +2013,7 @@ class BaseHtml
     }
 
     /**
+     * 为指定的选项添加一个或多个 CSS class
      * Adds a CSS class (or several classes) to the specified options.
      * If the CSS class is already in the options, it will not be added again.
      * If class specification at given options is an array, and some class placed there with the named (string) key,
@@ -1834,6 +2043,8 @@ class BaseHtml
     }
 
     /**
+     * 将已经存在的CSS class与新的CSS class合并
+     *
      * Merges already existing CSS classes with new one.
      * This method provides the priority for named existing classes over additional.
      * @param array $existingClasses already existing CSS classes.
@@ -1853,6 +2064,10 @@ class BaseHtml
     }
 
     /**
+     * 从指定的选项中删除一个CSS class
+     * $options = ['class' => 'btn btn-default'];
+       Html::removeCssClass($options, 'btn-default');
+     *
      * Removes a CSS class from the specified options.
      * @param array $options the options to be modified.
      * @param string|array $class the CSS class(es) to be removed
@@ -1880,6 +2095,8 @@ class BaseHtml
     }
 
     /**
+     * 将指定的CSS样式添加到HTML选项中
+     *
      * Adds the specified CSS style to the HTML options.
      *
      * If the options already contain a `style` element, the new style will be merged
@@ -1919,6 +2136,7 @@ class BaseHtml
     }
 
     /**
+     * 从HTML选项中删除指定的CSS样式
      * Removes the specified CSS style from the HTML options.
      *
      * For example,
@@ -1944,6 +2162,7 @@ class BaseHtml
     }
 
     /**
+     * 将CSS样式数组转换为字符串表示
      * Converts a CSS style array into a string representation.
      *
      * For example,
@@ -1968,6 +2187,7 @@ class BaseHtml
     }
 
     /**
+     * 将CSS样式字符串转换为数组表示
      * Converts a CSS style string into an array representation.
      *
      * The array keys are the CSS property names, and the array values
@@ -1996,6 +2216,14 @@ class BaseHtml
     }
 
     /**
+     * 从给定的属性表达式中返回真实属性名
+     *
+     *  [0]content 代表多行输入时第一个 model 的 content 属性的数据值。
+        dates[0] 代表 dates 属性的第一个数组元素。
+        [0]dates[0] 代表多行输入时第一个 model 的 dates 属性的第一个数组元素
+     *
+     *  Html::getAttributeName('dates[0]')  // dates
+     *
      * Returns the real attribute name from the given attribute expression.
      *
      * An attribute expression is an attribute name prefixed and/or suffixed with array indexes.
@@ -2022,6 +2250,14 @@ class BaseHtml
     }
 
     /**
+     * 返回指定的属性名或表达式的值
+     *
+     *  // my first post
+        echo Html::getAttributeValue($post, 'title');
+
+        // $post->authors[0]
+        echo Html::getAttributeValue($post, '[0]authors[0]');
+     *
      * Returns the value of the specified attribute name or expression.
      *
      * For an attribute expression like `[0]dates[0]`, this method will return the value of `$model->dates[0]`.
@@ -2070,6 +2306,10 @@ class BaseHtml
     }
 
     /**
+     * 为指定的属性名或表达式生成适当的输入框名称
+        // Post[title]
+        echo Html::getInputName($post, 'title');
+     *
      * Generates an appropriate input name for the specified attribute name or expression.
      *
      * This method generates a name that can be used as the input name to collect user input
@@ -2103,6 +2343,10 @@ class BaseHtml
     }
 
     /**
+     * 为指定的属性名或表达式生成适当的输入ID
+     *  // post-title
+        echo Html::getInputId($post, 'title');
+     *
      * Generates an appropriate input ID for the specified attribute name or expression.
      *
      * This method converts the result [[getInputName()]] into a valid input ID.
@@ -2119,6 +2363,8 @@ class BaseHtml
     }
 
     /**
+     * 转义正则表达式以便JavaScript中使用
+     *
      * Escapes regular expression to use in JavaScript
      * @param string $regexp the regular expression to be escaped.
      * @return string the escaped result.

@@ -8,6 +8,7 @@
 namespace yii\data;
 
 use Yii;
+use yii\behaviors\SluggableBehavior;
 use yii\db\ActiveQueryInterface;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
@@ -16,12 +17,13 @@ use yii\db\QueryInterface;
 use yii\di\Instance;
 
 /**
+ * 使用 yii\db\Query 或者 yii\db\ActiveQuery 从数据库查询数据并且以数组项的方式或者 Active Record 实例的方式返回。
  * ActiveDataProvider implements a data provider based on [[\yii\db\Query]] and [[\yii\db\ActiveQuery]].
  *
  * ActiveDataProvider provides data by performing DB queries using [[query]].
  *
  * The following is an example of using ActiveDataProvider to provide ActiveRecord instances:
- *
+ * 下面是一个使用ActiveDataProvider来提供ActiveRecord实例的例子
  * ```php
  * $provider = new ActiveDataProvider([
  *     'query' => Post::find(),
@@ -30,10 +32,12 @@ use yii\di\Instance;
  *     ],
  * ]);
  *
+ * // 获取当前页面上的数据
  * // get the posts in the current page
  * $posts = $provider->getModels();
  * ```
  *
+ * 下面的例子展示了如何使用ActiveDataProvider，而不使用ActiveRecord
  * And the following example shows how to use ActiveDataProvider without ActiveRecord:
  *
  * ```php
@@ -45,6 +49,7 @@ use yii\di\Instance;
  *     ],
  * ]);
  *
+ * // 获取当前页面上的数据
  * // get the posts in the current page
  * $posts = $provider->getModels();
  * ```
@@ -60,8 +65,30 @@ class ActiveDataProvider extends BaseDataProvider
      */
     public $query;
     /**
+     * 用作数据模型的关键字的列
+     * 这可以是列名称，也可以是返回给定数据模型的键值的匿名方法
+     *
+     *  // 使用 "slug" 字段作为键值
+     *  @see SluggableBehavior;
+        $provider = new ActiveDataProvider([
+            'query' => Post::find(),
+            'key' => 'slug',
+        ]);
+
+        // 使用md5(id)的结果作为键值
+        $provider = new ActiveDataProvider([
+            'query' => Post::find(),
+            'key' => function ($model) {
+                return md5($model->id);
+            }
+        ]);
+     *
      * @var string|callable the column that is used as the key of the data models.
      * This can be either a column name, or a callable that returns the key value of a given data model.
+     *
+     * 如果没有设置此值，则将使用以下规则来确定数据模型的关键字：
+     * 如果[[query]]是[[\yii\db\ActiveQuery]]的实例，则使用主键
+     * 否则，将使用[[models]]数组的键
      *
      * If this is not set, the following rules will be used to determine the keys of the data models:
      *
@@ -72,6 +99,7 @@ class ActiveDataProvider extends BaseDataProvider
      */
     public $key;
     /**
+     * 数据库连接对象或数据库连接的应用程序组件ID
      * @var Connection|array|string the DB connection object or the application component ID of the DB connection.
      * If not set, the default DB connection will be used.
      * Starting from version 2.0.2, this can also be a configuration array for creating the object.
@@ -80,6 +108,7 @@ class ActiveDataProvider extends BaseDataProvider
 
 
     /**
+     * 初始化数据库连接组件
      * Initializes the DB connection component.
      * This method will initialize the [[db]] property to make sure it refers to a valid DB connection.
      * @throws InvalidConfigException if [[db]] is invalid.
@@ -93,6 +122,7 @@ class ActiveDataProvider extends BaseDataProvider
     }
 
     /**
+     * 准备在当前页面中可用的数据模型
      * @inheritdoc
      */
     protected function prepareModels()
@@ -113,6 +143,7 @@ class ActiveDataProvider extends BaseDataProvider
     }
 
     /**
+     * 准备与当前可用的数据模型相关联的key
      * @inheritdoc
      */
     protected function prepareKeys($models)
@@ -154,6 +185,7 @@ class ActiveDataProvider extends BaseDataProvider
     }
 
     /**
+     * 返回该数据提供者中数据的总数量
      * @inheritdoc
      */
     protected function prepareTotalCount()
@@ -166,6 +198,7 @@ class ActiveDataProvider extends BaseDataProvider
     }
 
     /**
+     * 为这个数据提供者设置排序定义
      * @inheritdoc
      */
     public function setSort($value)

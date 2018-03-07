@@ -8,6 +8,7 @@
 namespace yii\helpers;
 
 /**
+ * 格式转换器，提供了在不同格式化模式格式之间转换的功能
  * FormatConverter provides functionality to convert between different formatting pattern formats.
  *
  * It provides functions to convert date format patterns between different conventions.

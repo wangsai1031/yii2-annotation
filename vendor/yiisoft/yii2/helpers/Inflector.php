@@ -8,6 +8,7 @@
 namespace yii\helpers;
 
 /**
+ * 英语名词的复数和名词化。它还包含一些其他有用的方法
  * Inflector pluralizes and singularizes English nouns. It also contains some other useful methods.
  *
  * @author Antonio Ramirez <amigo.cobos@gmail.com>

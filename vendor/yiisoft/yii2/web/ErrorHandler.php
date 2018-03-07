@@ -14,11 +14,13 @@ use yii\base\UserException;
 use yii\helpers\VarDumper;
 
 /**
+ * ErrorHandler处理未捕获的PHP错误和异常
  * ErrorHandler handles uncaught PHP errors and exceptions.
+ * ErrorHandler根据错误的性质和应用程序运行的模式，使用适当的视图显示这些错误。
+ * ErrorHandler displays these errors using appropriate views based on the nature of the errors and the mode the application runs at.
  *
- * ErrorHandler displays these errors using appropriate views based on the
- * nature of the errors and the mode the application runs at.
- *
+ * 默认情况下，ErrorHandler在[[\yii\base\Application]]中被配置为应用程序组件。
+ * 您可以通过Yii来访问该实例:$app-errorHandler。
  * ErrorHandler is configured as an application component in [[\yii\base\Application]] by default.
  * You can access that instance via `Yii::$app->errorHandler`.
  *
@@ -29,10 +31,12 @@ use yii\helpers\VarDumper;
 class ErrorHandler extends \yii\base\ErrorHandler
 {
     /**
+     * 要显示的源代码行数的最大数量。默认为19。
      * @var integer maximum number of source code lines to be displayed. Defaults to 19.
      */
     public $maxSourceLines = 19;
     /**
+     * 要显示的跟踪源代码行数的整数最大数量。默认为13
      * @var integer maximum number of trace source code lines to be displayed. Defaults to 13.
      */
     public $maxTraceSourceLines = 13;

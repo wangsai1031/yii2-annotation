@@ -21,6 +21,12 @@ use Yii;
 class BaseStringHelper
 {
     /**
+     * 返回给定字符串中的字节数
+     *  $name = '今天';
+        echo strlen($name), '<br/>';                // 6
+        echo mb_strlen($name, 'utf8'), '<br/>';     // 2
+        echo mb_strlen($name, '8bit'), '<br/>';     // 6
+     *
      * Returns the number of bytes in the given string.
      * This method ensures the string is treated as a byte array by using `mb_strlen()`.
      * @param string $string the string being measured for length
@@ -32,12 +38,18 @@ class BaseStringHelper
     }
 
     /**
+     * 返回由start和length参数指定的字符串的部分
+     * 通过使用`mb_substr()`，该方法确保将字符串作为一个字节数组处理。
      * Returns the portion of string specified by the start and length parameters.
      * This method ensures the string is treated as a byte array by using `mb_substr()`.
      * @param string $string the input string. Must be one character or longer.
      * @param integer $start the starting position
-     * @param integer $length the desired portion length. If not specified or `null`, there will be
-     * no limit on length i.e. the output will be until the end of the string.
+     * 所需的部分长度。如果没有指定或null，长度就没有限制。
+     * 也就是将一直截取到字符串的末尾。
+     * @param integer $length the desired portion length.
+     * If not specified or `null`, there will be no limit on length
+     * i.e. the output will be until the end of the string.
+     * 返回字符串的截取部分，截取失败或空字符串将FALSE
      * @return string the extracted part of string, or FALSE on failure or an empty string.
      * @see http://www.php.net/manual/en/function.substr.php
      */
@@ -47,6 +59,7 @@ class BaseStringHelper
     }
 
     /**
+     * 返回路径的末尾名称
      * Returns the trailing name component of a path.
      * This method is similar to the php function `basename()` except that it will
      * treat both \ and / as directory separators, independent of the operating system.
@@ -73,6 +86,8 @@ class BaseStringHelper
     }
 
     /**
+     * 返回父目录的路径
+     *
      * Returns parent directory's path.
      * This method is similar to `dirname()` except that it will treat
      * both \ and / as directory separators, independent of the operating system.
@@ -92,12 +107,22 @@ class BaseStringHelper
     }
     
     /**
+     * 将字符串截到指定的字符数量
      * Truncates a string to the number of characters specified.
      *
      * @param string $string The string to truncate.
      * @param integer $length How many characters from original string to include into truncated string.
      * @param string $suffix String to append to the end of truncated string.
      * @param string $encoding The charset to use, defaults to charset currently used by application.
+     *
+     * 是否将字符串中的HTML算入字数并保留HTML标记？
+     *
+     * e.g.
+     * $string = '<span>今天天气</span>不错呦,啦啦啦!';
+     * StringHelper::truncate($string, 10) // <span>今天天气...
+     * StringHelper::truncate($string, 10, '...', null, true); // <span>今天天气 </span>不错呦,啦 ... (译者：不知为何会出现空格占字符)
+     *
+     *
      * @param boolean $asHtml Whether to treat the string being truncated as HTML and preserve proper HTML tags.
      * This parameter is available since version 2.0.1.
      * @return string the truncated string.
@@ -109,14 +134,20 @@ class BaseStringHelper
         }
         
         if (mb_strlen($string, $encoding ?: Yii::$app->charset) > $length) {
-            return rtrim(mb_substr($string, 0, $length, $encoding ?: Yii::$app->charset)) . $suffix;
+            return trim(mb_substr($string, 0, $length, $encoding ?: Yii::$app->charset)) . $suffix;
         } else {
             return $string;
         }
     }
     
     /**
+     * 将字符串截为指定的单词数量
      * Truncates a string to the number of words specified.
+     *
+     * e.g.
+     * $string = '<span> Hello world! </span> How are You?';
+     * StringHelper::truncateWords($string, 3) // <span> Hello world!...
+     * StringHelper::truncateWords($string, 3, '...', true) // <span> Hello world! </span>How...
      *
      * @param string $string The string to truncate.
      * @param integer $count How many words from original string to include into truncated string.
@@ -140,6 +171,7 @@ class BaseStringHelper
     }
     
     /**
+     * 在保留HTML的同时截断字符串
      * Truncate a string while preserving the HTML.
      *
      * @param string $string The string to truncate
@@ -164,14 +196,16 @@ class BaseStringHelper
                 $truncated[] = $token;
             } elseif ($token instanceof \HTMLPurifier_Token_Text && $totalCount <= $count) { //Text
                 if (false === $encoding) {
-                    preg_match('/^(\s*)/um', $token->data, $prefixSpace) ?: $prefixSpace = ['',''];
-                    $token->data = $prefixSpace[1] . self::truncateWords(ltrim($token->data), $count - $totalCount, '');
+                    $token->data = self::truncateWords($token->data, $count - $totalCount, '');
                     $currentCount = self::countWords($token->data);
                 } else {
-                    $token->data = self::truncate($token->data, $count - $totalCount, '', $encoding);
+                    $token->data = self::truncate($token->data, $count - $totalCount, '', $encoding) . ' ';
                     $currentCount = mb_strlen($token->data, $encoding);
                 }
                 $totalCount += $currentCount;
+                if (1 === $currentCount) {
+                    $token->data = ' ' . $token->data;
+                }
                 $truncated[] = $token;
             } elseif ($token instanceof \HTMLPurifier_Token_End) { //Tag ends
                 $openTokens--;
@@ -189,7 +223,9 @@ class BaseStringHelper
     }
 
     /**
+     * 检查给定字符串是否从指定的子字符串开始
      * Check if given string starts with specified substring.
+     * 二进制和多字节安全
      * Binary and multibyte safe.
      *
      * @param string $string Input string
@@ -210,7 +246,9 @@ class BaseStringHelper
     }
 
     /**
+     * 检查给定字符串以指定的子字符串结束
      * Check if given string ends with specified substring.
+     * 二进制和多字节安全
      * Binary and multibyte safe.
      *
      * @param string $string
@@ -235,6 +273,7 @@ class BaseStringHelper
     }
 
     /**
+     * 将字符串组合成数组，可选的trims(头尾裁剪)值，并跳过空的值
      * Explodes string into array, optionally trims values and skips empty ones
      *
      * @param string $string String to be exploded.
@@ -270,6 +309,7 @@ class BaseStringHelper
     }
 
     /**
+     * 在字符串中计算单词数量
      * Counts words in a string
      * @since 2.0.8
      *

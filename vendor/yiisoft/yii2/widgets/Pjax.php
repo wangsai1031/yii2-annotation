@@ -45,6 +45,8 @@ use yii\web\Response;
 class Pjax extends Widget
 {
     /**
+     * 小部件容器标签的HTML属性
+     *
      * @var array the HTML attributes for the widget container tag. The following special options are recognized:
      *
      * - `tag`: string, the tag name for the container. Defaults to `div`
@@ -55,9 +57,15 @@ class Pjax extends Widget
      */
     public $options = [];
     /**
+     * 应该触发pjax请求链接的jQuery选择器
+     *
      * @var string|false the jQuery selector of the links that should trigger pjax requests.
+     *
+     * 如果不设置，Pjax的封闭内容内的所有链接都将触发Pjax请求
      * If not set, all links within the enclosed content of Pjax will trigger pjax requests.
      * If set to false, no code will be registered to handle links.
+     *
+     * 注意，如果对pjax请求的响应是一个完整的页面，那么将再次发送一个正常的请求
      * Note that if the response to the pjax request is a full page, a normal request will be sent again.
      */
     public $linkSelector;
@@ -69,30 +77,50 @@ class Pjax extends Widget
      */
     public $formSelector;
     /**
+     * 触发表单处理程序的jQuery事件。默认为 "submit"
+     *
      * @var string The jQuery event that will trigger form handler. Defaults to "submit".
      * @since 2.0.9
      */
     public $submitEvent = 'submit';
     /**
+     * 是否启用pushState
+     * pushState的功能是修改url而页面无跳转，并且该url会被存放在历史记录中
+     *
      * @var boolean whether to enable push state.
      */
     public $enablePushState = true;
     /**
+     * 是否启用replaceState
+     * replaceState用新的state和URL替换当前。不会造成页面刷新。
+     *
      * @var boolean whether to enable replace state.
      */
     public $enableReplaceState = false;
     /**
+     * AJAX请求时超时时间（毫秒）
+     *
      * @var integer pjax timeout setting (in milliseconds). This timeout is used when making AJAX requests.
+     *
+     * 如果服务器比较慢，使用更大的数字。
+     *
+     * 如果AJAX超时，服务器没有响应,将会重新建加载整个页面
+     *
      * Use a bigger number if your server is slow. If the server does not respond within the timeout,
      * a full page load will be triggered.
      */
     public $timeout = 1000;
     /**
+     * 当收到pjax响应时，如何滚动页面。
+     * 如果是 false，就不会有页面滚动
+     * 如果你想滚动到某个特定的地方，使用一个数字(距离页面顶部的像素值)
+     *
      * @var boolean|integer how to scroll the page when pjax response is received. If false, no page scroll will be made.
      * Use a number if you want to scroll to a particular place.
      */
     public $scrollTo = false;
     /**
+     * 要传递给pjax JS插件的其他选项。
      * @var array additional options to be passed to the pjax JS plugin. Please refer to the
      * [pjax project page](https://github.com/yiisoft/jquery-pjax) for available options.
      */
@@ -168,6 +196,8 @@ class Pjax extends Widget
     }
 
     /**
+     * 当前的请求是否需要来自这个小部件的pjax响应
+     *
      * @return boolean whether the current request requires pjax response from this widget
      */
     protected function requiresPjax()
@@ -178,6 +208,8 @@ class Pjax extends Widget
     }
 
     /**
+     * 注册所需的JavaScript
+     *
      * Registers the needed JavaScript.
      */
     public function registerClientScript()

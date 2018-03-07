@@ -218,6 +218,7 @@ class BaseInflector
         'Yengeese' => 'Yengeese',
     ];
     /**
+     * 当intl扩展不可用时，可用于 [[transliterate()]]的音译的备用映射。
      * @var array fallback map for transliteration used by [[transliterate()]] when intl isn't available.
      */
     public static $transliteration = [
@@ -282,6 +283,8 @@ class BaseInflector
 
 
     /**
+     * 将一个词转换为复数形式
+     * 仅适用于英语
      * Converts a word to its plural form.
      * Note that this is for English only!
      * For example, 'apple' will become 'apples', and 'child' will become 'children'.
@@ -290,10 +293,14 @@ class BaseInflector
      */
     public static function pluralize($word)
     {
+        // 处理特殊转换方式的单词
         if (isset(static::$specials[$word])) {
             return static::$specials[$word];
         }
+
+        // 处理常规结构的单词
         foreach (static::$plurals as $rule => $replacement) {
+            // 遍历进行匹配
             if (preg_match($rule, $word)) {
                 return preg_replace($rule, $replacement, $word);
             }
@@ -303,17 +310,23 @@ class BaseInflector
     }
 
     /**
+     * 返回单词的单数
      * Returns the singular of the $word
      * @param string $word the english word to singularize
      * @return string Singular noun.
      */
     public static function singularize($word)
     {
+        // 在特殊转换方式的单词中查找
         $result = array_search($word, static::$specials, true);
         if ($result !== false) {
+            // 存在则直接返回
             return $result;
         }
+
+        // 处理常规结构的单词
         foreach (static::$singulars as $rule => $replacement) {
+            // 遍历进行匹配
             if (preg_match($rule, $word)) {
                 return preg_replace($rule, $replacement, $word);
             }
@@ -323,6 +336,7 @@ class BaseInflector
     }
 
     /**
+     * 将一个下划线法或驼峰法的单词转换为多个英语单词
      * Converts an underscored or CamelCase word into a English
      * sentence.
      * @param string $words
@@ -331,29 +345,63 @@ class BaseInflector
      */
     public static function titleize($words, $ucAll = false)
     {
+        // 将驼峰法转换成下划线法
+        // 将下划线法转换为人类易读法
         $words = static::humanize(static::underscore($words), $ucAll);
 
-        return $ucAll ? ucwords($words) : ucfirst($words);
+        // ucwords() 每个单词首字母大重写
+        // ucfirst() 第一个单词首字母大写
+        return $ucAll ? ($words) : ucfirst($words);
     }
 
     /**
+     * 以驼峰法返回单词 ：第一个字母大写
      * Returns given word as CamelCased
-     * Converts a word like "send_email" to "SendEmail". It
-     * will remove non alphanumeric character from the word, so
-     * "who's online" will be converted to "WhoSOnline"
+     * Converts a word like "send_email" to "SendEmail". It will remove non alphanumeric character from the word,
+     * so "who's online" will be converted to "WhoSOnline"
      * @see variablize()
      * @param string $word the word to CamelCase
      * @return string
      */
     public static function camelize($word)
     {
+        // preg_replace('/[^A-Za-z0-9]+/', ' ', $word) 将除去 A-Za-z0-9 之外所有的字符都转换成 空格 send_email => send email
+        // ucwords() 将每个单词转成大写 Send Email
+        // 去掉空格 SendEmail
         return str_replace(' ', '', ucwords(preg_replace('/[^A-Za-z0-9]+/', ' ', $word)));
     }
 
     /**
+     * 将驼峰法字符串转换成空格分隔的单词
+     *
+     * eg: 'UserDetailUId HID'
+     *
+     * 1. preg_replace('/(?<![A-Z])[A-Z]/', ' \0', $name)
+     *
+     * (?<!pattern) 非获取匹配，反向否定预查
+     * 即 '/(?<![A-Z])[A-Z]/' 不匹配两个相连的大写字母
+     * @link https://baike.baidu.com/item/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/1700215?fr=aladdin
+     *
+     * 匹配到 ["U", "D", "U", "H"]
+     *
+     * ' \0' 中 '\0' 表示匹配到的整个字符串
+     * 即将 ["U", "D", "U", "H"] 分别替换成 [" U", " D", " U", " H"]
+     *
+     * 'UserDetailUUid H'  替换的结果为 string(20) " User Detail UUid H"
+     *
+     * 2. str_replace(['-', '_', '.', ], ' ', $str)
+     * 将$str中的['-', '_', '.'] 全部替换为空格
+     *
+     * 3. strtolower($str) 将$str中的字母全部转换为小写 " user detail uuid h"
+     *
+     * 4. trim($str) 去掉$str两边的空白字符 "user detail uuid h"
+     *
+     * 5. ucwords($str) 将每个单词的第一个字母大写 "User Detail Uuid H"
+     *
      * Converts a CamelCase name into space-separated words.
      * For example, 'PostTag' will be converted to 'Post Tag'.
      * @param string $name the string to be converted
+     * // 是否将每一个单词首字母大写
      * @param boolean $ucwords whether to capitalize the first letter in each word
      * @return string the resulting words
      */
@@ -369,16 +417,19 @@ class BaseInflector
     }
 
     /**
+     * 将驼峰法单词转换成任意字符分隔的小写字母
      * Converts a CamelCase name into an ID in lowercase.
      * Words in the ID may be concatenated using the specified character (defaults to '-').
      * For example, 'PostTag' will be converted to 'post-tag'.
      * @param string $name the string to be converted
      * @param string $separator the character used to concatenate the words in the ID
+     * 是否在两个连续的大写字符之间插入一个分隔符？ 默认为false
      * @param boolean|string $strict whether to insert a separator between two consecutive uppercase chars, defaults to false
      * @return string the resulting ID
      */
     public static function camel2id($name, $separator = '-', $strict = false)
     {
+        // $strict ? 匹配所有大写字母 : 不匹配两个相连的大写字母
         $regex = $strict ? '/[A-Z]/' : '/(?<![A-Z])[A-Z]/';
         if ($separator === '_') {
             return trim(strtolower(preg_replace($regex, '_\0', $name)), '_');
@@ -388,6 +439,7 @@ class BaseInflector
     }
 
     /**
+     * 将任意字符分隔的单词转换为驼峰法
      * Converts an ID into a CamelCase name.
      * Words in the ID separated by `$separator` (defaults to '-') will be concatenated into a CamelCase name.
      * For example, 'post-tag' is converted to 'PostTag'.
@@ -401,6 +453,7 @@ class BaseInflector
     }
 
     /**
+     * 将驼峰法转换成下划线法
      * Converts any "CamelCased" into an "underscored_word".
      * @param string $words the word(s) to underscore
      * @return string
@@ -411,19 +464,29 @@ class BaseInflector
     }
 
     /**
+     * 将一个单词转换为人类易读的字符串
+     *
+     * 去掉 _id 结尾，将 _ 转换为空格
+     *
+     * 将每个单词的第一个字符大写，或所有字母都大写
+     *
      * Returns a human-readable string from $word
      * @param string $word the string to humanize
+     * 是否将所有单词设置为大写
      * @param boolean $ucAll whether to set all words to uppercase or not
      * @return string
      */
     public static function humanize($word, $ucAll = false)
     {
+        // 去掉 _id 结尾，将 _ 转换为空格
         $word = str_replace('_', ' ', preg_replace('/_id$/', '', $word));
-
+        // 将每个单词的第一个字符大写，或所有字母都大写
         return $ucAll ? ucwords($word) : ucfirst($word);
     }
 
     /**
+     * 以驼峰法返回单词 ：第一个字母小写
+     *
      * Same as camelize but first char is in lowercase.
      * Converts a word like "send_email" to "sendEmail". It
      * will remove non alphanumeric character from the word, so
@@ -439,6 +502,7 @@ class BaseInflector
     }
 
     /**
+     * 将类名转换为表名 （成复数）
      * Converts a class name to its table name (pluralized)
      * naming conventions. For example, converts "Person" to "people"
      * @param string $className the class name for getting related table_name
@@ -450,12 +514,15 @@ class BaseInflector
     }
 
     /**
+     * 返回一个字符串，所有空格都转换为给定的替换
+     * 非文字字符被移除，其他字符被音译
      * Returns a string with all spaces converted to given replacement,
      * non word characters removed and the rest of characters transliterated.
      *
-     * If intl extension isn't available uses fallback that converts latin characters only
-     * and removes the rest. You may customize characters map via $transliteration property
-     * of the helper.
+     * 如果intl扩展不能使用，只转换拉丁字符，并删除其余部分
+     * 您可以通过$transliteration属性定制字符映射
+     * If intl extension isn't available uses fallback that converts latin characters only and removes the rest.
+     * You may customize characters map via $transliteration property of the helper.
      *
      * @param string $string An arbitrary string to convert
      * @param string $replacement The replacement to use for spaces
@@ -473,6 +540,7 @@ class BaseInflector
     }
 
     /**
+     * 返回一个字符串的音译版本
      * Returns transliterated version of a string.
      *
      * If intl extension isn't available uses fallback that converts latin characters only
@@ -499,6 +567,7 @@ class BaseInflector
     }
 
     /**
+     * 判断是否加载 intl 扩展
      * @return boolean if intl extension is loaded
      */
     protected static function hasIntl()
@@ -507,6 +576,7 @@ class BaseInflector
     }
 
     /**
+     * 将表名转换为它的类名
      * Converts a table name to its class name. For example, converts "people" to "Person"
      * @param string $tableName
      * @return string
@@ -517,6 +587,7 @@ class BaseInflector
     }
 
     /**
+     * 把数字转换成它的序数词英语形式
      * Converts number to its ordinal English form. For example, converts 13 to 13th, 2 to 2nd ...
      * @param integer $number the number to get its ordinal value
      * @return string
@@ -539,8 +610,10 @@ class BaseInflector
     }
 
     /**
+     * 将单词列表转换为句子
      * Converts a list of words into a sentence.
      *
+     * 对最后几个词进行了特殊处理
      * Special treatment is done for the last few words. For example,
      *
      * ```php

@@ -8,6 +8,7 @@
 namespace yii\web;
 
 /**
+ * 表示状态码410 "Gone"HTTP异常：被请求的资源在服务器上已经不再可用，而且没有任何已知的转发地址。
  * GoneHttpException represents a "Gone" HTTP exception with status code 410
  *
  * Throw a GoneHttpException when a user requests a resource that no longer exists

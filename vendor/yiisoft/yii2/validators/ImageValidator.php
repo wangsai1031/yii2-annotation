@@ -11,7 +11,16 @@ use Yii;
 use yii\web\UploadedFile;
 
 /**
+ * 检查输入值是否为代表有效的图片文件。
+ * 它继承自 file 验证器， 并因此继承有其全部属性
  * ImageValidator verifies if an attribute is receiving a valid image.
+ *
+ *  // 检查 "primaryImage" 是否为适当尺寸的有效图片
+    ['primaryImage', 'image',
+ *      'extensions' => 'png, jpg',
+        'minWidth' => 100, 'maxWidth' => 1000,
+        'minHeight' => 100, 'maxHeight' => 1000,
+    ],
  *
  * @author Taras Gudz <gudz.taras@gmail.com>
  * @since 2.0
@@ -19,6 +28,7 @@ use yii\web\UploadedFile;
 class ImageValidator extends FileValidator
 {
     /**
+     * 当上传的文件不是图像时使用的错误消息
      * @var string the error message used when the uploaded file is not an image.
      * You may use the following tokens in the message:
      *
@@ -27,30 +37,35 @@ class ImageValidator extends FileValidator
      */
     public $notImage;
     /**
+     * 图片的最小宽度。默认为 null，代表无下限。
      * @var integer the minimum width in pixels.
      * Defaults to null, meaning no limit.
      * @see underWidth for the customized message used when image width is too small.
      */
     public $minWidth;
     /**
+     * 图片的最大宽度。默认为 null，代表无上限。
      * @var integer the maximum width in pixels.
      * Defaults to null, meaning no limit.
      * @see overWidth for the customized message used when image width is too big.
      */
     public $maxWidth;
     /**
+     * 图片的最小高度。 默认为 null，代表无下限。
      * @var integer the minimum height in pixels.
      * Defaults to null, meaning no limit.
      * @see underHeight for the customized message used when image height is too small.
      */
     public $minHeight;
     /**
+     * 图片的最大高度。默认为 null，代表无上限。
      * @var integer the maximum width in pixels.
      * Defaults to null, meaning no limit.
      * @see overWidth for the customized message used when image height is too big.
      */
     public $maxHeight;
     /**
+     * 当图像宽度低于[[minWidth]]时使用的错误消息
      * @var string the error message used when the image is under [[minWidth]].
      * You may use the following tokens in the message:
      *
@@ -60,6 +75,7 @@ class ImageValidator extends FileValidator
      */
     public $underWidth;
     /**
+     * 当图像宽度高于[[maxWidth]]时使用的错误消息
      * @var string the error message used when the image is over [[maxWidth]].
      * You may use the following tokens in the message:
      *

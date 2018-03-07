@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link http://www.yiiframework.com/
  * @copyright Copyright (c) 2008 Yii Software LLC
@@ -60,7 +61,6 @@ class ReplaceArrayValue
      * @var mixed value used as replacement.
      */
     public $value;
-
 
     /**
      * Constructor.

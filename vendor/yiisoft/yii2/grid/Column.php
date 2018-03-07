@@ -12,6 +12,7 @@ use yii\base\Object;
 use yii\helpers\Html;
 
 /**
+ * Column是所有GridView列类的基类
  * Column is the base class of all [[GridView]] column classes.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
@@ -24,37 +25,50 @@ class Column extends Object
      */
     public $grid;
     /**
+     * 标题单元格内容。注意，它未经过html编码
      * @var string the header cell content. Note that it will not be HTML-encoded.
      */
     public $header;
     /**
+     * 页脚单元内容。注意，它未经过html编码
      * @var string the footer cell content. Note that it will not be HTML-encoded.
      */
     public $footer;
     /**
+     * 这里是一个可调用的函数，可用于生成每个单元的内容。
+     * 函数的参数应该如下:function ($model, $key, $index, $column)。
+     * $model、$key和$index指的是 模型、当前正在呈现的行的键和索引，`$column`是对[[Column]]对象的引用。
      * @var callable This is a callable that will be used to generate the content of each cell.
      * The signature of the function should be the following: `function ($model, $key, $index, $column)`.
-     * Where `$model`, `$key`, and `$index` refer to the model, key and index of the row currently being rendered
-     * and `$column` is a reference to the [[Column]] object.
+     * Where `$model`, `$key`, and `$index` refer to the model, key and index of the row currently being rendered and `$column` is a reference to the [[Column]] object.
      */
     public $content;
     /**
+     * 这一列是否可见。默认值为true
      * @var boolean whether this column is visible. Defaults to true.
      */
     public $visible = true;
     /**
+     * 列组标签的HTML属性
      * @var array the HTML attributes for the column group tag.
      * @see \yii\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
      */
     public $options = [];
     /**
+     * 标题单元格标签的HTML属性
      * @var array the HTML attributes for the header cell tag.
      * @see \yii\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
      */
     public $headerOptions = [];
     /**
-     * @var array|\Closure the HTML attributes for the data cell tag. This can either be an array of
-     * attributes or an anonymous function ([[Closure]]) that returns such an array.
+     * 数据单元格标签的HTML属性。
+     * 它可以是一个属性数组，也可以是返回这样一个数组的匿名函数(闭包)。
+     * 函数的参数应该如下:function ($model, $key, $index, $column)。
+     * $model、$key和$index指的是 模型、当前正在呈现的行的键和索引，`$column`是对[[Column]]对象的引用。
+     * 可以使用一个函数根据行中不同的数据而分配不同的属性。
+     *
+     * @var array|\Closure the HTML attributes for the data cell tag.
+     * This can either be an array of attributes or an anonymous function ([[Closure]]) that returns such an array.
      * The signature of the function should be the following: `function ($model, $key, $index, $column)`.
      * Where `$model`, `$key`, and `$index` refer to the model, key and index of the row currently being rendered
      * and `$column` is a reference to the [[Column]] object.
@@ -64,11 +78,13 @@ class Column extends Object
      */
     public $contentOptions = [];
     /**
+     * 页脚单元格标签的HTML属性
      * @var array the HTML attributes for the footer cell tag.
      * @see \yii\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
      */
     public $footerOptions = [];
     /**
+     * 过滤单元格标签的HTML属性
      * @var array the HTML attributes for the filter cell tag.
      * @see \yii\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
      */

@@ -11,6 +11,9 @@ use yii\base\InvalidParamException;
 use yii\helpers\Json;
 
 /**
+ * 所有的解析器都要实现 RequestParserInterface
+ * 这个接口也只是要求实现 parse() 方法
+ *
  * Parses a raw HTTP request using [[\yii\helpers\Json::decode()]]
  *
  * To enable parsing for JSON requests you can configure [[Request::parsers]] using this class:

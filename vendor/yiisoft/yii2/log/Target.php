@@ -15,7 +15,37 @@ use yii\helpers\VarDumper;
 use yii\web\Request;
 
 /**
+ * Target是所有日志目标类的基类。
  * Target is the base class for all log target classes.
+ * ```
+ *  'bootstrap' => ['log'],
+ *  'components' => [
+        'log' => [
+            'targets' => [
+                [
+                    'class' => 'yii\log\DbTarget',
+                    'levels' => ['error', 'warning'],
+                ],
+                [
+                    'class' => 'yii\log\EmailTarget',
+                    'levels' => ['error'],
+                    'categories' => ['yii\db\*'],
+                    'message' => [
+                        'from' => ['log@example.com'],
+                        'to' => ['admin@example.com', 'developer@example.com'],
+                        'subject' => 'Database errors at example.com',
+                    ],
+                ],
+            ],
+        ],
+    ],
+ * ```
+ * 在上面的代码中，在 yii\log\Dispatcher::$targets 属性里有两个日志目标被注册：
+    第一个目标选择的是错误和警告层级的消息，并且在数据库表里保存他们；
+    第二个目标选择的是错误层级的消息并且是在以 yii\db\ 开头的分类下，并且在一个邮件里将它们发送到 admin@example.com 和 developer@example.com。
+ *
+ * 注意: log 组件必须在 bootstrapping 期间就被加载，以便于它能够及时调度日志消息到目标里。
+ * 这是为什么在上面的代码中，它被列在 bootstrap 数组中的原因。
  *
  * A log target object will filter the messages logged by [[Logger]] according
  * to its [[levels]] and [[categories]] properties. It may also export the filtered
@@ -200,6 +230,7 @@ abstract class Target extends Component
     }
 
     /**
+     * 根据给定消息的类别和级别对他们进行过滤
      * Filters the given messages according to their categories and levels.
      * @param array $messages messages to be filtered.
      * The message structure follows that in [[Logger::messages]].
@@ -243,6 +274,10 @@ abstract class Target extends Component
     }
 
     /**
+     * 将一个日志消息格式化为一个字符串：
+     * Timestamp [IP address][User ID][Session ID][Severity Level][Category] Message Text
+     * eg: 2014-10-04 18:10:15 [::1][][-][trace][yii\base\Module::getModule] Loading module: debug
+     *
      * Formats a log message for display as a string.
      * @param array $message the log message to be formatted.
      * The message structure follows that in [[Logger::messages]].

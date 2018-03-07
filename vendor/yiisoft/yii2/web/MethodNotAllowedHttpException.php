@@ -8,6 +8,7 @@
 namespace yii\web;
 
 /**
+ * 表示状态码为 405 "Method Not Allowed" 异常，是由于使用错误的Http方法引起的
  * MethodNotAllowedHttpException represents a "Method Not Allowed" HTTP exception with status code 405.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
