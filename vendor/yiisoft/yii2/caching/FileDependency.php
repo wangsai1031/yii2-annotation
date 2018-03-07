@@ -11,8 +11,10 @@ use Yii;
 use yii\base\InvalidConfigException;
 
 /**
+ * FileDependency 表示依赖于文件的最后修改时间的依赖关系。
  * FileDependency represents a dependency based on a file's last modification time.
  *
+ * 如果文件的最后修改时间发生变化，则依赖改变。
  * If the last modification time of the file specified via [[fileName]] is changed,
  * the dependency is considered as changed.
  *
@@ -24,6 +26,7 @@ use yii\base\InvalidConfigException;
 class FileDependency extends Dependency
 {
     /**
+     * 文件路径或路径别名，其最后修改时间用于检查是否已更改了依赖关系。
      * @var string the file path or [path alias](guide:concept-aliases) whose last modification time is used to
      * check if the dependency has been changed.
      */
@@ -31,6 +34,8 @@ class FileDependency extends Dependency
 
 
     /**
+     * 生成所需的数据，以确定是否已经更改了依赖关系。
+     * 该方法返回文件的最后修改时间。
      * Generates the data needed to determine if dependency has been changed.
      * This method returns the file's last modification time.
      * @param CacheInterface $cache the cache component that is currently evaluating this dependency
@@ -40,9 +45,11 @@ class FileDependency extends Dependency
     protected function generateDependencyData($cache)
     {
         if ($this->fileName === null) {
+            // fileName 不能为空
             throw new InvalidConfigException('FileDependency::fileName must be set');
         }
 
+        // 返回文件最后修改时间
         $fileName = Yii::getAlias($this->fileName);
         clearstatcache(false, $fileName);
         return @filemtime($fileName);

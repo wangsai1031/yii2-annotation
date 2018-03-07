@@ -8,6 +8,10 @@
 namespace yii\web;
 
 /**
+ * 代表状态码401 "Unauthorized"HTTP异常.
+ * 使用这个异常来表示客户端需要进行身份验证或登录来执行所请求的操作。
+ * 如果客户端已经进行了身份验证，但是不允许执行某些操作，应该考虑使用 403 [[ForbiddenHttpException]] or 404 [[NotFoundHttpException]]
+ *
  * UnauthorizedHttpException represents an "Unauthorized" HTTP exception with status code 401.
  *
  * Use this exception to indicate that a client needs to authenticate via WWW-Authenticate header

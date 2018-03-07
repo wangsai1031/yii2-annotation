@@ -14,6 +14,7 @@ use yii\web\Linkable;
 use yii\web\Request;
 
 /**
+ * Pagination表示与数据项分页相关的信息
  * Pagination represents information relevant to pagination of data items.
  *
  * When data needs to be rendered in multiple pages, Pagination can be used to
@@ -81,41 +82,61 @@ class Pagination extends BaseObject implements Linkable
     const LINK_LAST = 'last';
 
     /**
+     * 存储当前页面页码的参数的名称
      * @var string name of the parameter storing the current page index.
      * @see params
      */
     public $pageParam = 'page';
     /**
+     * 存储每页数据条数的参数的名称
      * @var string name of the parameter storing the page size.
      * @see params
      */
     public $pageSizeParam = 'per-page';
     /**
+     * 是否总是在由createUrl()创建URL时添加页面参数
+     * 如果设置为false并且page为0，则页面参数将不会放入URL中
      * @var bool whether to always have the page parameter in the URL created by [[createUrl()]].
      * If false and [[page]] is 0, the page parameter will not be put in the URL.
      */
     public $forcePageParam = true;
     /**
+     * 用于显示分页内容的控制器动作的路径
+     * 如果不设置，则意味着使用当前请求的路由
+     *
+     *  $pagination->route = 'article/index';
+
+        // 显示: /index.php?r=article%2Findex&page=100
+        echo $pagination->createUrl(100);
+     *
      * @var string the route of the controller action for displaying the paged contents.
      * If not set, it means using the currently requested route.
      */
     public $route;
     /**
+     * 参数(name => value) 用于获取当前页面编号，并创建新的分页url
+     * 如果不设置，则将使用$GET的参数
      * @var array parameters (name => value) that should be used to obtain the current page number
      * and to create new pagination URLs. If not set, all parameters from $_GET will be used instead.
      *
+     * 为了将 锚点 加入到链接中，可以使用 array_merge($_GET, ['#' => 'my-hash'])
      * In order to add hash to all links use `array_merge($_GET, ['#' => 'my-hash'])`.
      *
+     * 由[[pageParam]]索引的数组元素被认为是当前的页码(默认值为0)
+     * 由[[pageSizeParam]]索引的元素被视为页面大小（每页显示条数）(默认为defaultPageSize)
      * The array element indexed by [[pageParam]] is considered to be the current page number (defaults to 0);
      * while the element indexed by [[pageSizeParam]] is treated as the page size (defaults to [[defaultPageSize]]).
      */
     public $params;
     /**
+     * 用于创建分页URL的URL管理器
+     * 如果没有设置,将使用“urlManager”应用程序组件。
      * @var \yii\web\UrlManager the URL manager used for creating pagination URLs. If not set,
      * the "urlManager" application component will be used.
      */
     public $urlManager;
     /**
+     * 是否检查页面是否在有效范围内
      * @var bool whether to check if [[page]] is within valid range.
      * When this property is true, the value of [[page]] will always be between 0 and ([[pageCount]]-1).
      * Because [[pageCount]] relies on the correct value of [[totalCount]] which may not be available
@@ -124,21 +145,26 @@ class Pagination extends BaseObject implements Linkable
      */
     public $validatePage = true;
     /**
+     * 数据总条数
      * @var int total number of items.
      */
     public $totalCount = 0;
     /**
+     * 默认每页显示条数
      * @var int the default page size. This property will be returned by [[pageSize]] when page size
      * cannot be determined by [[pageSizeParam]] from [[params]].
      */
     public $defaultPageSize = 20;
     /**
+     * 页面大小限制
+     * 如果这是false，则意味着pageSize应该总是defaultPageSize的值
      * @var array|false the page size limits. The first array element stands for the minimal page size, and the second
      * the maximal page size. If this is false, it means [[pageSize]] should always return the value of [[defaultPageSize]].
      */
     public $pageSizeLimit = [1, 50];
 
     /**
+     * 每个页面上的数据数量
      * @var int number of items on each page.
      * If it is less than 1, it means the page size is infinite, and thus a single page contains all items.
      */
@@ -146,6 +172,7 @@ class Pagination extends BaseObject implements Linkable
 
 
     /**
+     * 总页数
      * @return int number of pages
      */
     public function getPageCount()
@@ -163,7 +190,9 @@ class Pagination extends BaseObject implements Linkable
     private $_page;
 
     /**
+     * 返回基于零的当前页码
      * Returns the zero-based current page number.
+     * 是否根据页面大小和数据条数数重新计算当前页面
      * @param bool $recalculate whether to recalculate the current page based on the page size and item count.
      * @return int the zero-based current page number.
      */
@@ -178,6 +207,7 @@ class Pagination extends BaseObject implements Linkable
     }
 
     /**
+     * 设置当前页码
      * Sets the current page number.
      * @param int $value the zero-based index of the current page.
      * @param bool $validatePage whether to validate the page number. Note that in order
@@ -203,6 +233,10 @@ class Pagination extends BaseObject implements Linkable
     }
 
     /**
+     * 返回每个页面的数据条数
+     * 默认情况下，该方法将尝试使用params中的pageSizeParam来确定页面大小。
+     * 如果不能以这种方式确定页面大小，则将返回defaultPageSize。
+     *
      * Returns the number of items per page.
      * By default, this method will try to determine the page size by [[pageSizeParam]] in [[params]].
      * If the page size cannot be determined this way, [[defaultPageSize]] will be returned.
@@ -226,6 +260,7 @@ class Pagination extends BaseObject implements Linkable
     }
 
     /**
+     * 设置每页数据条数
      * @param int $value the number of items per page.
      * @param bool $validatePageSize whether to validate page size.
      */
@@ -247,6 +282,7 @@ class Pagination extends BaseObject implements Linkable
     }
 
     /**
+     * 创建适合分页的URL，并使用指定的页码
      * Creates the URL suitable for pagination with the specified page number.
      * This method is mainly called by pagers when creating URLs used to perform pagination.
      * @param int $page the zero-based page number that the URL should point to.
@@ -287,6 +323,8 @@ class Pagination extends BaseObject implements Linkable
     }
 
     /**
+     * 数据的偏移量。
+     * 这可以用来设置用于获取当前数据页的SQL语句的偏移值
      * @return int the offset of the data. This may be used to set the
      * OFFSET value for a SQL statement for fetching the current page of data.
      */
@@ -310,7 +348,9 @@ class Pagination extends BaseObject implements Linkable
     }
 
     /**
+     * 返回一组链接，用于导航到第一个、最后一个、下一个和上一个页面
      * Returns a whole set of links for navigating to the first, last, next and previous pages.
+     * 生成的url是否应该是绝对的
      * @param bool $absolute whether the generated URLs should be absolute.
      * @return array the links for navigational purpose. The array keys specify the purpose of the links (e.g. [[LINK_FIRST]]),
      * and the array values are the corresponding URLs.
@@ -335,6 +375,7 @@ class Pagination extends BaseObject implements Linkable
     }
 
     /**
+     * 返回指定的查询参数的值
      * Returns the value of the specified query parameter.
      * This method returns the named parameter value from [[params]]. Null is returned if the value does not exist.
      * @param string $name the parameter name

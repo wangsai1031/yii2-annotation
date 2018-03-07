@@ -261,6 +261,7 @@ class Model extends Component implements StaticInstanceInterface, IteratorAggreg
     {
         // 默认场景
         $scenarios = [self::SCENARIO_DEFAULT => []];
+
         foreach ($this->getValidators() as $validator) {
             foreach ($validator->on as $scenario) {
                 $scenarios[$scenario] = [];
@@ -629,7 +630,7 @@ class Model extends Component implements StaticInstanceInterface, IteratorAggreg
                  * append(), 在数组末尾添加元素
                  */
                 $validators->append($rule);
-                // 是数组，则至少有两个元素
+            // 是数组，则至少有两个元素
             } elseif (is_array($rule) && isset($rule[0], $rule[1])) { // attributes, validator type
                 /**
                  * array_slice($rule, 2), 从数组的第三个元素开始取出，并返回数组中的其余元素
@@ -786,7 +787,7 @@ class Model extends Component implements StaticInstanceInterface, IteratorAggreg
      *
      * Note that when returning errors for all attributes, the result is a two-dimensional array, like the following:
      * 请注意，当返回所有属性的错误信息时，结果就是一个二维数组，格式如下：
-     * 
+     *
      * ```php
      * [
      *     'username' => [
@@ -818,7 +819,7 @@ class Model extends Component implements StaticInstanceInterface, IteratorAggreg
      * @return array the first errors. The array keys are the attribute names, and the array
      * values are the corresponding error messages. An empty array will be returned if there is no error.
      * 返回值 数组 第一个错误。数组的键数属性名，数组的值是相应的错误西你想。如果没有错误，就返回空数组
-     * 
+     *
      * @see getErrors()
      * @see getFirstError()
      */

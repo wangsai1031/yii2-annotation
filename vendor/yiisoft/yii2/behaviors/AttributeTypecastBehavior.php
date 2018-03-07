@@ -17,6 +17,9 @@ use yii\validators\NumberValidator;
 use yii\validators\StringValidator;
 
 /**
+ * AttributeTypecastBehavior 行为是yii2在v2.0.10版本时增加的，
+ * 主要提供了一个自动转换模型属性格式的行为，这针对于类似MongoDB或Redis等无模式的数据库来说是非常有用的。
+ *
  * AttributeTypecastBehavior provides an ability of automatic model attribute typecasting.
  * This behavior is very useful in case of usage of ActiveRecord for the schema-less databases like MongoDB or Redis.
  * It may also come in handy for regular [[\yii\db\ActiveRecord]] or even [[\yii\base\Model]], allowing to maintain

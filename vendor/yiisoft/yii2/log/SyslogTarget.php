@@ -11,6 +11,7 @@ use Yii;
 use yii\helpers\VarDumper;
 
 /**
+ * 通过调用PHP函数 syslog() 将日志消息保存到系统日志里。
  * SyslogTarget writes log to syslog.
  *
  * @author miramir <gmiramir@gmail.com>

@@ -10,6 +10,7 @@ namespace yii\console;
 use yii\base\UserException;
 
 /**
+ * 表示由于控制台命令不正确使用而导致的异常
  * Exception represents an exception caused by incorrect usage of a console command.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>

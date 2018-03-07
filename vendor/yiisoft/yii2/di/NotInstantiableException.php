@@ -10,6 +10,7 @@ namespace yii\di;
 use yii\base\InvalidConfigException;
 
 /**
+ * NotInstantiableException 表示由不正确的依赖注入容器配置或使用情况引起的异常
  * NotInstantiableException represents an exception caused by incorrect dependency injection container
  * configuration or usage.
  *

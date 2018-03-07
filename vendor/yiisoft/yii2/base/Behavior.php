@@ -9,7 +9,7 @@ namespace yii\base;
 
 /**
  * Behavior is the base class for all behavior classes.
- * * Behavior类是所有行为类的基类
+ * Behavior类是所有行为类的基类
  *
  * A behavior can be used to enhance the functionality of an existing component without modifying its code.
  * 使用行为，可以不用更改组件的代码就能增强他们的功能
@@ -35,7 +35,7 @@ namespace yii\base;
                 ActiveRecord::EVENT_BEFORE_VALIDATE => 'beforeValidate',
             ];
         }
-        
+
         // 注意beforeValidate 是行为的成员函数，而不是绑定的类的成员函数。
         // 还要注意，这个函数的签名，要满足事件handler的要求。
         public function beforeValidate($event)
@@ -44,7 +44,6 @@ namespace yii\base;
         }
     }
  *
- * 
  */
 class Behavior extends BaseObject
 {

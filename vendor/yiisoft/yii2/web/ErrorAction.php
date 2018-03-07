@@ -13,10 +13,13 @@ use yii\base\Exception;
 use yii\base\UserException;
 
 /**
+ * ErrorAction使用指定的视图显示应用程序错误
  * ErrorAction displays application errors using a specified view.
  *
+ * 要使用ErrorAction，您需要执行以下步骤
  * To use ErrorAction, you need to do the following steps:
  *
+ * 首先，在`SiteController`（或其他控制器）类的`actions()`方法中声明ErrorAction类型的动作，如下:
  * First, declare an action of ErrorAction type in the `actions()` method of your `SiteController`
  * class (or whatever controller you prefer), like the following:
  *
@@ -28,6 +31,8 @@ use yii\base\UserException;
  *     ];
  * }
  * ```
+ * 然后，为该操作创建一个视图文件。如果error action的路径是site/error，那么视图文件应该是视图/site/error.php。
+ * 在这个视图文件中，以下变量是可用的:
  *
  * Then, create a view file for this action. If the route of your error action is `site/error`, then
  * the view file should be `views/site/error.php`. In this view file, the following variables are available:
@@ -36,6 +41,7 @@ use yii\base\UserException;
  * - `$message`: the error message
  * - `$exception`: the exception being handled
  *
+ * 最后，配置“errorHandler”应用程序组件
  * Finally, configure the "errorHandler" application component as follows,
  *
  * ```php
@@ -51,17 +57,22 @@ use yii\base\UserException;
 class ErrorAction extends Action
 {
     /**
+     * 要呈现的视图文件，如果不设置，它将取[[id]]的值。
+     * 这意味着，如果您将操作命名为“error”，那么视图名将是“error”，相应的视图文件将是"views/site/error.php"。
      * @var string the view file to be rendered. If not set, it will take the value of [[id]].
      * That means, if you name the action as "error" in "SiteController", then the view name
      * would be "error", and the corresponding view file would be "views/site/error.php".
      */
     public $view;
     /**
+     * 当异常名称无法确定时，错误的名称。默认为 "Error"
      * @var string the name of the error when the exception name cannot be determined.
      * Defaults to "Error".
      */
     public $defaultName;
     /**
+     * 当异常消息包含敏感信息时要显示的消息。
+     * 默认为“An internal server error occurred”。
      * @var string the message to be displayed when the exception message contains sensitive information.
      * Defaults to "An internal server error occurred.".
      */
@@ -162,7 +173,9 @@ class ErrorAction extends Action
      */
     protected function findException()
     {
+        // 目前没有正在处理的异常。
         if (($exception = Yii::$app->getErrorHandler()->exception) === null) {
+            // 操作不是从错误处理程序调用的，而是直接通过路由调用的，因此我们显示“404 not Found”
             $exception = new NotFoundHttpException(Yii::t('yii', 'Page not found.'));
         }
 
@@ -191,6 +204,7 @@ class ErrorAction extends Action
      */
     protected function getExceptionName()
     {
+        // Http 异常，获取http状态码
         if ($this->exception instanceof Exception) {
             $name = $this->exception->getName();
         } else {

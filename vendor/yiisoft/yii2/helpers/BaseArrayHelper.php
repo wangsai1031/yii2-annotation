@@ -22,26 +22,40 @@ use yii\base\InvalidArgumentException;
 class BaseArrayHelper
 {
     /**
+     * 将对象或对象数组转换为数组。
      * Converts an object or an array of objects into an array.
+     *
+     *  第一个参数包含我们想要转换成数组的对象，在本例中，我们要转换一个叫 Post 的 AR 模型。
+
+        第二个参数是每个类的转换映射表，我们在此设置了一个Post 模型的映射。 每个映射数组包含一组的映射，每个映射可以是：
+        - 一个要包含的照原样的字段名（和类中属性的名称一致）；
+        - 一个由你可随意取名的键名和你想从中取值的模型列名组成的键值对；
+        - 一个由你可随意取名的键名和有返回值的回调函数组成的键值对；
+     *
+     * 要转换成数组的对象
      * @param object|array|string $object the object to be converted into an array
+     * 对象的类名与需要放入结果数组的属性的映射
      * @param array $properties a mapping from object class names to the properties that need to put into the resulting arrays.
+     * 每个类指定的属性是以下格式的数组
      * The properties specified for each class is an array of the following format:
      *
      * ```php
-     * [
-     *     'app\models\Post' => [
-     *         'id',
-     *         'title',
-     *         // the key name in array result => property name
-     *         'createTime' => 'created_at',
-     *         // the key name in array result => anonymous function
-     *         'length' => function ($post) {
-     *             return strlen($post->content);
-     *         },
-     *     ],
-     * ]
+        $posts = Post::find()->limit(10)->all();
+        $data = ArrayHelper::toArray($posts, [
+            'app\models\Post' => [
+                'id',
+                'title',
+                // the key name in array result => property name
+                'createTime' => 'created_at',
+                // the key name in array result => anonymous function
+                'length' => function ($post) {
+                    return strlen($post->content);
+                },
+            ],
+        ]);
      * ```
      *
+     * ArrayHelper::toArray($post，$properties)将会返回以下结果
      * The result of `ArrayHelper::toArray($post, $properties)` could be like the following:
      *
      * ```php
@@ -52,7 +66,10 @@ class BaseArrayHelper
      *     'length' => 301,
      * ]
      * ```
+     * 也可以在一个特定的类中实现@see Arrayable 接口， 从而为其对象提供默认的转换成数组的方法。
+     * Arrayable具体实现在 @see ArrayableTrait
      *
+     * 是否递归地将对象转换为数组
      * @param bool $recursive whether to recursively converts properties which are objects into arrays.
      * @return array the array representation of the object
      */
@@ -100,6 +117,17 @@ class BaseArrayHelper
     }
 
     /**
+     * 将两个或者多个数组递归式的合并为一个数组。
+     * 如果每个数组有一个元素的键名相同，
+     * 那么后面元素的将覆盖前面的元素（不同于 array_merge_recursive）。
+     * 如果两个数组都有相同键名的数组元素（译者注：嵌套数组）
+     * 则将引发递归合并。
+     * 对数值型键名的元素，后面数组中的这些元素会被追加到前面数组中。
+     * @param array $a 被合并的数组
+     * @param array $b 合并的数组，你可以在第三、第四个
+     * 参数中指定另外的合并数组，等等
+     * @return array 合并的结果数组 (原始数组不会被改变)
+     *
      * Merges two or more arrays into one recursively.
      * If each array has an element with the same string key value, the latter
      * will overwrite the former (different from array_merge_recursive).
@@ -143,6 +171,11 @@ class BaseArrayHelper
     }
 
     /**
+     * 使用给定的键或属性名检索数组元素或对象属性的值
+     * 如果该键在数组或对象中不存在，则将返回默认值
+     *
+     * 此方法的方便之处在于我们不用在获取数组值前频繁使用 isset() 来判断键是否存在
+     *
      * Retrieves the value of an array element or object property with the given key or property name.
      * If the key does not exist in the array or object, the default value will be returned instead.
      *
@@ -154,19 +187,29 @@ class BaseArrayHelper
      * instead of going through the sub-arrays. So it is better to be done specifying an array of key names
      * like `['x', 'y', 'z']`.
      *
+     * 第一个参数是我们从哪里获取值。
+     * 第二个参数指定了如何获取数据，
+     * 第三个可选的参数如果没有给定值，则默认为 null
+     * 它可以是下述几种类型中的一个：
+     * - 数组键名或者欲从中取值的对象的属性名称；
+       - 以点号分割的数组键名或者对象属性名称组成的字符串，上例中使用的参数类型就是该类型；
+       - 返回一个值的回调函数。
+     *
      * Below are some usage examples,
      *
      * ```php
-     * // working with array
+     * // working with array 数组
      * $username = \yii\helpers\ArrayHelper::getValue($_POST, 'username');
-     * // working with object
+     * // working with object 对象
      * $username = \yii\helpers\ArrayHelper::getValue($user, 'username');
-     * // working with anonymous function
+     * // working with anonymous function 匿名函数
      * $fullName = \yii\helpers\ArrayHelper::getValue($user, function ($user, $defaultValue) {
      *     return $user->firstName . ' ' . $user->lastName;
      * });
+     * // 使用点格式来检索嵌套对象的属性
      * // using dot format to retrieve the property of embedded object
      * $street = \yii\helpers\ArrayHelper::getValue($users, 'address.street');
+     * // 使用一组键来检索值
      * // using an array of keys to retrieve the value
      * $value = \yii\helpers\ArrayHelper::getValue($versions, ['1.0', 'date']);
      * ```
@@ -291,6 +334,7 @@ class BaseArrayHelper
     }
 
     /**
+     * 从数组中删除一个项并返回值，如果数组中不存在该键，则返回默认值。
      * Removes an item from an array and returns the value. If the key does not exist in the array, the default value
      * will be returned instead.
      *
@@ -355,6 +399,10 @@ class BaseArrayHelper
     }
 
     /**
+     * 根据指定的键对数组进行索引和/或分组
+     * 输入的数组应该是多维数组或者是一个对象数组。
+     * 键名（第二个参数）可以是子数组的键名、对象的属性名， 也可以是一个返回给定元素数组键值的匿名函数。
+     *
      * Indexes and/or groups the array according to a specified key.
      * The input should be either multidimensional array or an array of objects.
      *
@@ -395,7 +443,7 @@ class BaseArrayHelper
      *     return $element['id'];
      * });
      * ```
-     *
+     * 通过id作为第三个参数，将按id对数组进行分组(注意，该功能从2.0.8版本才加入，统计数据时非常有用):
      * Passing `id` as a third argument will group `$array` by `id`:
      *
      * ```php
@@ -490,6 +538,7 @@ class BaseArrayHelper
     }
 
     /**
+     * 在数组中返回指定列的值。
      * Returns the values of a specified column in an array.
      * The input array should be multidimensional or an array of objects.
      *
@@ -503,6 +552,7 @@ class BaseArrayHelper
      * $result = ArrayHelper::getColumn($array, 'id');
      * // the result is: ['123', '345']
      *
+     * 如果需要额外的转换或者取值的方法比较复杂， 第二参数可以指定一个匿名函数：
      * // using anonymous function
      * $result = ArrayHelper::getColumn($array, function ($element) {
      *     return $element['id'];
@@ -532,6 +582,12 @@ class BaseArrayHelper
     }
 
     /**
+     * 从一个多维数组或者一个对象数组中建立一个映射表(键值对)
+     * $from 和 $to 参数分别指定了欲构建的映射表的键名和属性名。
+     * 根据需要，你可以按照一个分组字段 $group 将映射表进行分组
+     *
+     * 注意：此方法与 array_map() 没有任何联系
+     *
      * Builds a map (key-value pairs) from a multidimensional array or an array of objects.
      * The `$from` and `$to` parameters specify the key names or property names to set up the map.
      * Optionally, one can further group the map according to a grouping field `$group`.
@@ -589,6 +645,8 @@ class BaseArrayHelper
     }
 
     /**
+     * 检查给定数组是否包含指定的键
+     * 该方法相对于`array_key_exists()`增加了支持不区分大小写的功能
      * Checks if the given array contains the specified key.
      * This method enhances the `array_key_exists()` function by supporting case-insensitive
      * key comparison.
@@ -600,6 +658,8 @@ class BaseArrayHelper
     public static function keyExists($key, $array, $caseSensitive = true)
     {
         if ($caseSensitive) {
+            // `isset`方法查询速度比array_key_exists()更快但是却会忽略掉键值为 null 的情况。
+            // `array_key_exists` 方法来处理这种情况
             // Function `isset` checks key faster but skips `null`, `array_key_exists` handles this case
             // http://php.net/manual/en/function.array-key-exists.php#107786
             return isset($array[$key]) || array_key_exists($key, $array);
@@ -615,6 +675,36 @@ class BaseArrayHelper
     }
 
     /**
+     * 对嵌套数组或者对象数组进行排序，可按一到多个键名排序
+     *
+     *  $data = [
+            ['age' => 30, 'name' => 'Alexander'],
+            ['age' => 30, 'name' => 'Brian'],
+            ['age' => 19, 'name' => 'Barney'],
+        ];
+        ArrayHelper::multisort($data, ['age', 'name'], [SORT_ASC, SORT_DESC]);
+        排序之后我们在 $data 中得到的值如下所示：
+
+        [
+            ['age' => 19, 'name' => 'Barney'],
+            ['age' => 30, 'name' => 'Brian'],
+            ['age' => 30, 'name' => 'Alexander'],
+        ];
+     *
+     * 第二个参数指定排序的键名，
+     * 如果是单键名的话可以是字符串，如果是多键名则是一个数组，
+     * 或者是如下例所示的一个匿名函数：
+     *
+     *  ArrayHelper::multisort($data, function($item) {
+            return isset($item['age']) ? ['age', 'name'] : 'name';
+        });
+     *
+     * 第三个参数表示增降顺序。单键排序时，它可以是 SORT_ASC 或者 SORT_DESC 之一。
+     * 如果是按多个键名排序，你可以用一个数组为 各个键指定不同的顺序。
+
+       第四个参数是PHP的排序标识（sort flag），可使用的值和调用PHP sort() 函数时传递的值一样。
+     * @see http://php.net/manual/zh/function.sort.php
+     *
      * Sorts an array of objects or arrays (with the same structure) by one or several keys.
      * @param array $array the array to be sorted. The array will be modified after calling this method.
      * @param string|\Closure|array $key the key(s) to be sorted by. This refers to a key name of the sub-array
@@ -666,6 +756,11 @@ class BaseArrayHelper
     }
 
     /**
+     * 将数组中字符串的特殊字符编码为HTML实体
+     * 默认情况只会对值做编码。
+     * 通过给第二个参数传 false ，你也可以对键名做编码。
+     * 编码将默认使用应用程序的字符集，你可以通过第三个参数指定该字符集。
+     *
      * Encodes special characters in an array of strings into HTML entities.
      * Only array values will be encoded by default.
      * If a value is an array, this method will also encode it recursively.
@@ -701,6 +796,11 @@ class BaseArrayHelper
     }
 
     /**
+     * 将数组中HTML实体字符串解码成相应字符
+     *
+     * 默认情况只会对值做解码。
+     * 通过给第二个参数传 false ，也可以对键名做解码。
+     *
      * Decodes HTML entities into the corresponding characters in an array of strings.
      * Only array values will be decoded by default.
      * If a value is an array, this method will also decode it recursively.
@@ -731,6 +831,7 @@ class BaseArrayHelper
     }
 
     /**
+     * 判断给定数组是否为关联数组
      * Returns a value indicating whether the given array is an associative array.
      *
      * An array is associative if all its keys are strings. If `$allStrings` is false,
@@ -739,6 +840,7 @@ class BaseArrayHelper
      * Note that an empty array will NOT be considered associative.
      *
      * @param array $array the array being checked
+     * // 数组的所有键名都为字符串才判定为关联数组
      * @param bool $allStrings whether the array keys must be all strings in order for
      * the array to be treated as associative.
      * @return bool whether the array is associative
@@ -769,6 +871,8 @@ class BaseArrayHelper
     }
 
     /**
+     * 指示给定的数组是否为一个索引数组
+     *
      * Returns a value indicating whether the given array is an indexed array.
      *
      * An array is indexed if all its keys are integers. If `$consecutive` is true,
@@ -777,6 +881,7 @@ class BaseArrayHelper
      * Note that an empty array will be considered indexed.
      *
      * @param array $array the array being checked
+     * 数组键是否必须是连续序列，才能将数组作为索引进行处理
      * @param bool $consecutive whether the array keys must be a consecutive sequence
      * in order for the array to be treated as indexed.
      * @return bool whether the array is indexed
@@ -805,7 +910,13 @@ class BaseArrayHelper
     }
 
     /**
+     * 检查数组或[[@see \Traversable]](可遍历对象)是否包含元素
      * Check whether an array or [[\Traversable]] contains an element.
+     *
+     *  // true
+        ArrayHelper::isIn('a', ['a']);
+     *  // true
+        ArrayHelper::isIn('a', new(ArrayObject['a']));
      *
      * This method does the same as the PHP function [in_array()](http://php.net/manual/en/function.in-array.php)
      * but additionally works for objects that implement the [[\Traversable]] interface.
@@ -835,6 +946,8 @@ class BaseArrayHelper
     }
 
     /**
+     * 检查一个变量是否是一个数组或[[@see \Traversable]](可遍历对象)
+     *
      * Checks whether a variable is an array or [[\Traversable]].
      *
      * This method does the same as the PHP function [is_array()](http://php.net/manual/en/function.is-array.php)
@@ -850,6 +963,8 @@ class BaseArrayHelper
     }
 
     /**
+     * 判断一个数组或[[@see \Traversable]](可遍历对象) 是否是 第二个数组或[[@see \Traversable]](可遍历对象)的子集。
+     *
      * Checks whether an array or [[\Traversable]] is a subset of another array or [[\Traversable]].
      *
      * This method will return `true`, if all elements of `$needles` are contained in
@@ -877,6 +992,7 @@ class BaseArrayHelper
     }
 
     /**
+     * 根据指定的规则过滤数组
      * Filters array according to rules specified.
      *
      * For example:
@@ -912,6 +1028,7 @@ class BaseArrayHelper
      * ```
      *
      * @param array $array Source array
+     * 定义数组键的规则，这些键应该从结果中删除
      * @param array $filters Rules that define array keys which should be left or removed from results.
      * Each rule is:
      * - `var` - `$array['var']` will be left in result.

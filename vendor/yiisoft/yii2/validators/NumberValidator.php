@@ -19,38 +19,59 @@ use yii\web\JsExpression;
  * Optionally, you may configure the [[max]] and [[min]] properties to ensure the number
  * is within certain range.
  *
+ * // double
+ * ['salary', 'double'],
+ *
+ * // integer
+ * ['salary', 'integer'],
+ *
+ * // number
+ * ['salary', 'number'],
+ *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
 class NumberValidator extends Validator
 {
     /**
+     * 属性值是否只能是整数。
      * @var bool whether the attribute value can only be an integer. Defaults to false.
      */
     public $integerOnly = false;
     /**
+     * 上限值（含界点）。若不设置，则验证器不检查上限。
      * @var int|float upper limit of the number. Defaults to null, meaning no upper limit.
      * @see tooBig for the customized message used when the number is too big.
      */
     public $max;
     /**
+     * 下限值（含界点）。若不设置，则验证器不检查下限。
      * @var int|float lower limit of the number. Defaults to null, meaning no lower limit.
      * @see tooSmall for the customized message used when the number is too small.
      */
     public $min;
     /**
+     * 当值大于最大值时展示给用户的错误消息
      * @var string user-defined error message used when the value is bigger than [[max]].
      */
     public $tooBig;
     /**
+     * 当值小于最小值时展示给用户的错误消息
      * @var string user-defined error message used when the value is smaller than [[min]].
      */
     public $tooSmall;
     /**
+     * 匹配整数的正则表达式
+     * 允许无限长的连续数字，
+     * 允许前后有空白字符，
+     * 允许数字前带正负号，
+     * 不允许有小数点
      * @var string the regular expression for matching integers.
      */
     public $integerPattern = '/^\s*[+-]?\d+\s*$/';
     /**
+     * 匹配数字的正则表达式。
+     * 它默认为一个匹配浮点数和可选指数部分的模式(e.g. -1.23e-10).
      * @var string the regular expression for matching numbers. It defaults to a pattern
      * that matches floating numbers with optional exponential part (e.g. -1.23e-10).
      */
@@ -103,6 +124,7 @@ class NumberValidator extends Validator
      */
     protected function validateValue($value)
     {
+        // 判断是否是数字，不是则返回错误信息
         if ($this->isNotNumber($value)) {
             return [Yii::t('yii', '{attribute} is invalid.'), []];
         }
@@ -123,6 +145,7 @@ class NumberValidator extends Validator
      */
     private function isNotNumber($value)
     {
+        // 若值是数组或者是对象且没有 '__toString' 方法
         return is_array($value)
         || (is_object($value) && !method_exists($value, '__toString'))
         || (!is_object($value) && !is_scalar($value) && !is_null($value));

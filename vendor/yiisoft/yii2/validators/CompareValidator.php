@@ -12,6 +12,8 @@ use yii\base\InvalidConfigException;
 use yii\helpers\Html;
 
 /**
+ *
+ * 将指定的属性值与另一个值进行比较
  * CompareValidator compares the specified attribute value with another value.
  *
  * The value being compared with can be another attribute value
@@ -28,6 +30,11 @@ use yii\helpers\Html;
  * are compared byte by byte. When comparing numbers, make sure to set the [[$type]]
  * to [[TYPE_NUMBER]] to enable numeric comparison.
  *
+ *  // 检查 "password" 特性的值是否与 "password_repeat" 的值相同
+    ['password', 'compare'],
+
+    // 检查年龄是否大于等于 30
+    ['age', 'compare', 'compareValue' => 30, 'operator' => '>='],
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
@@ -47,6 +54,10 @@ class CompareValidator extends Validator
     const TYPE_NUMBER = 'number';
 
     /**
+     * 用于与原特性相比较的特性名称。
+     * 当该验证器被用于验证某目标特性时，该属性会默认为目标属性加后缀 _repeat。
+     * 举例来说，若目标特性为 password，则该属性默认为 password_repeat。
+     *
      * @var string the name of the attribute to be compared with. When both this property
      * and [[compareValue]] are set, the latter takes precedence. If neither is set,
      * it assumes the comparison is against another attribute whose name is formed by
@@ -56,12 +67,20 @@ class CompareValidator extends Validator
      */
     public $compareAttribute;
     /**
+     * 用于与输入值相比较的常量值。
+     * 当该属性与 compareAttribute 属性同时被指定时， 该属性优先被使用。
+     *
      * @var mixed the constant value to be compared with. When both this property
      * and [[compareAttribute]] are set, this property takes precedence.
      * @see compareAttribute
      */
     public $compareValue;
     /**
+     * 被比较的值的类型，支持以下类型：
+     * 支持以下类型：
+     * - string: 值被作为字符串进行比较。在比较之前不会进行转换。
+     * - number: 值被作为数字进行比较,在比较之前，字符串值将被转换为数字（float）。
+     *
      * @var string the type of the values being compared. The follow types are supported:
      *
      * - [[TYPE_STRING|string]]: the values are being compared as strings. No conversion will be done before comparison.
@@ -69,6 +88,18 @@ class CompareValidator extends Validator
      */
     public $type = self::TYPE_STRING;
     /**
+     * 比较操作符。默认为 ==，意味着检查输入值是否与 compareAttribute 或 compareValue 的值相等。
+     * 该属性支持如下操作符：
+     *
+     *  ==  ：检查两值是否相等。比对为非严格模式。
+        === ：检查两值是否全等。比对为严格模式。
+        !=  ：检查两值是否不等。比对为非严格模式。
+        !== ：检查两值是否不全等。比对为严格模式。
+        >   ：检查待测目标值是否大于给定被测值。
+        >=  ：检查待测目标值是否大于等于给定被测值。
+        <   ：检查待测目标值是否小于给定被测值。
+        <=  ：检查待测目标值是否小于等于给定被测值。
+     *
      * @var string the operator for comparison. The following operators are supported:
      *
      * - `==`: check if two values are equal. The comparison is done is non-strict mode.
@@ -84,6 +115,14 @@ class CompareValidator extends Validator
      */
     public $operator = '==';
     /**
+     * 用户定义的错误消息。
+     * 它可能包含以下占位符，这些占位符将被验证器所取代:
+     * - `{attribute}`: 被验证的属性的标签
+     * - `{value}`: 被验证的属性的值
+     * - `{compareValue}`: 与之比较的值或属性标签
+     * - `{compareAttribute}`: 与之相比较的属性的标签
+     * - `{compareValueOrAttribute}`: 与之比较的值或属性标签
+     *
      * @var string the user-defined error message. It may contain the following placeholders which
      * will be replaced accordingly by the validator:
      *
@@ -135,24 +174,32 @@ class CompareValidator extends Validator
     }
 
     /**
+     * 验证属性
      * {@inheritdoc}
      */
     public function validateAttribute($model, $attribute)
     {
+        // 获取属性值
         $value = $model->$attribute;
+        // 若值是数组，则返回错误
         if (is_array($value)) {
             $this->addError($model, $attribute, Yii::t('yii', '{attribute} is invalid.'));
 
             return;
         }
+        // 若 compareValue 不为空
         if ($this->compareValue !== null) {
+            // 连续赋值
             $compareLabel = $compareValue = $compareValueOrAttribute = $this->compareValue;
         } else {
+            // 若 $this->compareAttribute 为空，则默认在 $attribute 后接 '_repeat' 拼接成 compareAttribute
             $compareAttribute = $this->compareAttribute === null ? $attribute . '_repeat' : $this->compareAttribute;
+            // 获取要对比的值
             $compareValue = $model->$compareAttribute;
+            // 获取属性标签
             $compareLabel = $compareValueOrAttribute = $model->getAttributeLabel($compareAttribute);
         }
-
+        // 比较值
         if (!$this->compareValues($this->operator, $this->type, $value, $compareValue)) {
             $this->addError($model, $attribute, $this->message, [
                 'compareAttribute' => $compareLabel,
@@ -163,13 +210,17 @@ class CompareValidator extends Validator
     }
 
     /**
+     * todo ？ 用不到啊
+     * 验证值
      * {@inheritdoc}
      */
     protected function validateValue($value)
     {
+        // $this->compareValue 不能为空
         if ($this->compareValue === null) {
             throw new InvalidConfigException('CompareValidator::compareValue must be set.');
         }
+        // 比较值
         if (!$this->compareValues($this->operator, $this->type, $value, $this->compareValue)) {
             return [$this->message, [
                 'compareAttribute' => $this->compareValue,
@@ -182,6 +233,7 @@ class CompareValidator extends Validator
     }
 
     /**
+     * 使用指定的操作符将两个值进行比较。
      * Compares two values with the specified operator.
      * @param string $operator the comparison operator
      * @param string $type the type of the values being compared
@@ -191,10 +243,12 @@ class CompareValidator extends Validator
      */
     protected function compareValues($operator, $type, $value, $compareValue)
     {
+        // 如果是 数字，则转换为float
         if ($type === self::TYPE_NUMBER) {
             $value = (float) $value;
             $compareValue = (float) $compareValue;
         } else {
+            // 否则将转换为字符串
             $value = (string) $value;
             $compareValue = (string) $compareValue;
         }
@@ -221,6 +275,7 @@ class CompareValidator extends Validator
     }
 
     /**
+     * 客户端验证
      * {@inheritdoc}
      */
     public function clientValidateAttribute($model, $attribute, $view)

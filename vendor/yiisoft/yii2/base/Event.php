@@ -39,16 +39,16 @@ use yii\helpers\StringHelper;
     // 定义事件的关联数据
     class MsgEvent extend yii\base\Event
     {
-    public $dateTime;   // 微博发出的时间
-    public $author;     // 微博的作者
-    public $content;    // 微博的内容
+        public $dateTime;   // 微博发出的时间
+        public $author;     // 微博的作者
+        public $content;    // 微博的内容
     }
-    
+
     // 在发布新的微博时，准备好要传递给handler的数据
     $event = new MsgEvent;
     $event->title = $title;
     $event->author = $auhtor;
-    
+
     // 触发事件
     $msg->trigger(Msg::EVENT_NEW_MESSAGE, $event);
  *
@@ -166,15 +166,15 @@ class Event extends BaseObject
      * handler list.
      * 参数 boolean 是否添加新的事件处理程序到已经存在的事件处理程序列表的最后。如果为false，新的事件处理程序会被添加到事件处理
      * 程序列表的开头
+     *
      * @see off()
-     * 
      *
      * 先讲讲类级别的事件。类级别事件用于响应所有类实例的事件。
      * 比如，工头需要了解所有工人的下班时间， 那么，对于数百个工人，即数百个Worker实例，工头难道要一个一个去绑定自己的handler么？ 这也太低级了吧？
      * 其实，他只需要绑定一个handler到Worker类，这样每个工人下班时，他都能知道了。
      * 与实例级别的事件不同，类级别事件的绑定需要使用 yii\base\Event::on()
      *
-     *  Event::on(
+     * Event::on(
             Worker::className(),                     // 第一个参数表示事件发生的类
             Worker::EVENT_OFF_DUTY,                  // 第二个参数表示是什么事件
             function ($event) {                      // 对事件的处理

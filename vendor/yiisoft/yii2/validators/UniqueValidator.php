@@ -16,6 +16,8 @@ use yii\db\ActiveRecordInterface;
 use yii\helpers\Inflector;
 
 /**
+ * 检查输入值是否在某表字段中唯一。
+ * 它只对活动记录类型的模型类特性起作用， 能支持对一个或多过字段的验证。
  * UniqueValidator validates that the attribute value is unique in the specified database table.
  *
  * UniqueValidator checks if the value being validated is unique in the table column specified by
@@ -25,14 +27,19 @@ use yii\helpers\Inflector;
  *
  * ```php
  * // a1 needs to be unique
+ * // a1 需要在 "a1" 特性所代表的字段内唯一
  * ['a1', 'unique']
  * // a1 needs to be unique, but column a2 will be used to check the uniqueness of the a1 value
+ * // a1 需要唯一，但检验的是 a1 的值在字段 a2 中的唯一性
  * ['a1', 'unique', 'targetAttribute' => 'a2']
  * // a1 and a2 need to be unique together, and they both will receive error message
+ * // a1 和 a2 的组合需要唯一，且它们都能收到错误提示
  * [['a1', 'a2'], 'unique', 'targetAttribute' => ['a1', 'a2']]
  * // a1 and a2 need to be unique together, only a1 will receive error message
+ *  // a1 和 a2 的组合需要唯一，只有 a1 能接收错误提示
  * ['a1', 'unique', 'targetAttribute' => ['a1', 'a2']]
  * // a1 needs to be unique by checking the uniqueness of both a2 and a3 (using a1 value)
+ * // 通过同时在 a2 和 a3 字段中检查 a2 和 a3 的值来确定 a1 的唯一性
  * ['a1', 'unique', 'targetAttribute' => ['a2', 'a1' => 'a3']]
  * ```
  *
@@ -42,12 +49,21 @@ use yii\helpers\Inflector;
 class UniqueValidator extends Validator
 {
     /**
+     * 用于查找输入值的目标 AR 类。
+     * 若不设置，则会使用正在进行验证的当前模型类。
      * @var string the name of the ActiveRecord class that should be used to validate the uniqueness
      * of the current attribute value. If not set, it will use the ActiveRecord class of the attribute being validated.
      * @see targetAttribute
      */
     public $targetClass;
     /**
+     * 用于检查输入值唯一性的 targetClass 的模型特性。
+     * 若不设置，它会直接使用待测特性名（整个参数数组的首元素）。
+     * 除了指定为字符串以外，你也可以用数组的形式，同时指定多个用于验证的表字段，
+     * 数组的键和值都是代表字段的特性名， 值表示 targetClass 的待测数据源字段，而键表示当前模型的待测特性名。
+     * 若键和值相同，你可以只指定值。
+     * （如:['a2'] 就代表 ['a2'=>'a2']）
+     *
      * @var string|array the name of the [[\yii\db\ActiveRecord|ActiveRecord]] attribute that should be used to
      * validate the uniqueness of the current attribute value. If not set, it will use the name
      * of the attribute currently being validated. You may use an array to validate the uniqueness
@@ -56,6 +72,10 @@ class UniqueValidator extends Validator
      */
     public $targetAttribute;
     /**
+     * 用于检查输入值唯一性必然会进行数据库查询， 而该属性为用于进一步筛选该查询的过滤条件。
+     * 可以为代表额外查询条件的字符串或数组 （关于查询条件的格式，请参考 yii\db\Query::where()）；
+     * 或者样式为 function ($query) 的匿名函数， $query 参数为你希望在该函数内进行修改的 Query 对象。
+     *
      * @var string|array|\Closure additional filter to be applied to the DB query used to check the uniqueness of the attribute value.
      * This can be a string or an array representing the additional query condition (refer to [[\yii\db\Query::where()]]
      * on the format of query condition), or an anonymous function with the signature `function ($query)`, where `$query`

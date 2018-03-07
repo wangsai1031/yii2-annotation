@@ -8,11 +8,14 @@
 namespace yii\caching;
 
 /**
+ * 使用 Zend Data Cache 作为底层缓存媒介。
  * ZendDataCache provides Zend data caching in terms of an application component.
  *
+ * 要使用这个应用程序组件，必须加载PHP扩展 [Zend Data Cache PHP extension](http://www.zend.com/en/products/server/)
  * To use this application component, the [Zend Data Cache PHP extension](http://www.zend.com/en/products/server/)
  * must be loaded.
  *
+ * 查看[[Cache]]了解ZendDataCache支持的常用缓存操作。
  * See [[Cache]] for common cache operations that ZendDataCache supports.
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
@@ -24,6 +27,8 @@ namespace yii\caching;
 class ZendDataCache extends Cache
 {
     /**
+     * 使用指定的键从缓存中检索值
+     * 这是在父类中声明的方法的实现
      * Retrieves a value from cache with a specified key.
      * This is the implementation of the method declared in the parent class.
      * @param string $key a unique key identifying the cached value
@@ -37,6 +42,8 @@ class ZendDataCache extends Cache
     }
 
     /**
+     * 在缓存中存储一个键对应的值。
+     * 这是在父类中声明的方法的实现.
      * Stores a value identified by a key in cache.
      * This is the implementation of the method declared in the parent class.
      *
@@ -52,6 +59,8 @@ class ZendDataCache extends Cache
     }
 
     /**
+     * 如果缓存不包含该键，则缓存该键和值。
+     * 这是在父类中声明的方法的实现.
      * Stores a value identified by a key into cache if the cache does not contain this key.
      * This is the implementation of the method declared in the parent class.
      *
@@ -67,6 +76,8 @@ class ZendDataCache extends Cache
     }
 
     /**
+     * 从缓存中删除指定键的值。
+     * 这是在父类中声明的方法的实现.
      * Deletes a value with the specified key from cache
      * This is the implementation of the method declared in the parent class.
      * @param string $key the key of the value to be deleted
@@ -78,6 +89,8 @@ class ZendDataCache extends Cache
     }
 
     /**
+     * 清空所有缓存
+     * 这是在父类中声明的方法的实现.
      * Deletes all values from cache.
      * This is the implementation of the method declared in the parent class.
      * @return bool whether the flush operation was successful.

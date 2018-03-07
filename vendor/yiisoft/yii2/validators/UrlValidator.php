@@ -13,10 +13,15 @@ use yii\helpers\Json;
 use yii\web\JsExpression;
 
 /**
+ * 检查输入值是否为有效 URL。
  * UrlValidator validates that the attribute value is a valid http or https URL.
  *
  * Note that this validator only checks if the URL scheme and host part are correct.
  * It does not check the remaining parts of a URL.
+ *
+ *  // 检查 "website" 是否为有效的 URL。若没有 URI 方案，
+    // 则给 "website" 特性加 "http://" 前缀
+    ['website', 'url', 'defaultScheme' => 'http'],
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
@@ -30,17 +35,25 @@ class UrlValidator extends Validator
      */
     public $pattern = '/^{schemes}:\/\/(([A-Z0-9][A-Z0-9_-]*)(\.[A-Z0-9][A-Z0-9_-]*)+)(?::\d{1,5})?(?:$|[?\/#])/i';
     /**
+     * 用于指定那些 URI 方案会被视为有效的数组。
+     * 默认为 ['http', 'https']， 代表 http 和 https URLs 会被认为有效。
      * @var array list of URI schemes which should be considered valid. By default, http and https
      * are considered to be valid schemes.
      */
     public $validSchemes = ['http', 'https'];
     /**
+     * 若输入值没有对应的方案前缀，会使用的默认 URI 方案前缀。
+     * 默认为 null，代表不修改输入值本身。
      * @var string the default URI scheme. If the input doesn't contain the scheme part, the default
      * scheme will be prepended to it (thus changing the input). Defaults to null, meaning a URL must
      * contain the scheme part.
      */
     public $defaultScheme;
     /**
+     * 验证过程是否应该考虑 IDN（internationalized domain names，国际化域名，也称多语种域名，比如中文域名）。
+     * 默认为 false。
+     * 要注意但是为使用 IDN 验证功能， 请先确保安装并开启 intl PHP 扩展，不然会导致抛出异常。
+     *
      * @var bool whether validation process should take into account IDN (internationalized
      * domain names). Defaults to false meaning that validation of URLs containing IDN will always
      * fail. Note that in order to use IDN validation you have to install and enable `intl` PHP

@@ -8,6 +8,7 @@
 namespace yii\db;
 
 /**
+ * 一般是由于使用锁机制时，相应数据被修改过引起的异常
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */

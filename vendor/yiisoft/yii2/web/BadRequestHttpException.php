@@ -8,6 +8,7 @@
 namespace yii\web;
 
 /**
+ * 表示状态码400的 "Bad Request" HTTP异常。
  * BadRequestHttpException represents a "Bad Request" HTTP exception with status code 400.
  *
  * Use this exception to represent a generic client error. In many cases, there

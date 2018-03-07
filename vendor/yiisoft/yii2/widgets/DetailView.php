@@ -18,15 +18,21 @@ use yii\helpers\Inflector;
 use yii\i18n\Formatter;
 
 /**
+ * DetailView 小部件显示的是单一 model 数据的详情。
  * DetailView displays the detail of a single data [[model]].
  *
+ * 它非常适合用常规格式显示一个模型（例如在一个表格的一行中显示模型的每个属性）。
+ * 这里说的模型可以是 yii\base\Model 或者其子类的一个实例，例如子类 active record，也可以是一个关联数组。
  * DetailView is best used for displaying a model in a regular format (e.g. each model attribute
  * is displayed as a row in a table.) The model can be either an instance of [[Model]]
  * or an associative array.
  *
+ * DetailView使用 $attributes 属性来决定显示模型哪些属性以及如何格式化。
+ * 可用的格式化选项，@see Formatter
  * DetailView uses the [[attributes]] property to determines which model attributes
  * should be displayed and how they should be formatted.
  *
+ * 一个典型的DetailView的使用方法如下：
  * A typical usage of DetailView is as follows:
  *
  * ```php

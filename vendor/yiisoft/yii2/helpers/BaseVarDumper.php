@@ -26,11 +26,16 @@ class BaseVarDumper
 
 
     /**
+     * 显示一个变量
      * Displays a variable.
+     * 该方法实现了与vardump和printr类似的功能
+     * 但在处理诸如Yii控制器之类的复杂对象时，则更加健壮
      * This method achieves the similar functionality as var_dump and print_r
      * but is more robust when handling complex objects such as Yii controllers.
      * @param mixed $var variable to be dumped
+     * 变量值展示发的最大深度的深度
      * @param int $depth maximum depth that the dumper should go into the variable. Defaults to 10.
+     * 是否 语法高亮显示 结果
      * @param bool $highlight whether the result should be syntax-highlighted
      */
     public static function dump($var, $depth = 10, $highlight = false)
@@ -39,11 +44,16 @@ class BaseVarDumper
     }
 
     /**
+     * 以字符串的形式展示一个变量
      * Dumps a variable in terms of a string.
+     * 该方法实现了与var_dump和print_r类似的功能
+     * 但在处理诸如Yii控制器之类的复杂对象时，则更加健壮
      * This method achieves the similar functionality as var_dump and print_r
      * but is more robust when handling complex objects such as Yii controllers.
      * @param mixed $var variable to be dumped
+     * 变量值展示发的最大深度的深度
      * @param int $depth maximum depth that the dumper should go into the variable. Defaults to 10.
+     * 是否 语法高亮显示 结果
      * @param bool $highlight whether the result should be syntax-highlighted
      * @return string the string representation of the variable
      */
@@ -137,14 +147,20 @@ class BaseVarDumper
     }
 
     /**
+     * 以字符串表达式的形式输出一个变量
      * Exports a variable as a string representation.
      *
+     * 字符串是PHP解析器可以使用的有效PHP表达式
+     * 并且运行结果会返回变量值
      * The string is a valid PHP expression that can be evaluated by PHP parser
      * and the evaluation result will give back the variable value.
      *
+     * 这个方法与 var_export() 类似。
+     * 主要的不同点是它使用简短的数组语法生成更紧凑的字符串表示
      * This method is similar to `var_export()`. The main difference is that
      * it generates more compact string representation using short array syntax.
      *
+     * 它还通过使用PHP函数serialize() and unserialize()来处理对象。
      * It also handles objects by using the PHP functions serialize() and unserialize().
      *
      * PHP 5.4 or above is required to parse the exported value.
@@ -225,6 +241,7 @@ class BaseVarDumper
     }
 
     /**
+     * 输出一个闭包实例
      * Exports a [[Closure]] instance.
      * @param \Closure $closure closure instance.
      * @return string

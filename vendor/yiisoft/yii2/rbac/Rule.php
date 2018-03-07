@@ -34,6 +34,7 @@ abstract class Rule extends BaseObject
 
 
     /**
+     * 执行规则
      * Executes the rule.
      *
      * @param string|int $user the user ID. This should be either an integer or a string representing

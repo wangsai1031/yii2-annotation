@@ -10,9 +10,13 @@ namespace yii\validators;
 use Yii;
 
 /**
+ * 检查输入值是否为特定长度的字符串。并检查特性的值是否为某个特定长度。
  * StringValidator validates that the attribute value is of certain length.
  *
  * Note, this validator should only be used with string-typed attributes.
+ *
+ *  // 检查 "username" 是否为长度 4 到 24 之间的字符串
+    ['username', 'string', 'length' => [4, 24]],
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
@@ -20,6 +24,11 @@ use Yii;
 class StringValidator extends Validator
 {
     /**
+     * 指定待测输入字符串的长度限制。 该属性可以被指定为以下格式之一：
+     * 整数：这个字符串的长度必须是这个值;
+     * 单元素数组：代表输入字符串的最小长度 (e.g. [8])。这会重写 min 属性。
+     * 包含两个元素的数组：代表输入字符串的最小和最大长度(e.g. [8, 128])。 这会同时重写 min 和 max 属性。
+     *
      * @var int|array specifies the length limit of the value to be validated.
      * This can be specified in one of the following forms:
      *
@@ -34,11 +43,14 @@ class StringValidator extends Validator
      */
     public $length;
     /**
+     * 输入字符串的最大长度。若不设置，则代表不设上限。
+     * 
      * @var int maximum length. If not set, it means no maximum length limit.
      * @see tooLong for the customized message for a too long string.
      */
     public $max;
     /**
+     * 输入字符串的最小长度。若不设置，则代表不设下限。
      * @var int minimum length. If not set, it means no minimum length limit.
      * @see tooShort for the customized message for a too short string.
      */
@@ -60,6 +72,7 @@ class StringValidator extends Validator
      */
     public $notEqual;
     /**
+     * 待测字符串的编码方式。若不设置，则使用应用自身的 charset 属性值， 该值默认为 UTF-8。
      * @var string the encoding of the string value to be validated (e.g. 'UTF-8').
      * If this property is not set, [[\yii\base\Application::charset]] will be used.
      */

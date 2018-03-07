@@ -21,7 +21,7 @@ use yii\helpers\StringHelper;
  * Event is a way to "inject" custom code into existing code at certain places. For example, a comment object can trigger
  * an "add" event when the user adds a comment. We can write custom code and attach it to this event so that when the event
  * is triggered (i.e. comment will be added), our custom code will be executed.
- *事件是把自定义的代码注入到指定位置的一种方式。例如，当用户添加评论的时候，评论对象可以触发一个add事件。我们就可以把自定义的代码写入事件，当事件触发的时候
+ * 事件是把自定义的代码注入到指定位置的一种方式。例如，当用户添加评论的时候，评论对象可以触发一个add事件。我们就可以把自定义的代码写入事件，当事件触发的时候
  * （例如添加评论的时候）我们自定义的代码就会执行。
  *
  * An event is identified by a name that should be unique within the class it is defined at. Event names are *case-sensitive*.
@@ -421,7 +421,6 @@ class Component extends BaseObject
         throw new UnknownMethodException('Calling unknown method: ' . get_class($this) . "::$name()");
     }
 
-
     /**
      * This method is called after the object is created by cloning an existing one.
      * It removes all behaviors because they are attached to the old object.
@@ -752,21 +751,21 @@ class Component extends BaseObject
 
         // 使用PHP全局函数作为handler来进行绑定
         $person->on(Person::EVENT_GREET, 'person_say_hello');
-    
+
         // 使用对象$obj的成员函数say_hello来进行绑定
         $person->on(Person::EVENT_GREET, [$obj, 'say_hello']);
-    
+
         // 使用类Greet的静态成员函数say_hello进行绑定
         $person->on(Person::EVENT_GREET, ['app\helper\Greet', 'say_hello']);
-    
+
         // 使用匿名函数
         $person->on(Person::EVENT_GREET, function ($event) {
             echo 'Hello';
         });
-    
-        // 使用第三个参数传递额外数据
-        $person->on(Person::EVENT_GREET, 'person_say_hello', 'Hello World!');
-    
+     *
+     *  // 使用第三个参数传递额外数据
+     *  $person->on(Person::EVENT_GREET, 'person_say_hello', 'Hello World!');
+
         // 'Hello World!' 可以通过 $event访问。
         function person_say_hello($event)
         {
@@ -784,7 +783,6 @@ class Component extends BaseObject
      * 但是不要以为Yii的事件handler就没办法偷天换日了，要使后加上的事件handler先运行，
      * 只需在调用 yii\base\Component::on() 进行绑定时，将第四个参数设为 $append 设为 false
      * 那么这个handler就会被放在数组的最前面了，它就会被最先执行，它也就有可能欺骗后面的handler了。
-     */
      */
     public function on($name, $handler, $data = null, $append = true)
     {
@@ -832,22 +830,23 @@ class Component extends BaseObject
      * @return boolean if a handler is found and detached
      * 返回值 boolean 事件处理程序是否被找到并移除
      * @see on()
-     * 
+     *
      *  // 删除所有EVENT_DISASTER事件的handler
         $coal->off(Coal::EVENT_DISASTER);
-    
+
         // 删除一个PHP全局函数的handler
         $coal->off(Coal::EVENT_DISASTER, 'global_onDisaster');
-    
+
         // 删除一个对象的成员函数的handler
         $coal->off(Coal::EVENT_DISASTER, [$baddy, 'onDisaster']);
-    
+
         // 删除一个类的静态成员函数的handler
         $coal->off(Coal::EVENT_DISASTER, ['path\to\Baddy', 'static_onDisaster']);
-    
+
         // 删除一个匿名函数的handler
         $coal->off(Coal::EVENT_DISASTER, $anonymousFunction);
-     * 
+     *
+     *
      * 要留意以下几点:
      *
      * 1. 当 $handler 为 null 时，表示解除 $name 事件的所有handler。
@@ -963,7 +962,6 @@ class Component extends BaseObject
                 }
             }
         }
-
         // invoke class-level attached handlers
         // 调用绑定过的类级别的事件处理程序
         // 触发类一级的事件
@@ -1146,7 +1144,7 @@ class Component extends BaseObject
             // 将该行为添加到行为数组中
             $this->_behaviors[] = $behavior;
 
-            // 如果是命名行为，先看看是否有同名的行为已经绑定在这个类上，如果有，用后来的行为取代之前的行为
+        // 如果是命名行为，先看看是否有同名的行为已经绑定在这个类上，如果有，用后来的行为取代之前的行为
         } else {
 
             // 已经有一个同名的行为，要先解除，再将新的行为绑定上去。

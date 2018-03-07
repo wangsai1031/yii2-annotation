@@ -10,6 +10,7 @@ namespace yii\web;
 use yii\base\UserException;
 
 /**
+ * HttpException代表一个由终端用户不恰当的请求引起的异常。
  * HttpException represents an exception caused by an improper request of the end-user.
  *
  * HttpException can be differentiated via its [[statusCode]] property value which

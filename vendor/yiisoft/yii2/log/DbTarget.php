@@ -15,6 +15,8 @@ use yii\di\Instance;
 use yii\helpers\VarDumper;
 
 /**
+ * DbTarget将日志消息存储在数据库表中。
+ * 在数据库表里存储日志消息。
  * DbTarget stores log messages in a database table.
  *
  * The database connection is specified by [[db]]. Database schema could be initialized by applying migration:

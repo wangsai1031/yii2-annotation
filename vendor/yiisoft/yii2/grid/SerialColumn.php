@@ -8,6 +8,7 @@
 namespace yii\grid;
 
 /**
+ * Serial column 渲染行号，以 1 起始并自动增长。
  * SerialColumn displays a column of row numbers (1-based).
  *
  * To add a SerialColumn to the [[GridView]], add it to the [[GridView::columns|columns]] configuration as follows:

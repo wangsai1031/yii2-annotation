@@ -18,6 +18,7 @@ namespace yii\helpers;
 class BaseHtmlPurifier
 {
     /**
+     * 通过html净化器传递标记，使其可以安全地输出给用户
      * Passes markup through HTMLPurifier making it safe to output to end user.
      *
      * @param string $content The HTML content to purify
@@ -59,6 +60,7 @@ class BaseHtmlPurifier
     }
 
     /**
+     * 允许扩展HtmlPurifier类，设置一些默认的配置选项
      * Allow the extended HtmlPurifier class to set some default config options.
      * @param \HTMLPurifier_Config $config
      * @since 2.0.3

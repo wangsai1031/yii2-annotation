@@ -8,6 +8,9 @@
 namespace yii\web;
 
 /**
+ * 表示状态码为406 "Not Acceptable" HTTP异常
+ * 当客户端请求您的应用程序不能返回的内容类型时，使用这个异常。
+ * 请注意，根据HTTP 1.1规范，在这种情况下，您不需要使用这种状态代码来响应。
  * NotAcceptableHttpException represents a "Not Acceptable" HTTP exception with status code 406.
  *
  * Use this exception when the client requests a Content-Type that your

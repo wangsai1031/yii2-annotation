@@ -21,6 +21,7 @@ use yii\base\InvalidArgumentException;
 class BaseMarkdown
 {
     /**
+     * 将markdown风格名称映射到对应的解析器类配置
      * @var array a map of markdown flavor names to corresponding parser class configurations.
      */
     public static $flavors = [
@@ -43,6 +44,7 @@ class BaseMarkdown
         ],
     ];
     /**
+     * 当没有明确指定的时候要使用的标记风格
      * @var string the markdown flavor to use when none is specified explicitly.
      * Defaults to `original`.
      * @see $flavors
@@ -51,6 +53,7 @@ class BaseMarkdown
 
 
     /**
+     * 将 MarkDown 转换为HTML
      * Converts markdown into HTML.
      *
      * @param string $markdown the markdown text to parse
@@ -67,6 +70,7 @@ class BaseMarkdown
     }
 
     /**
+     * 将markdown转换为HTML，但只解析内联元素
      * Converts markdown into HTML but only parses inline elements.
      *
      * This can be useful for parsing small comments or description lines.
@@ -85,6 +89,7 @@ class BaseMarkdown
     }
 
     /**
+     * markdown所使用的风格，如果没设置，使用[[$defaultFlavor]]
      * @param string $flavor the markdown flavor to use. See [[$flavors]] for available values.
      * Defaults to [[$defaultFlavor]], if not set.
      * @return \cebe\markdown\Parser

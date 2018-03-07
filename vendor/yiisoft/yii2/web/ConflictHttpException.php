@@ -8,6 +8,7 @@
 namespace yii\web;
 
 /**
+ * 表示状态代码为409的"Conflict" HTTP异常
  * ConflictHttpException represents a "Conflict" HTTP exception with status code 409.
  *
  * @see https://tools.ietf.org/html/rfc7231#section-6.5.8

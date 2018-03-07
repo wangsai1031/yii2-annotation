@@ -326,6 +326,10 @@ class Response extends \yii\base\Response
     }
 
     /**
+     * 在yii\web\Response::send() 方法调用前响应中的内容不会发送给用户，
+     * 该方法默认在yii\base\Application::run() 结尾自动调用，尽管如此，可以明确调用该方法强制立即发送响应。
+     *
+     * 一旦yii\web\Response::send() 方法被执行后，其他地方调用该方法会被忽略， 这意味着一旦响应发出后，就不能再追加其他内容。
      * Sends the response to the client.
      */
     public function send()
@@ -333,11 +337,17 @@ class Response extends \yii\base\Response
         if ($this->isSent) {
             return;
         }
+        // 触发 yii\web\Response::EVENT_BEFORE_SEND 事件.
         $this->trigger(self::EVENT_BEFORE_SEND);
+        // 格式化 response data 为 response content.
         $this->prepare();
+        // 触发 yii\web\Response::EVENT_AFTER_PREPARE 事件.
         $this->trigger(self::EVENT_AFTER_PREPARE);
+        // 调用 yii\web\Response::sendHeaders() 来发送注册的HTTP头
         $this->sendHeaders();
+        // 调用 yii\web\Response::sendContent() 来发送响应主体内容
         $this->sendContent();
+        // 触发 yii\web\Response::EVENT_AFTER_SEND 事件.
         $this->trigger(self::EVENT_AFTER_SEND);
         $this->isSent = true;
     }
@@ -358,6 +368,7 @@ class Response extends \yii\base\Response
     }
 
     /**
+     * 发送注册的HTTP头
      * Sends the response headers to the client.
      */
     protected function sendHeaders()
@@ -407,6 +418,7 @@ class Response extends \yii\base\Response
     }
 
     /**
+     * 发送响应主体内容
      * Sends the response content to the client.
      */
     protected function sendContent()
@@ -441,11 +453,17 @@ class Response extends \yii\base\Response
     }
 
     /**
+     * 向浏览器发送文件
      * Sends a file to the browser.
      *
+     * 请注意，此方法只是准备好发送的响应文件.
+     * 直到send()被显式或隐式地调用时，才会发送该文件.
+     * 后者是在你从控制器动作返回后完成的.
      * Note that this method only prepares the response for file sending. The file is not sent
      * until [[send()]] is called explicitly or implicitly. The latter is done after you return from a controller action.
      *
+     * 如果要发送的文件非常大，应考虑使用 yii\web\Response::sendStreamAsFile() 因为它更节约内存
+     * 
      * The following is an example implementation of a controller action that allows requesting files from a directory
      * that is not accessible from web:
      *
@@ -779,6 +797,8 @@ class Response extends \yii\base\Response
     }
 
     /**
+     * 将用户浏览器跳转到一个URL地址，该方法设置合适的 带指定URL的 Location 头并返回它自己为响应对象
+     * 
      * Redirects the browser to the specified URL.
      *
      * This method adds a "Location" header to the current response. Note that it does not send out
@@ -795,6 +815,13 @@ class Response extends \yii\base\Response
      * Yii::$app->getResponse()->redirect($url)->send();
      * return;
      * ```
+     *
+     * 如果当前请求为AJAX 请求， 发送一个 Location 头不会自动使浏览器跳转，
+     * 为解决这个问题， yii\web\Response::redirect() 方法设置一个值为要跳转的URL的X-Redirect 头，
+     * 在客户端可编写JavaScript 代码读取该头部值然后让浏览器跳转对应的URL。
+     *
+     * Info: Yii 配备了一个yii.js JavaScript 文件提供常用JavaScript功能，
+     * 包括基于X-Redirect头的浏览器跳转， 因此，如果你使用该JavaScript 文件(通过yii\web\YiiAsset 资源包注册)， 就不需要编写AJAX跳转的代码。
      *
      * In AJAX mode, this normally will not work as expected unless there are some
      * client-side JavaScript code handling the redirection. To help achieve this goal,
@@ -824,6 +851,9 @@ class Response extends \yii\base\Response
      * Any relative URL that starts with a single forward slash "/" will be converted
      * into an absolute one by prepending it with the host info of the current request.
      *
+     * Info: yii\web\Response::redirect() 方法默认会设置响应状态码为302，
+     * 该状态码会告诉浏览器请求的资源 临时 放在另一个URI地址上，
+     * 可传递一个301状态码告知浏览器请求的资源已经 永久 重定向到新的URId地址。
      * @param int $statusCode the HTTP status code. Defaults to 302.
      * See <https://tools.ietf.org/html/rfc2616#section-10>
      * for details about HTTP status code
@@ -891,6 +921,7 @@ class Response extends \yii\base\Response
     private $_cookies;
 
     /**
+     * 返回cookie集合
      * Returns the cookie collection.
      *
      * Through the returned cookie collection, you add or remove cookies as follows,

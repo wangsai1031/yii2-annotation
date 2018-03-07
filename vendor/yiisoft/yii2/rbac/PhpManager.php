@@ -13,16 +13,23 @@ use yii\base\InvalidCallException;
 use yii\helpers\VarDumper;
 
 /**
+ * PhpManager是一个授权管理器，它以PHP脚本文件的形式存储授权信息
  * PhpManager represents an authorization manager that stores authorization
  * information in terms of a PHP script file.
  *
+ * 授权数据将从以下三个文件中保存到并加载:[[itemFile]], [[assignmentFile]] and [[ruleFile]]
+ * yii\rbac\PhpManager 默认将 RBAC 数据保存在 @app/rbac 目录下的文件中。
+ * 如果权限层次数据在运行时会被修改，需确保WEB服务器进程对该目录和其中的文件有写权限。
  * The authorization data will be saved to and loaded from three files
  * specified by [[itemFile]], [[assignmentFile]] and [[ruleFile]].
  *
+ * PhpManager主要适用于不太大的授权数据(例如，个人博客系统的授权数据)。
+ * 使用DbManager来处理更复杂的授权数据。
  * PhpManager is mainly suitable for authorization data that is not too big
  * (for example, the authorization data for a personal blog system).
  * Use [[DbManager]] for more complex authorization data.
  *
+ * 注意，PhpManager与facebook的HHVM (http://hhvm.com/) 不兼容，因为它依赖于编写php文件，并在之后将它们包括在HHVM不支持的情况下。
  * Note that PhpManager is not compatible with facebooks [HHVM](http://hhvm.com/) because
  * it relies on writing php files and including them afterwards which is not supported by HHVM.
  *
@@ -37,6 +44,9 @@ use yii\helpers\VarDumper;
 class PhpManager extends BaseManager
 {
     /**
+     * 包含授权项的PHP脚本的路径。
+     * 这可以是文件路径，也可以是文件的路径别名。
+     * 如果需要在线更改授权，请确保该文件是由Web服务器进程编写的。
      * @var string the path of the PHP script that contains the authorization items.
      * This can be either a file path or a [path alias](guide:concept-aliases) to the file.
      * Make sure this file is writable by the Web server process if the authorization needs to be changed online.
@@ -45,6 +55,9 @@ class PhpManager extends BaseManager
      */
     public $itemFile = '@app/rbac/items.php';
     /**
+     * 包含授权角色分配的PHP脚本的路径
+     * 这可以是文件路径，也可以是文件的路径别名。
+     * 如果需要在线更改授权，请确保该文件是由Web服务器进程编写的。
      * @var string the path of the PHP script that contains the authorization assignments.
      * This can be either a file path or a [path alias](guide:concept-aliases) to the file.
      * Make sure this file is writable by the Web server process if the authorization needs to be changed online.
@@ -53,6 +66,9 @@ class PhpManager extends BaseManager
      */
     public $assignmentFile = '@app/rbac/assignments.php';
     /**
+     * 包含授权规则的PHP脚本的路径
+     * 这可以是文件路径，也可以是文件的路径别名。
+     * 如果需要在线更改授权，请确保该文件是由Web服务器进程编写的。
      * @var string the path of the PHP script that contains the authorization rules.
      * This can be either a file path or a [path alias](guide:concept-aliases) to the file.
      * Make sure this file is writable by the Web server process if the authorization needs to be changed online.
@@ -80,6 +96,8 @@ class PhpManager extends BaseManager
 
 
     /**
+     * 初始化应用程序组件
+     * 该方法通过从PHP脚本加载授权数据来覆盖父实现
      * Initializes the application component.
      * This method overrides parent implementation by loading the authorization data
      * from PHP script.

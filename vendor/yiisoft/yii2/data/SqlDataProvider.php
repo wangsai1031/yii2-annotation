@@ -15,6 +15,7 @@ use yii\db\Query;
 use yii\di\Instance;
 
 /**
+ * 执行一段SQL语句并且将数据库数据作为数组返回。
  * SqlDataProvider implements a data provider based on a plain SQL statement.
  *
  * SqlDataProvider provides data in terms of arrays, each representing a row of query result.
@@ -54,6 +55,9 @@ use yii\di\Instance;
  * // get the user records in the current page
  * $models = $dataProvider->getModels();
  * ```
+ * 说明：yii\data\SqlDataProvider::totalCount 的属性只有你需要 分页数据的时候才会用到。
+ * 这是因为通过 sql 指定的SQL语句将被数据提供者所修改并且只返回当 前页面数据。
+ * 数据提供者为了正确计算可用页面的数量仍旧需要知道数据项的总数。
  *
  * Note: if you want to use the pagination feature, you must configure the [[totalCount]] property
  * to be the total number of rows (without pagination). And if you want to use the sorting feature,
@@ -67,19 +71,25 @@ use yii\di\Instance;
 class SqlDataProvider extends BaseDataProvider
 {
     /**
+     * 数据库连接对象或数据库连接的应用程序组件ID
      * @var Connection|array|string the DB connection object or the application component ID of the DB connection.
      * Starting from version 2.0.2, this can also be a configuration array for creating the object.
      */
     public $db = 'db';
     /**
+     * 用于获取数据行的SQL语句
      * @var string the SQL statement to be used for fetching data rows.
      */
     public $sql;
     /**
+     * 将绑定到SQL语句的参数(name=>value)
      * @var array parameters (name=>value) to be bound to the SQL statement.
      */
     public $params = [];
     /**
+     * 用作数据模型的关键字的列
+     * 这可以是列名称，也可以是返回给定数据模型的键值的匿名方法
+     * 如果没有设置，将使用[[models]]数组的键
      * @var string|callable the column that is used as the key of the data models.
      * This can be either a column name, or a callable that returns the key value of a given data model.
      *
@@ -89,6 +99,7 @@ class SqlDataProvider extends BaseDataProvider
 
 
     /**
+     * 初始化数据库连接
      * Initializes the DB connection component.
      * This method will initialize the [[db]] property to make sure it refers to a valid DB connection.
      * @throws InvalidConfigException if [[db]] is invalid.
@@ -103,6 +114,7 @@ class SqlDataProvider extends BaseDataProvider
     }
 
     /**
+     * 准备在当前页面中可用的数据模型
      * {@inheritdoc}
      */
     protected function prepareModels()
@@ -138,6 +150,7 @@ class SqlDataProvider extends BaseDataProvider
     }
 
     /**
+     * 准备与当前可用的数据模型相关联的key
      * {@inheritdoc}
      */
     protected function prepareKeys($models)
@@ -159,6 +172,7 @@ class SqlDataProvider extends BaseDataProvider
     }
 
     /**
+     * 返回该数据提供者中数据的总数量
      * {@inheritdoc}
      */
     protected function prepareTotalCount()

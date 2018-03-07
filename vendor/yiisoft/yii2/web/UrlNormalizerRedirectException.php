@@ -8,6 +8,7 @@
 namespace yii\web;
 
 /**
+ * 表示在URL规范化过程中应该执行重定向的信息
  * UrlNormalizerRedirectException represents an information for redirection which should be
  * performed during the URL normalization.
  *
@@ -17,22 +18,27 @@ namespace yii\web;
 class UrlNormalizerRedirectException extends \yii\base\Exception
 {
     /**
+     * 生成用于重定向的有效URL的参数
      * @var array|string the parameter to be used to generate a valid URL for redirection
      * @see [[\yii\helpers\Url::to()]]
      */
     public $url;
     /**
+     * 在生成的URL中使用的用于重定向的URI方案
      * @var bool|string the URI scheme to use in the generated URL for redirection
      * @see [[\yii\helpers\Url::to()]]
      */
     public $scheme;
     /**
+     * HTTP状态代码
      * @var int the HTTP status code
      */
     public $statusCode;
 
 
     /**
+     * 生成用于重定向的有效URL的参数。
+     * 这将用作[[\yii\helpers\Url::to()]]的第一个参数。
      * @param array|string $url the parameter to be used to generate a valid URL for redirection.
      * This will be used as first parameter for [[\yii\helpers\Url::to()]]
      * @param int $statusCode HTTP status code used for redirection

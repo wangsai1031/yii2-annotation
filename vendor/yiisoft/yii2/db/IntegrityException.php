@@ -8,6 +8,7 @@
 namespace yii\db;
 
 /**
+ * 表示由违反DB约束引起的异常
  * Exception represents an exception that is caused by violation of DB constraints.
  *
  * @author Alexander Makarov <sam@rmcreative.ru>

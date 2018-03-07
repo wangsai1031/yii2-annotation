@@ -20,6 +20,9 @@ use yii\web\Response;
 /**
  * PageCache implements server-side caching of whole pages.
  *
+ * 页面缓存指的是在服务器端缓存整个页面的内容。
+ * 随后当同一个页面 被请求时，内容将从缓存中取出，而不是重新生成。
+ *
  * It is an action filter that can be added to a controller and handles the `beforeAction` event.
  *
  * To use PageCache, declare it in the `behaviors()` method of your controller class.

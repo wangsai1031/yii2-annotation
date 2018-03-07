@@ -29,7 +29,7 @@ class ErrorException extends \ErrorException
      *
      * We will handle fatal error a bit different on HHVM.
      * 在HHVM上处理致命错误会有少许不同
-     * 
+     *
      * @see https://github.com/facebook/hhvm/blob/master/hphp/runtime/base/runtime-error.h#L62
      * @since 2.0.6
      */
@@ -38,6 +38,7 @@ class ErrorException extends \ErrorException
 
     /**
      * Constructs the exception.
+     * 构造函数
      * @link http://php.net/manual/en/errorexception.construct.php
      * @param $message [optional]
      * @param $code [optional]

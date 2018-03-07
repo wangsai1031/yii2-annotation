@@ -13,6 +13,7 @@ use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 
 /**
+ * BaseFileHelper为FileHelper提供具体的实现。
  * BaseFileHelper provides concrete implementation for [[FileHelper]].
  *
  * Do not use BaseFileHelper. Use [[FileHelper]] instead.
@@ -30,6 +31,7 @@ class BaseFileHelper
     const PATTERN_CASE_INSENSITIVE = 32;
 
     /**
+     * 包含MIME类型信息映射关系的PHP文件的路径(或别名)
      * @var string the path (or alias) of a PHP file containing MIME type information.
      */
     public static $mimeMagicFile = '@yii/helpers/mimeTypes.php';
@@ -41,10 +43,15 @@ class BaseFileHelper
 
 
     /**
+     * 规范化文件/目录路径。
      * Normalizes a file/directory path.
      *
      * The normalization does the following work:
      *
+     * - 将所有目录分隔符转换为 '/' (e.g. "\a/b\c" becomes "/a/b/c")
+     * - 删除末尾的目录分隔符(e.g. "/a/b/c/" becomes "/a/b/c")
+     * - 将多个连续的斜杠转换成单个 (e.g. "/a///b/c" becomes "/a/b/c")
+     * - 基于他们的意义，删除'..'和 '.'
      * - Convert all directory separators into `DIRECTORY_SEPARATOR` (e.g. "\a/b\c" becomes "/a/b/c")
      * - Remove trailing directory separators (e.g. "/a/b/c/" becomes "/a/b/c")
      * - Turn multiple consecutive slashes into a single one (e.g. "/a///b/c" becomes "/a/b/c")
@@ -56,7 +63,9 @@ class BaseFileHelper
      */
     public static function normalizePath($path, $ds = DIRECTORY_SEPARATOR)
     {
+        // 将路径中的 '/' 和 '\' 全部替换为 DIRECTORY_SEPARATOR（根据当前系统决定）
         $path = rtrim(strtr($path, '/\\', $ds . $ds), $ds);
+
         if (strpos($ds . $path, "{$ds}.") === false && strpos($path, "{$ds}{$ds}") === false) {
             return $path;
         }
@@ -80,8 +89,10 @@ class BaseFileHelper
     }
 
     /**
+     * 返回指定文件的本地化版本
      * Returns the localized version of a specified file.
      *
+     * 搜索是基于指定的语言代码的。
      * The searching is based on the specified language code. In particular,
      * a file with the same name will be looked for under the subdirectory
      * whose name is the same as the language code. For example, given the file "path/to/view.php"
@@ -126,6 +137,7 @@ class BaseFileHelper
     }
 
     /**
+     * 判定指定文件的MIME类型
      * Determines the MIME type of the specified file.
      * This method will first try to determine the MIME type based on
      * [finfo_open](http://php.net/manual/en/function.finfo-open.php). If the `fileinfo` extension is not installed,
@@ -167,6 +179,7 @@ class BaseFileHelper
     }
 
     /**
+     * 根据指定文件的扩展名来确定MIME类型
      * Determines the MIME type based on the extension name of the specified file.
      * This method will use a local map between extension names and MIME types.
      * @param string $file the file name.
@@ -189,6 +202,7 @@ class BaseFileHelper
     }
 
     /**
+     * 通过给定的MIME类型来确定扩展名
      * Determines the extensions by given MIME type.
      * This method will use a local map between extension names and MIME types.
      * @param string $mimeType file MIME type.
@@ -210,7 +224,11 @@ class BaseFileHelper
     private static $_mimeTypes = [];
 
     /**
+     * 从指定文件加载MIME类型映射关系
      * Loads MIME types from the specified file.
+     *
+     * 包含所有可用MIME类型信息的文件的路径(或别名)。
+     * 如果未设置，则默认加载[[mimeMagicFile]]指定的文件
      * @param string $magicFile the path (or alias) of the file that contains all available MIME type information.
      * If this is not set, the file specified by [[mimeMagicFile]] will be used.
      * @return array the mapping from file extensions to MIME types
@@ -251,12 +269,28 @@ class BaseFileHelper
     }
 
     /**
+     * 将整个目录复制为另一个目录
+     * 文件和子目录也将被复制
      * Copies a whole directory as another one.
      * The files and sub-directories will also be copied over.
      * @param string $src the source directory
+     * 源目录
      * @param string $dst the destination directory
+     * 目标目录
      * @param array $options options for directory copy. Valid options are:
+     * 目录复制选项
      *
+     * - dirMode: integer, 为新复制的目录设置的权限。默认为0775。
+     * - fileMode:  integer, 为新复制的文件设置的权限。默认值根据当前环境设置。
+     * - filter: callback, 为每个目录或文件调用的PHP回调。
+     *   回调的签名应该是:`function ($path)`，$path指的是被过滤的完整路径。
+     *   回调可以返回下列值之一：
+     *
+     *   * true: 目录或文件将被复制("only" and "except"选项将被忽略)
+     *   * false: 目录或文件将不会被复制("only" and "except"选项将被忽略)
+     *   * null: "only" and "except"选项将决定是否要复制目录或文件。
+     * 
+     * 
      * - dirMode: integer, the permission to be set for newly copied directories. Defaults to 0775.
      * - fileMode:  integer, the permission to be set for newly copied files. Defaults to the current environment setting.
      * - filter: callback, a PHP callback that is called for each directory or file.
@@ -351,11 +385,13 @@ class BaseFileHelper
     }
 
     /**
+     * 递归地删除一个目录(及其所有内容)
      * Removes a directory (and all its content) recursively.
      *
      * @param string $dir the directory to be deleted recursively.
+     * 删除目录的配置选项，有效的选项有：
      * @param array $options options for directory remove. Valid options are:
-     *
+     *   是否遍历删除文件夹中通过软链接连接到的目录。默认是false，只会删除该软链接。
      * - traverseSymlinks: boolean, whether symlinks to the directories should be traversed too.
      *   Defaults to `false`, meaning the content of the symlinked directory would not be deleted.
      *   Only symlink would be removed in that default case.
@@ -364,29 +400,40 @@ class BaseFileHelper
      */
     public static function removeDirectory($dir, $options = [])
     {
+        // 判断是否是目录。不是则直接返回。
         if (!is_dir($dir)) {
             return;
         }
+        // 判断 是否遍历删除文件夹中通过软链接连接到的目录，is_link() 判断是否是软链接。
         if (isset($options['traverseSymlinks']) && $options['traverseSymlinks'] || !is_link($dir)) {
+            // opendir() 打开目录句柄。成功则返回目录句柄资源。失败则返回 FALSE。
             if (!($handle = opendir($dir))) {
                 return;
             }
+            // 返回目录句柄中的当前文件。
             while (($file = readdir($handle)) !== false) {
+                // 文件名不能是 '.' 或 '..'
                 if ($file === '.' || $file === '..') {
                     continue;
                 }
+                // 拼接文件目录
                 $path = $dir . DIRECTORY_SEPARATOR . $file;
+                // 若是目录，则递归地调用当前函数
                 if (is_dir($path)) {
                     static::removeDirectory($path, $options);
                 } else {
+                    // 删除文件
                     static::unlink($path);
                 }
             }
+            // 关闭目录句柄
             closedir($handle);
         }
+        // 是软链接，直接删除
         if (is_link($dir)) {
             static::unlink($dir);
         } else {
+            // 是目录的话，经过 !is_link($dir)，已经删除了该目录下所有文件，该目录也可以删除了。
             rmdir($dir);
         }
     }
@@ -401,6 +448,7 @@ class BaseFileHelper
      */
     public static function unlink($path)
     {
+        // 过目录分割符是 '\'， 则说明是windows目录
         $isWindows = DIRECTORY_SEPARATOR === '\\';
 
         if (!$isWindows) {
@@ -416,12 +464,22 @@ class BaseFileHelper
         } catch (ErrorException $e) {
             // last resort measure for Windows
             $lines = [];
+            /**
+             * http://www.php.net/manual/zh/function.exec.php
+             * exec — 执行一个外部程序命令
+             *
+             * DOS 命令
+             * DEL 删除多个文件
+             * /F 强制删除只读文件
+             * /Q 安静模式。删除全局通配符时，不要求确认。
+             */
             exec('DEL /F/Q ' . escapeshellarg($path), $lines, $deleteError);
             return $deleteError !== 0;
         }
     }
 
     /**
+     * 返回在指定目录和子目录下找到的文件
      * Returns the files found under the specified directory and subdirectories.
      * @param string $dir the directory under which the files will be looked for.
      * @param array $options options for file searching. Valid options are:
@@ -558,6 +616,7 @@ class BaseFileHelper
     }
 
     /**
+     * 检查给定的文件路径是否满足筛选选项
      * Checks if the given file path satisfies the filtering options.
      * @param string $path the path of the file or directory to be checked
      * @param array $options the filtering options. See [[findFiles()]] for explanations of
@@ -598,38 +657,60 @@ class BaseFileHelper
     }
 
     /**
+     * 创建一个新的目录
      * Creates a new directory.
      *
+     * 这个方法类似于PHP mkdir()函数，除了使用chmod()设置创建的目录的权限，为了避免umask设置的影响。
      * This method is similar to the PHP `mkdir()` function except that
      * it uses `chmod()` to set the permission of the created directory
      * in order to avoid the impact of the `umask` setting.
      *
+     * 要创建的目录的路径
      * @param string $path path of the directory to be created.
+     * 为创建的目录设置的权限
      * @param int $mode the permission to be set for the created directory.
+     * 是否递归创建目录，即：如果父目录不存在，是否创建父目录。
      * @param bool $recursive whether to create parent directories if they do not exist.
+     * 返回是否成功创建了目录
      * @return bool whether the directory is created successfully
      * @throws \yii\base\Exception if the directory could not be created (i.e. php error due to parallel changes)
      */
     public static function createDirectory($path, $mode = 0775, $recursive = true)
     {
+        // 判断文件名是否为一个目录，若是，说明目录已存在，直接返回 true
         if (is_dir($path)) {
             return true;
         }
+        // 获取父级目录
         $parentDir = dirname($path);
         // recurse if parent dir does not exist and we are not at the root of the file system.
+        // 如果父目录不存在，并且我们不是在文件系统的根目录，则递归调用本方法创建父级目录
         if ($recursive && !is_dir($parentDir) && $parentDir !== $path) {
             static::createDirectory($parentDir, $mode, true);
         }
         try {
+            // 创建目录，若不成功则返回false
             if (!mkdir($path, $mode)) {
                 return false;
             }
         } catch (\Exception $e) {
+            /**
+             * @see https://github.com/yiisoft/yii2/issues/9288
+             * issue 中提到这样一种情况：
+             *
+             * 在多个PHP进程并行状态下。
+             * 当检测目录是否存在时，目录不存在。
+             * 但是当运行到创建目录函数时，该目录已经被其他PHP进程创建了。
+             * 这时可能会抛异常。
+             *
+             * 因此，在抛出异常前，再检查一遍目录是否存在
+             */
             if (!is_dir($path)) {// https://github.com/yiisoft/yii2/issues/9288
                 throw new \yii\base\Exception("Failed to create directory \"$path\": " . $e->getMessage(), $e->getCode(), $e);
             }
         }
         try {
+            // 修改目录权限
             return chmod($path, $mode);
         } catch (\Exception $e) {
             throw new \yii\base\Exception("Failed to change permissions for directory \"$path\": " . $e->getMessage(), $e->getCode(), $e);
@@ -637,6 +718,7 @@ class BaseFileHelper
     }
 
     /**
+     * 对文件或目录名进行简单的比较
      * Performs a simple comparison of file or directory names.
      *
      * Based on match_basename() from dir.c of git 1.8.5.3 sources.
@@ -670,6 +752,7 @@ class BaseFileHelper
     }
 
     /**
+     * 将路径部分与带有可选通配符的模型进行比较
      * Compares a path part against a pattern with optional wildcards.
      *
      * Based on match_pathname() from dir.c of git 1.8.5.3 sources.
@@ -726,6 +809,9 @@ class BaseFileHelper
     }
 
     /**
+     * 对给定的排除列表进行反向扫描，以查看是否应该忽略路径名
+     * 匹配的第一项（即，列表的最后一项），如果有的话，不再继续
+     * 返回匹配的元素，未找到返回null
      * Scan the given exclude list in reverse to see whether pathname
      * should be ignored.  The first match (i.e. the last on the list), if
      * any, determines the fate.  Returns the element which
@@ -768,6 +854,7 @@ class BaseFileHelper
     }
 
     /**
+     * 处理模型，剥离特殊字符，如/和！。
      * Processes the pattern, stripping special characters like / and ! from the beginning and settings flags instead.
      * @param string $pattern
      * @param bool $caseSensitive
@@ -815,6 +902,7 @@ class BaseFileHelper
     }
 
     /**
+     * 在模型中搜索第一个通配符字符
      * Searches for the first wildcard character in the pattern.
      * @param string $pattern the pattern to search in
      * @return int|bool position of first wildcard character or false if not found
@@ -832,6 +920,7 @@ class BaseFileHelper
     }
 
     /**
+     * 规格化 Option
      * @param array $options raw options
      * @return array normalized options
      * @since 2.0.12

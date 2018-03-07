@@ -8,6 +8,11 @@
  * @link http://www.yiiframework.com/
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
+ *
+ * Yii类映射文件，保存了一系列的类名与其所在PHP文件的映射关系
+ *
+ * 这个映射表以类名为键，以实际类文件为值，Yii所有的核心类都已经写入到这个 classes.php 文件中，所以，核心类的加载是最便捷，最快的。
+ *
  */
 
 return [

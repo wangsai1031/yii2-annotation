@@ -264,6 +264,7 @@ abstract class ErrorHandler extends Component
         if (error_reporting() & $code) {
             // load ErrorException manually here because autoloading them will not work
             // 在这里手动加载异常错误处理，因为自动加载时，无法生效
+
             // when error occurs while autoloading a class
             // 发生错误时，自动加载一个类
             if (!class_exists('yii\\base\\ErrorException', false)) {

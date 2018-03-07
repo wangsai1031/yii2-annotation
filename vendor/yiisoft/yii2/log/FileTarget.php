@@ -12,6 +12,7 @@ use yii\base\InvalidConfigException;
 use yii\helpers\FileHelper;
 
 /**
+ * 保存日志消息到文件中.
  * FileTarget records log messages in a file.
  *
  * The log file is specified via [[logFile]]. If the size of the log file exceeds

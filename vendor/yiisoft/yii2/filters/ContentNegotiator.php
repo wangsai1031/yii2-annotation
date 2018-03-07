@@ -16,6 +16,12 @@ use yii\web\Response;
 use yii\web\UnsupportedMediaTypeHttpException;
 
 /**
+ * ContentNegotiator 支持响应格式协商和应用程序语言协商.
+ * ContentNegotiator支持响应内容格式处理和语言处理。
+ * 通过检查 GET 参数和 Accept HTTP头部来决定响应内容格式和语言。
+ *
+ * 如果请求中没有检测到内容格式和语言， 使用formats和languages第一个配置项。
+ *
  * ContentNegotiator supports response format negotiation and application language negotiation.
  *
  * When the [[formats|supported formats]] property is specified, ContentNegotiator will support response format
@@ -31,6 +37,10 @@ use yii\web\UnsupportedMediaTypeHttpException;
  *
  * The following code shows how you can use ContentNegotiator as a bootstrapping component. Note that in this case,
  * the content negotiation applies to the whole application.
+ *
+ * 在应用主体生命周期过程中检测响应格式和语言简单很多， 因此ContentNegotiator设计可被 引导启动组件调用的过滤器。
+ * 如下示例，可以将它配置在应用主体配置。
+ * 配置ContentNegotiator支持JSON和XML响应格式 和英语（美国）和德语.
  *
  * ```php
  * // in application configuration
@@ -244,9 +254,14 @@ class ContentNegotiator extends ActionFilter implements BootstrapInterface
     }
 
     /**
+     * 返回一个值，指示是否支持所请求的语言
      * Returns a value indicating whether the requested language matches the supported language.
+     *
+     * 所请求的语言代码
      * @param string $requested the requested language code
+     * 支持的语言代码
      * @param string $supported the supported language code
+     * 是否支持所请求的语言
      * @return bool whether the requested language is supported
      */
     protected function isLanguageSupported($requested, $supported)

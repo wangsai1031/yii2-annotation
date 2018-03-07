@@ -317,7 +317,6 @@ window.yii = (function ($) {
             if (pos < 0) {
                 return {};
             }
-
             // 截取 ? 之后到第一个 # 之前的部分，再将该部分以 '&' 为分隔符，切分成数组。
             var pairs = $.grep(url.substring(pos + 1).split('#')[0].split('&'), function (value) {
                 return value !== '';

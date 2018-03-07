@@ -21,22 +21,27 @@ use yii\base\NotSupportedException;
 trait QueryTrait
 {
     /**
+     * 查询条件。这是SQL语句中的WHERE子句
      * @var string|array query condition. This refers to the WHERE clause in a SQL statement.
      * For example, `['age' => 31, 'team' => 1]`.
      * @see where() for valid syntax on specifying this value.
      */
     public $where;
     /**
+     * 返回的记录的最大数量。如果不设置或小于0，则表示没有限制
      * @var int|ExpressionInterface maximum number of records to be returned. May be an instance of [[ExpressionInterface]].
      * If not set or less than 0, it means no limit.
      */
     public $limit;
     /**
+     * 以零为基础的偏移量，记录要返回的位置
+     * ：如果不设置或小于0，就意味着从0开始
      * @var int|ExpressionInterface zero-based offset from where the records are to be returned.
      * May be an instance of [[ExpressionInterface]]. If not set or less than 0, it means starting from the beginning.
      */
     public $offset;
     /**
+     * 如何对查询结果进行排序，这用于在SQL语句中构造ORDER BY子句
      * @var array how to sort the query results. This is used to construct the ORDER BY clause in a SQL statement.
      * The array keys are the columns to be sorted by, and the array values are the corresponding sort directions which
      * can be either [SORT_ASC](http://php.net/manual/en/array.constants.php#constant.sort-asc)
@@ -46,6 +51,11 @@ trait QueryTrait
      */
     public $orderBy;
     /**
+     * 查询结果应该被索引的列的名称
+     *
+     * 这也可以是一个根据给定的行数据返回索引值的可调用方法 例如匿名函数
+     * 这个属性仅在[[QueryInterface::all()|all()]]使用，详情请查看[[indexBy()]]方法
+     * 
      * @var string|callable the name of the column by which the query results should be indexed by.
      * This can also be a callable (e.g. anonymous function) that returns the index value based on the given
      * row data. For more details, see [[indexBy()]]. This property is only used by [[QueryInterface::all()|all()]].
@@ -60,6 +70,7 @@ trait QueryTrait
 
 
     /**
+     * 设置 [[indexBy]] 属性
      * Sets the [[indexBy]] property.
      * @param string|callable $column the name of the column by which the query results should be indexed by.
      * This can also be a callable (e.g. anonymous function) that returns the index value based on the given
@@ -81,6 +92,7 @@ trait QueryTrait
     }
 
     /**
+     * 设置查询的WHERE部分
      * Sets the WHERE part of the query.
      *
      * See [[QueryInterface::where()]] for detailed documentation.
@@ -97,6 +109,8 @@ trait QueryTrait
     }
 
     /**
+     * 在现有的情况下添加一个附加 WHERE 条件
+     * 新的条件和现有的条件将使用'AND'操作符连接
      * Adds an additional WHERE condition to the existing one.
      * The new condition and the existing one will be joined using the 'AND' operator.
      * @param array $condition the new WHERE condition. Please refer to [[where()]]
@@ -117,6 +131,8 @@ trait QueryTrait
     }
 
     /**
+     * 在现有的情况下添加一个附加 WHERE 条件。
+     * 新的条件和现有的条件将使用“OR”操作符连接
      * Adds an additional WHERE condition to the existing one.
      * The new condition and the existing one will be joined using the 'OR' operator.
      * @param array $condition the new WHERE condition. Please refer to [[where()]]
@@ -137,6 +153,11 @@ trait QueryTrait
     }
 
     /**
+     * filterWhere() 和 where() 唯一的不同就在于，前者 将忽略在条件当中的hash format的空值。
+     * 所以如果 $email 为空而 $username 不为空，那么上面的代码最终将生产如下 SQL ...WHERE username=:username。
+     *
+     * 提示: 当一个值为 null、空数组、空字符串或者一个只包含空白字符时，那么它将被判定为空值。
+     *
      * Sets the WHERE part of the query but ignores [[isEmpty()|empty operands]].
      *
      * This method is similar to [[where()]]. The main difference is that this method will
@@ -222,6 +243,7 @@ trait QueryTrait
     }
 
     /**
+     * 从给定的查询条件中删除[[isEmpty()|空操作数]]
      * Removes [[isEmpty()|empty operands]] from the given query condition.
      *
      * @param array $condition the original condition
@@ -286,8 +308,14 @@ trait QueryTrait
     }
 
     /**
+     * 返回一个值，表示赋值是否为“空”
      * Returns a value indicating whether the give value is "empty".
      *
+     * 如果满足下列条件之一，则该值被认为是“空的”
+     * - `null`,
+     * - 空字符串 (`''`),
+     * - 一个包含空白字符的字符串,
+     * - 空数组.
      * The value is considered "empty", if one of the following conditions is satisfied:
      *
      * - it is `null`,
@@ -304,11 +332,19 @@ trait QueryTrait
     }
 
     /**
+     * 用来指定 SQL 语句当中的 ORDER BY 子句
      * Sets the ORDER BY part of the query.
      * @param string|array|ExpressionInterface $columns the columns (and the directions) to be ordered by.
      * Columns can be specified in either a string (e.g. `"id ASC, name DESC"`) or an array
      * (e.g. `['id' => SORT_ASC, 'name' => SORT_DESC]`).
      *
+     * // ... ORDER BY `id` ASC, `name` DESC
+     * $query->orderBy('id ASC, name DESC');
+     *
+        $query->orderBy([
+            'id' => SORT_ASC,
+            'name' => SORT_DESC,
+        ]);
      * The method will automatically quote the column names unless a column contains some parenthesis
      * (which means the column contains a DB expression).
      *
@@ -356,6 +392,7 @@ trait QueryTrait
     }
 
     /**
+     * 规范化 ORDER BY 数据格式
      * Normalizes format of ORDER BY data.
      *
      * @param array|string|ExpressionInterface $columns the columns value to normalize. See [[orderBy]] and [[addOrderBy]].
@@ -383,6 +420,7 @@ trait QueryTrait
     }
 
     /**
+     * 设置查询的限制部分
      * Sets the LIMIT part of the query.
      * @param int|ExpressionInterface|null $limit the limit. Use null or negative value to disable limit.
      * @return $this the query object itself
@@ -394,6 +432,7 @@ trait QueryTrait
     }
 
     /**
+     * 设置查询的偏移部分
      * Sets the OFFSET part of the query.
      * @param int|ExpressionInterface|null $offset the offset. Use null or negative value to disable offset.
      * @return $this the query object itself

@@ -8,6 +8,9 @@
 namespace yii\web;
 
 /**
+ * 422 "Unprocessable Entity"。无法处理的请求实体。
+ * 请求格式正确，但是由于含有语义错误，无法响应。（RFC 4918 WebDAV）
+ * 例如，返回表单验证错误。
  * UnprocessableEntityHttpException represents an "Unprocessable Entity" HTTP
  * exception with status code 422.
  *

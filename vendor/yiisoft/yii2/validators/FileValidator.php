@@ -15,11 +15,18 @@ use yii\web\JsExpression;
 use yii\web\UploadedFile;
 
 /**
+ * 检查输入值是否为一个有效的上传文件。
+ * FileValidator 通常与 @see \yii\web\UploadedFile 共同使用。
+ *
  * FileValidator verifies if an attribute is receiving a valid uploaded file.
  *
  * Note that you should enable `fileinfo` PHP extension.
  *
  * @property int $sizeLimit The size limit for uploaded files. This property is read-only.
+ *
+ *  // 检查 "primaryImage" 是否为 PNG, JPG 或 GIF 格式的上传图片。
+    // 文件大小必须小于  1MB
+    ['primaryImage', 'file', 'extensions' => ['png', 'jpg', 'gif'], 'maxSize' => 1024*1024*1024],
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
@@ -27,6 +34,11 @@ use yii\web\UploadedFile;
 class FileValidator extends Validator
 {
     /**
+     * 可接受上传的文件扩展名列表。
+     * 它可以是数组， 也可以是用空格或逗号分隔各个扩展名的字符串 (e.g. "gif, jpg")。
+     * 扩展名大小写不敏感。
+     * 默认为 null， 意味着所有扩展名都被接受。
+     *
      * @var array|string a list of file name extensions that are allowed to be uploaded.
      * This can be either an array or a string consisting of file extension names
      * separated by space or comma (e.g. "gif, jpg").
@@ -36,11 +48,19 @@ class FileValidator extends Validator
      */
     public $extensions;
     /**
+     * 是否通过文件的 MIME 类型来判断其文件扩展。
+     * 若由 MIME 判定的文件扩展与给定文件的扩展不一样，则文件会被认为无效。
+     * 默认为 true，代表执行上述检测。
      * @var bool whether to check file type (extension) with mime-type. If extension produced by
      * file mime-type check differs from uploaded file extension, the file will be considered as invalid.
      */
     public $checkExtensionByMimeType = true;
     /**
+     * 可接受上传的 MIME 类型列表。
+     * 它可以是数组，也可以是用空格或逗号分隔各个 MIME 的字符串 (e.g. "image/jpeg, image/png")。
+     * Mime 类型名是大小写不敏感的。
+     * 默认为 null， 意味着所有 MIME 类型都被接受。
+     *
      * @var array|string a list of file MIME types that are allowed to be uploaded.
      * This can be either an array or a string consisting of file MIME types
      * separated by space or comma (e.g. "text/plain, image/png").
@@ -51,12 +71,18 @@ class FileValidator extends Validator
      */
     public $mimeTypes;
     /**
+     * 上传文件所需最少多少 Byte 的大小。
+     * 默认为 null，代表没有下限。
+     *
      * @var int the minimum number of bytes required for the uploaded file.
      * Defaults to null, meaning no limit.
      * @see tooSmall for the customized message for a file that is too small.
      */
     public $minSize;
     /**
+     * 上传文件所需最多多少 Byte 的大小。
+     * 默认为 null，代表没有上限。
+     *
      * @var int the maximum number of bytes required for the uploaded file.
      * Defaults to null, meaning no limit.
      * Note, the size limit is also affected by `upload_max_filesize` and `post_max_size` INI setting
@@ -68,6 +94,10 @@ class FileValidator extends Validator
      */
     public $maxSize;
     /**
+     * 给定特性最多能承载多少个文件。
+     * 默认为 1，代表只允许单文件上传。
+     * 若值大于一，那么输入值必须为包含最多 maxFiles 个上传文件元素的数组。
+     *
      * @var int the maximum file count the given attribute can hold.
      * Defaults to 1, meaning single file upload. By defining a higher number,
      * multiple uploads become possible. Setting it to `0` means there is no limit on

@@ -11,6 +11,8 @@ use Yii;
 use yii\db\BaseActiveRecord;
 
 /**
+ *
+ * 使用当前的用户ID, 自动填充指定的属性
  * BlameableBehavior automatically fills the specified attributes with the current user ID.
  *
  * To use BlameableBehavior, insert the following code to your ActiveRecord class:
@@ -57,11 +59,15 @@ use yii\db\BaseActiveRecord;
 class BlameableBehavior extends AttributeBehavior
 {
     /**
+     * 将接收当前用户ID值的属性。
+     * 如果您不想记录创建者ID，那么将该属性设置为false
      * @var string the attribute that will receive current user ID value
      * Set this property to false if you do not want to record the creator ID.
      */
     public $createdByAttribute = 'created_by';
     /**
+     * 将接收当前用户ID值的属性。
+     * 如果您不想记录修改者 ID，则将该属性设置为false
      * @var string the attribute that will receive current user ID value
      * Set this property to false if you do not want to record the updater ID.
      */
@@ -69,6 +75,7 @@ class BlameableBehavior extends AttributeBehavior
     /**
      * {@inheritdoc}
      *
+     * 当属性为null时，`Yii::$app->user->id`的值将作为'value'使用
      * In case, when the property is `null`, the value of `Yii::$app->user->id` will be used as the value.
      */
     public $value;
@@ -88,7 +95,9 @@ class BlameableBehavior extends AttributeBehavior
 
         if (empty($this->attributes)) {
             $this->attributes = [
+                // 默认 beforeInsert事件对应要自动赋值的属性为 created_by updated_by
                 BaseActiveRecord::EVENT_BEFORE_INSERT => [$this->createdByAttribute, $this->updatedByAttribute],
+                // 默认 beforeUpdate事件对应要自动赋值的属性为 updated_by
                 BaseActiveRecord::EVENT_BEFORE_UPDATE => $this->updatedByAttribute,
             ];
         }
@@ -97,12 +106,15 @@ class BlameableBehavior extends AttributeBehavior
     /**
      * {@inheritdoc}
      *
+     * 当属性为null时，`Yii::$app->user->id`的值将作为'value'使用
      * In case, when the [[value]] property is `null`, the value of [[defaultValue]] will be used as the value.
      */
     protected function getValue($event)
     {
         if ($this->value === null && Yii::$app->has('user')) {
+            // 获取User组件
             $userId = Yii::$app->get('user')->id;
+            // 若User是游客，返回null。登录用户返回ID
             if ($userId === null) {
                 return $this->getDefaultValue($event);
             }

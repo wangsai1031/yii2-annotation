@@ -52,6 +52,7 @@ trait DynamicContentAwareTrait
     }
 
     /**
+     * 通过运行动态语句的结果来替换内容中的占位符
      * Replaces placeholders in $content with results of evaluated dynamic statements.
      * @param string $content content to be parsed.
      * @param string[] $placeholders placeholders and their values.
@@ -66,9 +67,12 @@ trait DynamicContentAwareTrait
 
         if (count($this->getView()->getDynamicContents()) === 0) {
             // outermost cache: replace placeholder with dynamic content
+            // 遍历动态内容占位符， $name 为 占位符名称， $statements 为 PHP 语句
             foreach ($placeholders as $name => $statements) {
+                // 运行给定的PHP语句。将返回结果赋给 $placeholders[$name]
                 $placeholders[$name] = $this->getView()->evaluateDynamicContent($statements);
             }
+            // 替换$content中的占位符
             $content = strtr($content, $placeholders);
         }
         if ($isRestoredFromCache) {
@@ -79,4 +83,5 @@ trait DynamicContentAwareTrait
 
         return $content;
     }
+
 }

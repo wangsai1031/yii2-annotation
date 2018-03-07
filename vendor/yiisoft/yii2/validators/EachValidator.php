@@ -12,6 +12,7 @@ use yii\base\InvalidConfigException;
 use yii\base\Model;
 
 /**
+ * 通过对嵌入的验证规则检查每个元素来验证一个数组
  * EachValidator validates an array by checking each of its elements against an embedded validation rule.
  *
  * ```php
@@ -29,9 +30,11 @@ use yii\base\Model;
  * }
  * ```
  *
+ * 如果在模型范围之外使用，这个验证器将无法使用内联验证规则.
  * > Note: This validator will not work with inline validation rules in case of usage outside the model scope,
  *   e.g. via [[validate()]] method.
  *
+ * EachValidator 验证器只能在基本情况下使用，您应该考虑使用表格输入，使用几个模型来进行更复杂情况的验证
  * > Note: EachValidator is meant to be used only in basic cases, you should consider usage of tabular input,
  *   using several models for the more complex case.
  *
@@ -55,6 +58,9 @@ class EachValidator extends Validator
      */
     public $rule;
     /**
+     * 如果验证失败，是否使用由验证器声明的错误消息
+     * 如果启用，这个验证器本身指定的错误消息只有在属性值不是数组时才会出现
+     * 如果禁用了，将始终使用自己的错误消息值
      * @var bool whether to use error message composed by validator declared via [[rule]] if its validation fails.
      * If enabled, error message specified for this validator itself will appear only if attribute value is not an array.
      * If disabled, own error message value will be used always.
@@ -88,6 +94,7 @@ class EachValidator extends Validator
     }
 
     /**
+     * 返回在规则[[rule]]中声明的验证器。
      * Returns the validator declared in [[rule]].
      * @param Model|null $model model in which context validator should be created.
      * @return Validator the declared validator.
@@ -102,6 +109,7 @@ class EachValidator extends Validator
     }
 
     /**
+     * 根据规则[[rule]]中指定的验证规则创建验证器对象。
      * Creates validator object based on the validation rule specified in [[rule]].
      * @param Model|null $model model in which context validator should be created.
      * @throws \yii\base\InvalidConfigException

@@ -10,6 +10,8 @@ namespace yii\db;
 use yii\base\BaseObject;
 
 /**
+ * 迭代器模式
+ * BatchQueryResult表示一个批量查询，可以批量地检索数据
  * BatchQueryResult represents a batch query from which you can retrieve data in batches.
  *
  * You usually do not instantiate BatchQueryResult directly. Instead, you obtain it by
@@ -31,38 +33,48 @@ use yii\base\BaseObject;
 class BatchQueryResult extends BaseObject implements \Iterator
 {
     /**
+     * 在执行批处理查询时，要使用的DB连接
      * @var Connection the DB connection to be used when performing batch query.
      * If null, the "db" application component will be used.
      */
     public $db;
     /**
+     * 与这个批处理查询相关联的查询对象
+     * 不要直接修改该属性，除非[[reset()]]已经明确被调用之后
      * @var Query the query object associated with this batch query.
      * Do not modify this property directly unless after [[reset()]] is called explicitly.
      */
     public $query;
     /**
+     * 每一批要返回的行数
      * @var int the number of rows to be returned in each batch.
      */
     public $batchSize = 100;
     /**
+     * 是否每次只返回一行数据
+     * 如果是false，将在每次迭代中返回一组数据（batchSize行）
      * @var bool whether to return a single row during each iteration.
      * If false, a whole batch of rows will be returned in each iteration.
      */
     public $each = false;
 
     /**
+     * 与此批处理查询相关的数据读取器
      * @var DataReader the data reader associated with this batch query.
      */
     private $_dataReader;
     /**
+     * 在当前批处理中检索的数据
      * @var array the data retrieved in the current batch
      */
     private $_batch;
     /**
+     * 当前迭代的值
      * @var mixed the value for the current iteration
      */
     private $_value;
     /**
+     * 为当前迭代的键
      * @var string|int the key for the current iteration
      */
     private $_key;
@@ -73,11 +85,14 @@ class BatchQueryResult extends BaseObject implements \Iterator
      */
     public function __destruct()
     {
+        // 确保游标指针是关闭的
         // make sure cursor is closed
         $this->reset();
     }
 
     /**
+     * 重置批量查询
+     * 该方法将清理现有的批处理查询，以便执行新的批处理查询
      * Resets the batch query.
      * This method will clean up the existing batch query so that a new batch query can be performed.
      */
@@ -93,6 +108,7 @@ class BatchQueryResult extends BaseObject implements \Iterator
     }
 
     /**
+     * 将迭代器重新设置为初始状态
      * Resets the iterator to the initial state.
      * This method is required by the interface [[\Iterator]].
      */
@@ -103,6 +119,7 @@ class BatchQueryResult extends BaseObject implements \Iterator
     }
 
     /**
+     * 将内部指针移动到下一个数据集
      * Moves the internal pointer to the next dataset.
      * This method is required by the interface [[\Iterator]].
      */
@@ -129,6 +146,7 @@ class BatchQueryResult extends BaseObject implements \Iterator
     }
 
     /**
+     * 获取下一批数据
      * Fetches the next batch of data.
      * @return array the data fetched
      */

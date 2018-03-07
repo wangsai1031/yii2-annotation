@@ -8,6 +8,7 @@
 namespace yii\db;
 
 /**
+ * Exception表示由一些与 数据库 相关的操作引起的异常。
  * Exception represents an exception that is caused by some DB-related operations.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
@@ -16,6 +17,8 @@ namespace yii\db;
 class Exception extends \yii\base\Exception
 {
     /**
+     * PDO异常提供的错误信息。
+     * 这与 [PDO::errorInfo](http://www.php.net/manual/en/pdo.errorinfo.php) 返回的信息时一样的
      * @var array the error info provided by a PDO exception. This is the same as returned
      * by [PDO::errorInfo](http://www.php.net/manual/en/pdo.errorinfo.php).
      */

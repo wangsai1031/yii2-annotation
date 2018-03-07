@@ -16,6 +16,7 @@ namespace yii\web;
 interface AssetConverterInterface
 {
     /**
+     * 将一个给定的资产文件转换为一个CSS或JS文件。
      * Converts a given asset file into a CSS or JS file.
      * @param string $asset the asset file path, relative to $basePath
      * @param string $basePath the directory the $asset is relative to.

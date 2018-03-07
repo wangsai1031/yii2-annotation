@@ -67,7 +67,7 @@ class Module extends ServiceLocator
     const EVENT_BEFORE_ACTION = 'beforeAction';
     /**
      * @event ActionEvent an event raised after executing a controller action.
-     * 执行完控制器动作以后触发的事件动作。
+     * 事件 执行完控制器动作以后触发的事件动作。
      */
     const EVENT_AFTER_ACTION = 'afterAction';
 
@@ -713,6 +713,7 @@ class Module extends ServiceLocator
      */
     public function runAction($route, $params = [])
     {
+        //根据路由创建控制器
         $parts = $this->createController($route);
         if (is_array($parts)) {
             /* @var $controller Controller */

@@ -82,6 +82,7 @@ use Yii;
  * files. This property is read-only.
  * 属性 $view 用来渲染很多页面文件的视图应用组件，该属性只读
  *
+ *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
@@ -609,7 +610,6 @@ abstract class Application extends Module
 
         return $this->_runtimePath;
     }
-
 
     /**
      * Sets the directory that stores runtime files.

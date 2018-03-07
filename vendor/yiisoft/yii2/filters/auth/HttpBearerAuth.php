@@ -8,6 +8,9 @@
 namespace yii\filters\auth;
 
 /**
+ * HttpBearerAuth 是一个操作过滤器，它支持基于HTTP Bearer Token 的身份验证方法
+ * 关于HTTP Bearer Token @see http://www.haomou.net/2014/08/13/2014_bare_token/
+ *
  * HttpBearerAuth is an action filter that supports the authentication method based on HTTP Bearer token.
  *
  * You may use HttpBearerAuth by attaching it as a behavior to a controller or module, like the following:

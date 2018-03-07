@@ -198,6 +198,7 @@ class DynamicModel extends Model
 
         return $this;
     }
+
     /**
      * Validates the given data with the specified validation rules.
      * 使用指定的验证规则验证给定的数据
@@ -221,6 +222,7 @@ class DynamicModel extends Model
     public static function validateData(array $data, $rules = [])
     {
         /* @var $model DynamicModel */
+        /* @var $model 动态模型 */
         $model = new static($data);
         if (!empty($rules)) {
             $validators = $model->getValidators();

@@ -14,6 +14,8 @@ use yii\web\JsExpression;
 use yii\web\View;
 
 /**
+ * 生成 规定格式的文本输入
+ *
  * MaskedInput generates a masked text input.
  *
  * MaskedInput is similar to [[Html::textInput()]] except that an input mask will be used to force users to enter
@@ -47,6 +49,8 @@ use yii\web\View;
 class MaskedInput extends InputWidget
 {
     /**
+     * 用于这个小部件的jQuery插件的名称
+     *
      * The name of the jQuery plugin to use for this widget.
      */
     const PLUGIN_NAME = 'inputmask';

@@ -8,6 +8,9 @@
 namespace yii\web;
 
 /**
+ * 415 "Unsupported Media Type"
+ * 当客户端以您的应用程序不理解的格式发送数据时，请使用这个异常。
+ * 例如，如果客户端将XML数据发布到只接受JSON的操作或控制器，就会抛出这个异常。
  * UnsupportedMediaTypeHttpException represents an "Unsupported Media Type" HTTP exception with status code 415.
  *
  * Use this exception when the client sends data in a format that your

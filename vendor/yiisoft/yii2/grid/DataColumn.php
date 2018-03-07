@@ -17,15 +17,23 @@ use yii\helpers\Html;
 use yii\helpers\Inflector;
 
 /**
+ * Data column 用于显示和排序数据。这是默认的列的类型， 所以在使用 DataColumn 为列类时，可省略列类的指定（不需要'class'选项）。
  * DataColumn is the default column type for the [[GridView]] widget.
  *
+ * 它用于显示数据列，并允许启用排序和过滤筛选
  * It is used to show data columns and allows [[enableSorting|sorting]] and [[filter|filtering]] them.
  *
+ * 一个简单的数据列定义指的是GridView数据提供者的数据模型中的一个属性。
+ * 属性的名称是由[[attribute]]指定的。
  * A simple data column definition refers to an attribute in the data model of the
  * GridView's data provider. The name of the attribute is specified by [[attribute]].
  *
+ * 通过设置[[value]]和[[label]]，可以对标题和单元内容进行定制。
  * By setting [[value]] and [[label]], the header and cell content can be customized.
  *
+ * 一个数据列区别在于[[getDataCellValue|data cell value]]和[[renderDataCellContent|data cell content]]。
+ * 单元格值是一种可以用于计算的未格式化的值，
+ * 而实际的单元内容是一种[[format|formatted]]的格式，它可能包含HTML标记。
  * A data column differentiates between the [[getDataCellValue|data cell value]] and the
  * [[renderDataCellContent|data cell content]]. The cell value is an un-formatted value that
  * may be used for calculation, while the actual cell content is a [[format|formatted]] version of that
@@ -75,6 +83,27 @@ class DataColumn extends Column
      */
     public $value;
     /**
+     * 数据列的主要配置项是 format 属性。
+     * 它的值对应于 formatter application component 应用组件里面的一些方法， 默认是使用 Formatter 应用组件。
+     *  [
+            'attribute' => 'name',
+            'format' => 'text'
+        ],
+        [
+            'attribute' => 'birthday',
+            'format' => ['date', 'php:Y-m-d']
+        ],
+     * 在上面的代码中，text 对应于 yii\i18n\Formatter::asText()。列的值作为第一个参数传递。
+     * 在第二列的定义中，date 对应于 yii\i18n\Formatter::asDate()。
+     * 同样地，列值也是通过第一个参数传递的，而 'php:Y-m-d' 用作第二个参数的值。
+     *
+     * 在任何格式中，每个数据模型的值应该显示为(例如:`"raw"`, `"text"`, `"html"`,`['date', 'php:Y-m-d']`)。
+     * 支持的格式由[[GridView::formatter|formatter]]决定，由GridView使用。
+     * 默认格式是“text”，当[[\yii\i18n\Formatter]]被用作[[GridView::$formatter|formatter]]时，它将以html编码的纯文本格式格式化该值。
+     *
+     * 数据列配置，还有一个”快捷格式化串”的方法：
+     * 举例说明， "name:text:Name" 快捷格式化串，表示列名为 name 格式为 text 显示标签是 Name
+     *
      * @var string|array|Closure in which format should the value of each data model be displayed as (e.g. `"raw"`, `"text"`, `"html"`,
      * `['date', 'php:Y-m-d']`). Supported formats are determined by the [[GridView::formatter|formatter]] used by
      * the [[GridView]]. Default format is "text" which will format the value as an HTML-encoded plain text when

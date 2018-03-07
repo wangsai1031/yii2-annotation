@@ -15,6 +15,7 @@ use yii\helpers\Url;
 use yii\widgets\InputWidget;
 
 /**
+ * Captcha呈现一个Captcha图像和一个输入域，该字段接受用户输入的验证码。
  * Captcha renders a CAPTCHA image and an input field that takes user-entered verification code.
  *
  * Captcha is used together with [[CaptchaAction]] to provide [CAPTCHA](http://en.wikipedia.org/wiki/Captcha) - a way

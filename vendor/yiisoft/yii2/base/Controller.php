@@ -314,7 +314,7 @@ class Controller extends Component implements ViewContextInterface
             // 若 外部 action 中存在指定id，则直接返回该外部action对象
             return Yii::createObject($actionMap[$id], [$id, $this]);
 
-            // 匹配 $id 是否只包含 小写字母，数字，'-', '_'，并且中间没有两个连续的'--',且两侧都没有 '-'。
+        // 匹配 $id 是否只包含 小写字母，数字，'-', '_'，并且中间没有两个连续的'--',且两侧都没有 '-'。
         } elseif (preg_match('/^[a-z0-9\\-_]+$/', $id) && strpos($id, '--') === false && trim($id, '-') === $id) {
             /*
              * 格式化 action 方法名：
@@ -423,7 +423,6 @@ class Controller extends Component implements ViewContextInterface
         $this->trigger(self::EVENT_AFTER_ACTION, $event);
         return $event->result;
     }
-
 
     /**
      * Returns all ancestor modules of this controller.

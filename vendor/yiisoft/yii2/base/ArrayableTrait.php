@@ -117,8 +117,6 @@ trait ArrayableTrait
     }
 
     /**
-     * todo 修改
-     *
      * Converts the model into an array.
      * 把model转化成数组
      *
