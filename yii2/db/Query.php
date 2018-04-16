@@ -796,6 +796,9 @@ PATTERN;
              */
             $columns = preg_split('/\s*,\s*/', trim($columns), -1, PREG_SPLIT_NO_EMPTY);
         }
+        // this sequantial assignment is needed in order to make sure select is being reset
+        // before using getUniqueColumns() that checks it
+        $this->select = [];
         $this->select = $this->getUniqueColumns($columns);
         $this->selectOption = $option;
         return $this;
@@ -850,22 +853,28 @@ PATTERN;
      */
     protected function getUniqueColumns($columns)
     {
-        $columns = array_unique($columns);
         $unaliasedColumns = $this->getUnaliasedColumnsFromSelect();
 
+        $result = [];
         foreach ($columns as $columnAlias => $columnDefinition) {
-            if ($columnDefinition instanceof Query) {
-                continue;
+            if (!$columnDefinition instanceof Query) {
+                if (is_string($columnAlias)) {
+                    $existsInSelect = isset($this->select[$columnAlias]) && $this->select[$columnAlias] === $columnDefinition;
+                    if ($existsInSelect) {
+                        continue;
+                    }
+                } elseif (is_int($columnAlias)) {
+                    $existsInSelect = in_array($columnDefinition, $unaliasedColumns, true);
+                    $existsInResultSet = in_array($columnDefinition, $result, true);
+                    if ($existsInSelect || $existsInResultSet) {
+                        continue;
+                    }
+                }
             }
 
-            if (
-                (is_string($columnAlias) && isset($this->select[$columnAlias]) && $this->select[$columnAlias] === $columnDefinition)
-                || (is_integer($columnAlias) && in_array($columnDefinition, $unaliasedColumns))
-            ) {
-                unset($columns[$columnAlias]);
-            }
+            $result[$columnAlias] = $columnDefinition;
         }
-        return $columns;
+        return $result;
     }
 
     /**
@@ -877,7 +886,7 @@ PATTERN;
         $result = [];
         if (is_array($this->select)) {
             foreach ($this->select as $name => $value) {
-                if (is_integer($name)) {
+                if (is_int($name)) {
                     $result[] = $value;
                 }
             }

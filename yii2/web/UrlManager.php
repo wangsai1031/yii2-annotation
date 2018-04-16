@@ -614,7 +614,7 @@ class UrlManager extends Component
 
                     // 直接将 $baseUrl 和 锚点信息拼接到 $url 后面
                     return $url . $baseUrl . $anchor;
-                } elseif (strpos($url, '//') === 0) {
+                } elseif (strncmp($url, '//', 2) === 0) {
                     if ($baseUrl !== '' && ($pos = strpos($url, '/', 2)) !== false) {
                         return substr($url, 0, $pos) . $baseUrl . substr($url, $pos) . $anchor;
                     }
@@ -749,7 +749,7 @@ class UrlManager extends Component
         if (strpos($url, '://') === false) {
             // 获取主机地址（包含协议信息），拼接到$url前
             $hostInfo = $this->getHostInfo();
-            if (strpos($url, '//') === 0) {
+            if (strncmp($url, '//', 2) === 0) {
                 $url = substr($hostInfo, 0, strpos($hostInfo, '://')) . ':' . $url;
             } else {
                 $url = $hostInfo . $url;

@@ -316,7 +316,7 @@ class UrlRule extends BaseObject implements UrlRuleInterface
                 // '://' 后再无其他 '/'，那么整个 pattern 其实就是主机信息
                 $this->host = $this->pattern;
             }
-        } elseif (strpos($this->pattern, '//') === 0) {
+        } elseif (strncmp($this->pattern, '//', 2) === 0) {
             if (($pos2 = strpos($this->pattern, '/', 2)) !== false) {
                 $this->host = substr($this->pattern, 0, $pos2);
             } else {
@@ -472,7 +472,7 @@ class UrlRule extends BaseObject implements UrlRuleInterface
         $this->pattern = '#^' . trim(strtr($this->_template, $tr), '/') . '$#u';
 
         // if host starts with relative scheme, then insert pattern to match any
-        if (strpos($this->host, '//') === 0) {
+        if (strncmp($this->host, '//', 2) === 0) {
             $this->pattern = substr_replace($this->pattern, '[\w]+://', 2, 0);
         }
 
@@ -792,7 +792,7 @@ class UrlRule extends BaseObject implements UrlRuleInterface
         // 删除 pattern 两端的 "/"，特别是重复的 "/"，
         // 在写 pattern 时，虽然有正则的成分，但不需要在两端加上 "/"，
         // 更不能加上 "#" 等其他分隔符
-        if (strpos($string, '//') === 0) {
+        if (strncmp($string, '//', 2) === 0) {
             return '//' . trim($string, '/');
         }
 

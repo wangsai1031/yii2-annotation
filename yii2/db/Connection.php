@@ -163,8 +163,8 @@ use yii\caching\CacheInterface;
  * 当前活跃的从数据库连接实例。如果没有可用的从数据库，并且`$fallbackToMaster`值为false时，返回Null。这个属性是只读的。
  * @property PDO $slavePdo The PDO instance for the currently active slave connection. `null` is returned if
  * no slave connection is available and `$fallbackToMaster` is false. This property is read-only.
- * @property Transaction $transaction The currently active transaction. Null if no active transaction. This
- * property is read-only.
+ * @property Transaction|null $transaction The currently active transaction. Null if no active transaction.
+ * This property is read-only.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
@@ -177,30 +177,30 @@ class Connection extends Component
      * 有时你可能想要在建立起数据库连接时立即执行一些语句来初始化一些环境变量 (比如设置时区或者字符集),
      * 你可以通过为数据库连接的 afterOpen 事件注册一个事件处理器来达到目的。
      * 你可以像这样直接在应用配置中注册处理器：
-
-        'db' => [
-            // ...
-            'on afterOpen' => function($event) {
-                // $event->sender refers to the DB connection
-                $event->sender->createCommand("SET time_zone = 'UTC'")->execute();
-            }
-        ],
-     * @event Event an event that is triggered after a DB connection is established
+     *
+     *  'db' => [
+     *      'on afterOpen' => function($event) {
+     *          // $event->sender refers to the DB connection
+     *          $event->sender->createCommand("SET time_zone = 'UTC'")->execute();
+     *      }
+     *  ],
+     *
+     * @event [[yii\base\Event|Event]] an event that is triggered after a DB connection is established
      */
     const EVENT_AFTER_OPEN = 'afterOpen';
     /**
      * 在顶级事务开始之前触发的事件
-     * @event Event an event that is triggered right before a top-level transaction is started
+     * @event [[yii\base\Event|Event]] an event that is triggered right before a top-level transaction is started
      */
     const EVENT_BEGIN_TRANSACTION = 'beginTransaction';
     /**
      * 在顶级事务提交之后触发的事件
-     * @event Event an event that is triggered right after a top-level transaction is committed
+     * @event [[yii\base\Event|Event]] an event that is triggered right after a top-level transaction is committed
      */
     const EVENT_COMMIT_TRANSACTION = 'commitTransaction';
     /**
      * 在顶级事务回滚之后触发的事件
-     * @event Event an event that is triggered right after a top-level transaction is rolled back
+     * @event [[yii\base\Event|Event]] an event that is triggered right after a top-level transaction is rolled back
      */
     const EVENT_ROLLBACK_TRANSACTION = 'rollbackTransaction';
 
@@ -432,9 +432,10 @@ class Connection extends Component
     /**
      * 缓存对象或缓存应用程序组件的ID，用于存储在主数据库[[masters]]和从数据库[[slaves]]中指定的DB服务器的健康状态。
      * 只有当启用 读/写分离 或者 [[masters]] 不是空的时候才使用它。
-     * @var CacheInterface|string the cache object or the ID of the cache application component that is used to store
+     * @var CacheInterface|string|false the cache object or the ID of the cache application component that is used to store
      * the health status of the DB servers specified in [[masters]] and [[slaves]].
      * This is used only when read/write splitting is enabled or [[masters]] is not empty.
+     * Set boolean `false` to disabled server status caching.
      */
     public $serverStatusCache = 'cache';
     /**
@@ -868,7 +869,7 @@ class Connection extends Component
      * 已经缓存有事务对象，且事务对象有效，则返回该事务对象,否则返回null
      *
      * Returns the currently active transaction.
-     * @return Transaction the currently active transaction. Null if no active transaction.
+     * @return Transaction|null the currently active transaction. Null if no active transaction.
      */
     public function getTransaction()
     {
@@ -1215,7 +1216,7 @@ class Connection extends Component
     public function getMaster()
     {
         if ($this->_master === false) {
-            $this->_master = ($this->shuffleMasters)
+            $this->_master = $this->shuffleMasters
                 ? $this->openFromPool($this->masters, $this->masterConfig)
                 : $this->openFromPoolSequentially($this->masters, $this->masterConfig);
         }

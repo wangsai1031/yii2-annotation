@@ -76,8 +76,9 @@ trait DynamicContentAwareTrait
             $content = strtr($content, $placeholders);
         }
         if ($isRestoredFromCache) {
+            $view = $this->getView();
             foreach ($placeholders as $name => $statements) {
-                $this->getView()->addDynamicPlaceholder($name, $statements);
+                $view->addDynamicPlaceholder($name, $statements);
             }
         }
 

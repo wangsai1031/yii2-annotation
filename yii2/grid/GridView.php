@@ -399,6 +399,7 @@ class GridView extends BaseListView
 
     /**
      * Renders the data models for the grid view.
+     * @return string the HTML code of table
      */
     public function renderItems()
     {

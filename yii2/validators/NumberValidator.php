@@ -148,7 +148,7 @@ class NumberValidator extends Validator
         // 若值是数组或者是对象且没有 '__toString' 方法
         return is_array($value)
         || (is_object($value) && !method_exists($value, '__toString'))
-        || (!is_object($value) && !is_scalar($value) && !is_null($value));
+        || (!is_object($value) && !is_scalar($value) && $value !== null);
     }
 
     /**

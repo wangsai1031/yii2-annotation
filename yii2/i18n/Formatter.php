@@ -1064,7 +1064,7 @@ class Formatter extends Component
             $zeroDateTime = (new DateTime())->setTimestamp(0);
             $valueDateTime = (new DateTime())->setTimestamp(abs($value));
             $interval = $valueDateTime->diff($zeroDateTime);
-        } elseif (strpos($value, 'P-') === 0) {
+        } elseif (strncmp($value, 'P-', 2) === 0) {
             $interval = new DateInterval('P' . substr($value, 2));
             $isNegative = true;
         } else {
@@ -1693,7 +1693,7 @@ class Formatter extends Component
                 if (abs($value) < $formatBase) {
                     break;
                 }
-                $value = $value / $formatBase;
+                $value /= $formatBase;
             }
             $position++;
         } while ($position < $maxPosition + 1);

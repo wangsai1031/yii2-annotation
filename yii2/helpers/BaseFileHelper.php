@@ -406,7 +406,7 @@ class BaseFileHelper
             return;
         }
         // 判断 是否遍历删除文件夹中通过软链接连接到的目录，is_link() 判断是否是软链接。
-        if (isset($options['traverseSymlinks']) && $options['traverseSymlinks'] || !is_link($dir)) {
+        if (!empty($options['traverseSymlinks']) || !is_link($dir)) {
             // opendir() 打开目录句柄。成功则返回目录句柄资源。失败则返回 FALSE。
             if (!($handle = opendir($dir))) {
                 return;

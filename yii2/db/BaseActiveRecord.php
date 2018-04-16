@@ -166,8 +166,9 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
             // 通过主键查询
             $primaryKey = static::primaryKey();
             if (isset($primaryKey[0])) {
+                // if condition is scalar, search for a single primary key, if it is array, search for multiple primary key values
                 // 存在主键，规范化 $condition
-                $condition = [$primaryKey[0] => $condition];
+                $condition = [$primaryKey[0] => is_array($condition) ? array_values($condition) : $condition];
             } else {
                 throw new InvalidConfigException('"' . get_called_class() . '" must have a primary key.');
             }
@@ -1962,7 +1963,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      */
     private function setRelationDependencies($name, $relation)
     {
-        if (empty($relation->via)) {
+        if (empty($relation->via) && $relation->link) {
             foreach ($relation->link as $attribute) {
                 $this->_relationsDependencies[$attribute][$name] = $name;
             }
